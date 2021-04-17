@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-/src/**/application-datasource.properties
-/src/**/application-oauth2.properties
+/src/**/application-datasource.*
+/src/**/application-oauth2.*
