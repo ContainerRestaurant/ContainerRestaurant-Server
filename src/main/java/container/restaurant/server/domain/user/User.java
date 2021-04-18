@@ -54,4 +54,8 @@ public class User {
         this.role = Role.USER;
         this.banned = false;
     }
+
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
 }

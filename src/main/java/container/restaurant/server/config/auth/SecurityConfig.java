@@ -1,11 +1,15 @@
 package container.restaurant.server.config.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -21,7 +25,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout(l -> l
                         .logoutSuccessUrl("/")
                 )
-                .formLogin().disable()
-                .oauth2Login();
+                .oauth2Login(o -> o
+                        .userInfoEndpoint().userService(customOAuth2UserService)
+                );
     }
 }
