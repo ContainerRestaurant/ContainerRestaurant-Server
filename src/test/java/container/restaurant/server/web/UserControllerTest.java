@@ -51,7 +51,7 @@ class UserControllerTest {
                 .email("me@test.com")
                 .profile("https://my.profile.path")
                 .build());
-        session.setAttribute("user", new SessionUser(myself));
+        session.setAttribute("user", SessionUser.from(myself));
         other = userRepository.save(User.builder()
                 .email("you@test.com")
                 .profile("https://your.profile.path")

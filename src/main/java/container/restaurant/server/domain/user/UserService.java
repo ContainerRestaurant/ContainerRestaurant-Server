@@ -6,11 +6,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import java.util.function.Supplier;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+
+    @Transactional
+    public User createOrUpdateByEmail(
+            @Email String email,
+            Supplier<@Valid ? extends User> supplier
+    ) {
+        User user = userRepository.findByEmail(email)
+                .orElse(supplier.get());
+        return userRepository.save(user);
+    }
 
     @Transactional(readOnly = true)
     public UserInfoDto findById(Long id) throws ResourceNotFoundException {

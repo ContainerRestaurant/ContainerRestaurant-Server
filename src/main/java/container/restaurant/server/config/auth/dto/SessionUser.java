@@ -1,14 +1,26 @@
 package container.restaurant.server.config.auth.dto;
 
 import container.restaurant.server.domain.user.User;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
+
+@Getter
+@NoArgsConstructor
 public class SessionUser {
 
-    private final String email;
-    private final String profile;
+    private Long id;
+    private String email;
+    private String profile;
 
-    public SessionUser(User user) {
+    protected SessionUser(User user) {
+        this.id = user.getId();
         this.email = user.getEmail();
         this.profile = user.getProfile();
+    }
+
+    public static SessionUser from(@Valid User user) {
+        return new SessionUser(user);
     }
 }

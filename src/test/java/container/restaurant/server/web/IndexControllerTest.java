@@ -48,7 +48,10 @@ class IndexControllerTest {
     @DisplayName("로그인 index 링크 테스트")
     void testAuthIndexLinks() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new SessionUser(new User()));
+        session.setAttribute("user", SessionUser.from(User.builder()
+                .email("index@test.com")
+                .profile("http://my.profile.path")
+                .build()));
         String testPath = "/";
 
         mvc.perform(

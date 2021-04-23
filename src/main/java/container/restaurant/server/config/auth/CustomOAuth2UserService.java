@@ -3,7 +3,7 @@ package container.restaurant.server.config.auth;
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
+import container.restaurant.server.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -23,7 +23,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final HttpSession httpSession;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -36,9 +36,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.of(
                 registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        User user = saveOrUpdate(attributes);
+        User user = userService.createOrUpdateByEmail(
+                attributes.getEmail(), attributes::toEntity);
 
-        httpSession.setAttribute("user", new SessionUser(user));
+        httpSession.setAttribute("user", SessionUser.from(user));
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
@@ -49,12 +50,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private OAuth2User getUserFromRequest(OAuth2UserRequest userRequest) {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         return delegate.loadUser(userRequest);
-    }
-
-    private User saveOrUpdate(OAuthAttributes attributes) {
-        User user = userRepository.findByEmail(attributes.getEmail())
-                .orElse(attributes.toEntity());
-        return userRepository.save(user);
     }
 
 }
