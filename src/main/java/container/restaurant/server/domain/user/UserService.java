@@ -2,6 +2,7 @@ package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.user.UserInfoDto;
+import container.restaurant.server.web.dto.user.UserUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +33,14 @@ public class UserService {
                 .map(UserInfoDto::from)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + id + ")"));
+    }
+
+    @Transactional
+    public UserInfoDto update(Long id, UserUpdateDto updateDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + id + ")"));
+        updateDto.updateUser(user);
+        return UserInfoDto.from(user);
     }
 }
