@@ -1,5 +1,6 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.User;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +48,7 @@ class IndexControllerTest {
     @DisplayName("로그인 index 링크 테스트")
     void testAuthIndexLinks() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new User());
+        session.setAttribute("user", new SessionUser(new User()));
         String testPath = "/";
 
         mvc.perform(
