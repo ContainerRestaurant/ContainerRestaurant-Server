@@ -13,9 +13,7 @@ class UserTest {
     void testBuilder() {
         //given
         String email = "test@test.com";
-        String nickname = "nick";
         String profile = "profilePath";
-        String greeting = "Hello! Container!";
 
         //when
         User user = User.builder()
@@ -25,7 +23,7 @@ class UserTest {
 
         //then
         assertThat(user.getEmail()).isEqualTo(email);
-        assertThat(user.getNickname()).isEmpty();
+        assertThat(user.getNickname()).isNull();
         assertThat(user.getProfile()).isEqualTo(profile);
         assertThat(user.getGreeting()).isNull();
         assertThat(user.getLevel()).isEqualTo(1);
