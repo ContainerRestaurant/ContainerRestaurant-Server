@@ -82,7 +82,31 @@ class UserControllerTest {
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.patch-user.href").exists())
+                .andExpect(jsonPath("_links.delete-user.href").exists())
+                .andExpect(jsonPath("_links.check-nickname-exists.href").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("사용자 정보 조회 - 타 사용자")
+    void testGetUserOther() throws Exception {
+        mvc.perform(
+                get("/api/user/{id}", other.getId())
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("email").value(other.getEmail()))
+                .andExpect(jsonPath("nickname").value(other.getNickname()))
+                .andExpect(jsonPath("profile").value(other.getProfile()))
+                .andExpect(jsonPath("level").value(other.getLevel()))
+                .andExpect(jsonPath("feedCount").value(other.getFeedCount()))
+                .andExpect(jsonPath("scrapCount").value(other.getScrapCount()))
+                .andExpect(jsonPath("bookmarkedCount").value(other.getBookmarkedCount()))
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.patch-user.href").doesNotExist())
+                .andExpect(jsonPath("_links.delete-user.href").doesNotExist())
+                .andExpect(jsonPath("_links.check-nickname-exists.href").doesNotExist());
     }
 
     @Test
@@ -125,7 +149,10 @@ class UserControllerTest {
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.patch-user.href").exists())
+                .andExpect(jsonPath("_links.delete-user.href").exists())
+                .andExpect(jsonPath("_links.check-nickname-exists.href").exists());
     }
 
     @Test

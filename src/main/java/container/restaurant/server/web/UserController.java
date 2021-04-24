@@ -10,9 +10,13 @@ import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -26,11 +30,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(
+            @PathVariable Long id, @LoginUser SessionUser sessionUser
+    ) {
         UserInfoDto dto = userService.findById(id);
-        return ResponseEntity.ok().body(
-                EntityModel.of(dto)
-                        .add(linkTo(UserController.class).slash(id).withSelfRel()));
+        List<Link> links = userInfoLinks(id, sessionUser);
+
+        return ResponseEntity.ok(
+                EntityModel.of(dto).add(links));
     }
 
     @PatchMapping("{id}")
@@ -40,9 +47,12 @@ public class UserController {
     ) {
         if (!id.equals(sessionUser.getId()))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
-        return ResponseEntity.ok().body(
-                EntityModel.of(userService.update(id, updateDto))
-                        .add(linkTo(UserController.class).slash(id).withSelfRel()));
+
+        UserInfoDto dto = userService.update(id, updateDto);
+        List<Link> links = userInfoLinks(id, sessionUser);
+
+        return ResponseEntity.ok(
+                EntityModel.of(dto).add(links));
     }
 
     @DeleteMapping("{id}")
@@ -63,7 +73,25 @@ public class UserController {
     ) {
         return ResponseEntity.ok().body(
                 EntityModel.of(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
-                        .add(linkTo(methodOn(UserController.class).existsNickname(nickname)).withSelfRel()));
+                        .add(linkTo(getController().existsNickname(nickname)).withSelfRel()));
+    }
+
+    private UserController getController() {
+        return methodOn(UserController.class);
+    }
+
+    private List<Link> userInfoLinks(Long id, SessionUser sessionUser) {
+        List<Link> links = new ArrayList<>();
+        links.add(linkTo(getController().getUserById(id, sessionUser)).withSelfRel());
+        if (id.equals(sessionUser.getId())) {
+            links.add(linkTo(getController().updateUserById(id, sessionUser, new UserUpdateDto()))
+                    .withRel("patch-user"));
+            links.add(linkTo(getController().deleteById(id, sessionUser))
+                    .withRel("delete-user"));
+            links.add(linkTo(getController().existsNickname(null))
+                    .withRel("check-nickname-exists"));
+        }
+        return links;
     }
 
 }
