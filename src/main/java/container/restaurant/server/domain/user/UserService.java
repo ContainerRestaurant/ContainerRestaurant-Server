@@ -48,4 +48,9 @@ public class UserService {
     public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public Boolean existsUserByNickname(String nickname) {
+        return userRepository.existsUserByNickname(nickname);
+    }
 }

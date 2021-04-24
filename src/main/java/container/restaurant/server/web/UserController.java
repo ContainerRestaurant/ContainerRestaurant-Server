@@ -3,7 +3,9 @@ package container.restaurant.server.web;
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.web.dto.user.NicknameExistsDto;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RequiredArgsConstructor
 @RestController
@@ -52,6 +55,15 @@ public class UserController {
         userService.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("nickname/exists")
+    public ResponseEntity<?> existsNickname(
+            @NicknameConstraint @RequestParam String nickname
+    ) {
+        return ResponseEntity.ok().body(
+                EntityModel.of(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
+                        .add(linkTo(methodOn(UserController.class).existsNickname(nickname)).withSelfRel()));
     }
 
 }

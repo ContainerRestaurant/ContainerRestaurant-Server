@@ -104,4 +104,21 @@ class UserRepositoryTest {
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
+    @Test
+    @DisplayName("닉네인 중복 확인 테스트")
+    void testExistsNickname() {
+        //given
+        String nickname = "추가된닉네임";
+        User user1 = User.builder()
+                .email("test@test")
+                .build();
+        user1.setNickname(nickname);
+        assertThat(userRepository.existsUserByNickname(nickname)).isFalse();
+
+        //when
+        user1 = userRepository.save(user1);
+
+        assertThat(userRepository.existsUserByNickname(nickname)).isTrue();
+    }
+
 }

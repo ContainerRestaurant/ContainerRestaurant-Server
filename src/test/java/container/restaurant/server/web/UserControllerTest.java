@@ -212,15 +212,45 @@ class UserControllerTest {
     @Test
     @DisplayName("닉네임 중복 됨")
     void testNicknameExists() throws Exception {
-        // TODO
-        assert false;
+        myself.setNickname("테스트닉네임");
+        myself = userRepository.save(myself);
+
+        mvc.perform(
+                get("/api/user/nickname/exists")
+                        .param("nickname",  myself.getNickname()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("nickname").value(myself.getNickname()))
+                .andExpect(jsonPath("exists").value(true))
+                .andExpect(jsonPath("_links.self.href").exists());
     }
 
     @Test
     @DisplayName("닉네임 중복 안됨")
     void testNicknameNonExists() throws Exception {
-        // TODO
-        assert false;
+        String nickname = "테스트닉네임";
+
+        mvc.perform(
+                get("/api/user/nickname/exists")
+                        .param("nickname", nickname))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("nickname").value(nickname))
+                .andExpect(jsonPath("exists").value(false))
+                .andExpect(jsonPath("_links.self.href").exists());
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 검사시 유효성 검사 실패")
+    void testInvalidNicknameExists() throws Exception {
+        mvc.perform(
+                get("/api/user/nickname/exists")
+                        .param("nickname", "this는nikname이라능!"))
+                .andExpect(status().isBadRequest())
+                .andExpect(
+                        jsonPath("errorType")
+                                .value(ConstraintViolationException.class.getSimpleName()))
+                .andExpect(jsonPath("messages[0]")
+                        .value("닉네임은 한글/영문/숫자/공백만 입력 가능하며, " +
+                                        "1~10자의 한글이나 2~20자의 영문/숫자/공백만 입력 가능합니다."));
     }
 
 }

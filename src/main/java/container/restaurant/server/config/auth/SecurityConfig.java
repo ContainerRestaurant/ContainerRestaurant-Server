@@ -11,6 +11,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
+    private final static String[] PERMITTED_ALL_PATH = {
+            "/",
+            "/auth/list",
+            "/api/user/nickname/**/exists"
+    };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -19,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .frameOptions().disable()
                 )
                 .authorizeRequests(a -> a
-                        .antMatchers("/", "/auth/list").permitAll()
+                        .antMatchers(PERMITTED_ALL_PATH).permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout(l -> l
