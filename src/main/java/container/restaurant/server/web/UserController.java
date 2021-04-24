@@ -42,4 +42,16 @@ public class UserController {
                         .add(linkTo(UserController.class).slash(id).withSelfRel()));
     }
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteById(
+            @PathVariable Long id, @LoginUser SessionUser sessionUser
+    ) {
+        if (!id.equals(sessionUser.getId()))
+            throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
+
+        userService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -43,4 +43,9 @@ public class UserService {
         updateDto.updateUser(user);
         return UserInfoDto.from(user);
     }
+
+    @Transactional
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
 }

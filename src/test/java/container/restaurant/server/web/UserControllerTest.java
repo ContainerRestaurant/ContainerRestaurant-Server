@@ -181,17 +181,32 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 탈퇴")
     void testDeleteUser() throws Exception {
-        // TODO
-        assert false;
+        mvc.perform(
+                delete("/api/user/{id}", myself.getId())
+                        .session(session))
+                .andExpect(status().isNoContent());
+
+        assertThat(userRepository.existsById(myself.getId())).isFalse();
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 탈퇴 실패 (403)")
     void testFailToDeleteUser() throws Exception {
-        // TODO
-        assert false;
+        mvc.perform(
+                delete("/api/user/{id}", other.getId())
+                        .session(session))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("errorType")
+                        .value(FailedAuthorizationException.class.getSimpleName()))
+                .andExpect(
+                        jsonPath("messages[0]")
+                                .value("해당 사용자의 정보를 수정할 수 없습니다.(id:" + other.getId() + ")"));
+
+        assertThat(userRepository.existsById(other.getId())).isTrue();
     }
 
     @Test
