@@ -2,6 +2,7 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.User;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -35,11 +37,11 @@ class IndexControllerTest {
         mvc.perform(get(testPath))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").value(Matchers.containsString(testPath)))
-                .andExpect(jsonPath("_links.auth.href").exists())
+                .andExpect(jsonPath("_links.auth-list.href").exists())
                 .andDo(document("index-guest",
                 links(
                         linkWithRel("self").description("본 응답의 링크"),
-                        linkWithRel("auth").description("인증을 위한 링크 리스트")
+                        linkWithRel("auth-list").description("인증을 위한 링크 리스트")
                 )
         ));
     }
@@ -59,10 +61,12 @@ class IndexControllerTest {
                         .session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").value(Matchers.containsString(testPath)))
+                .andExpect(jsonPath("_links.my-info").exists())
                 .andExpect(jsonPath("_links.logout.href").exists())
                 .andDo(document("index-user",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("my-info").description("현 사용자의 상세 정보 링크"),
                                 linkWithRel("logout").description("현재 로그인을 로그아웃 하기 위한 링크")
                         )
                 ));
