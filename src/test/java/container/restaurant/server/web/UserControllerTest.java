@@ -24,6 +24,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.validation.ConstraintViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,10 +57,13 @@ class UserControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        myself = userRepository.save(User.builder()
+        myself = User.builder()
                 .email("me@test.com")
                 .profile("https://my.profile.path")
-                .build());
+                .build();
+        myself.setNickname("테스트닉네임");
+        myself = userRepository.save(myself);
+
         session.setAttribute("user", SessionUser.from(myself));
         other = userRepository.save(User.builder()
                 .email("you@test.com")
@@ -85,7 +95,27 @@ class UserControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.patch-user.href").exists())
                 .andExpect(jsonPath("_links.delete-user.href").exists())
-                .andExpect(jsonPath("_links.check-nickname-exists.href").exists());
+                .andExpect(jsonPath("_links.check-nickname-exists.href").exists())
+                .andDo(document("get-user",
+                        preprocessResponse(prettyPrint()),
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("patch-user").description("본 사용자의 정보 업데이트 링크," +
+                                        "닉네임과 프로필만 수정 가능하다."),
+                                linkWithRel("delete-user").description("본 사용자의 계정 탈퇴 링크"),
+                                linkWithRel("check-nickname-exists").description("닉네임 중복 확인 링크, " +
+                                        "템플릿으로 제공되어, {nickname}을 지정해야 사용이 가능하다.")
+                        ),
+                        responseFields(
+                                fieldWithPath("email").description("본 사용자의 이메일 주소"),
+                                fieldWithPath("nickname").description("본 사용자의 닉네임"),
+                                fieldWithPath("profile").description("본 사용자의 프로필 경로"),
+                                fieldWithPath("level").description("본 사용자의 레벨"),
+                                fieldWithPath("feedCount").description("본 사용자의 피드 개수"),
+                                fieldWithPath("scrapCount").description("본 사용자의 스크랩한 피드 개수"),
+                                fieldWithPath("bookmarkedCount").description("본 사용자의 즐겨찾는 식당 개수"),
+                                subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 리스트")
+                        )));
     }
 
     @Test
@@ -152,7 +182,14 @@ class UserControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.patch-user.href").exists())
                 .andExpect(jsonPath("_links.delete-user.href").exists())
-                .andExpect(jsonPath("_links.check-nickname-exists.href").exists());
+                .andExpect(jsonPath("_links.check-nickname-exists.href").exists())
+                .andDo(document("patch-user",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("nickname").description("변경할 닉네임"),
+                                fieldWithPath("profile").description("변경할 프로필 사진 경로")
+                        )));
     }
 
     @Test
@@ -179,6 +216,12 @@ class UserControllerTest {
                         "닉네임은 한글/영문/숫자/공백만 입력 가능하며, " +
                                     "1~10자의 한글이나 2~20자의 영문/숫자/공백만 입력 가능합니다.",
                                 "프로필의 URL 형식이 잘못되었습니다."
+                        )))
+                .andDo(document("error-example",
+                        responseFields(
+                                fieldWithPath("errorType").description("발생한 에러의 타입"),
+                                fieldWithPath("messages").description("에러에 대한 상세 메시지, " +
+                                        "1개 이상의 메시지가 발생할 수 있다.")
                         )));
     }
 
@@ -214,7 +257,8 @@ class UserControllerTest {
         mvc.perform(
                 delete("/api/user/{id}", myself.getId())
                         .session(session))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-user"));
 
         assertThat(userRepository.existsById(myself.getId())).isFalse();
     }
@@ -239,22 +283,29 @@ class UserControllerTest {
     @Test
     @DisplayName("닉네임 중복 됨")
     void testNicknameExists() throws Exception {
-        myself.setNickname("테스트닉네임");
-        myself = userRepository.save(myself);
-
         mvc.perform(
                 get("/api/user/nickname/exists")
                         .param("nickname",  myself.getNickname()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
                 .andExpect(jsonPath("exists").value(true))
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andDo(document("check-nickname-exists",
+                        preprocessResponse(prettyPrint()),
+                        requestParameters(
+                                parameterWithName("nickname").description("중복 검사를 진행할 닉네임")
+                        ),
+                        responseFields(
+                                fieldWithPath("nickname").description("중복 검사를 진행한 닉네임"),
+                                fieldWithPath("exists").description("중복 검사 결과 - true: 중복 됨 / false: 중복 되지 않음"),
+                                subsectionWithPath("_links").ignored()
+                        )));
     }
 
     @Test
     @DisplayName("닉네임 중복 안됨")
     void testNicknameNonExists() throws Exception {
-        String nickname = "테스트닉네임";
+        String nickname = "없는닉네임";
 
         mvc.perform(
                 get("/api/user/nickname/exists")
