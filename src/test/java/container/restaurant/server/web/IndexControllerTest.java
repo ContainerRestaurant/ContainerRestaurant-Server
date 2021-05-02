@@ -2,18 +2,13 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.User;
-import org.assertj.core.api.Assertions;
+import container.restaurant.server.web.base.BaseMvcControllerTest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -22,12 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-class IndexControllerTest {
-
-    @Autowired
-    private MockMvc mvc;
+class IndexControllerTest extends BaseMvcControllerTest {
 
     @Test
     @DisplayName("비로그인 index 링크 테스트")
@@ -52,7 +42,7 @@ class IndexControllerTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", SessionUser.from(User.builder()
                 .email("index@test.com")
-                .profile("http://my.profile.path")
+                .profile("https://my.profile.path")
                 .build()));
         String testPath = "/";
 
