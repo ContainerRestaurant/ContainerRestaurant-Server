@@ -35,4 +35,17 @@ public class FeedScrapService {
                         });
     }
 
+    @Transactional
+    public void userCancelScrapFeed(Long userId, Long feedId) {
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+
+        feedScrapRepository.findByUserAndFeed(user, feed)
+                .ifPresent(feedScrap -> {
+                    feedScrapRepository.delete(feedScrap);
+                    userRepository.save(user.scrapCountDown());
+                });
+    }
 }

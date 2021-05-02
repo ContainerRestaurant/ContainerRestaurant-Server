@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -101,6 +102,32 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
         //then 인증되지 않은 유저가 주어진 피드를 스크랩하면 login 리다이렉트
         mvc.perform(post("/api/scrap/{feedId}", othersFeed.getId()))
                 .andExpect(status().isFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("스크랩 취소")
+    void cancelScrapFeed() throws Exception {
+        //given 유저가 이미 스크랩한 피드가 주어졌을 때
+        feedScrapService.userScrapFeed(myself.getId(), othersFeed.getId());
+        myself = userRepository.findById(myself.getId())
+                .orElse(myself);
+
+        //when myself 유저 세션으로 주어진 피드를 스크랩을 삭제하면
+        mvc.perform(
+                delete("/api/scrap/{feedId}", othersFeed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent());
+
+        //then myself 의 스크랩 개수가 1개 줄어들고, 남은 FeedScrap 없어진다.
+        assertThat(
+                userRepository.findById(myself.getId())
+                        .orElseThrow(() -> {throw new ResourceNotFoundException("없는 유저군");})
+                        .getScrapCount())
+                .isEqualTo(myself.getScrapCount() - 1);
+
+        List<FeedScrap> scrapList = feedScrapRepository.findAllByUser(myself);
+        assertThat(scrapList.size()).isEqualTo(0);
     }
 
 }

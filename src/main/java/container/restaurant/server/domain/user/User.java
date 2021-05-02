@@ -74,4 +74,9 @@ public class User extends BaseCreatedTimeEntity {
         this.scrapCount++;
         return this;
     }
+
+    public User scrapCountDown() {
+        this.scrapCount--;
+        return this;
+    }
 }
