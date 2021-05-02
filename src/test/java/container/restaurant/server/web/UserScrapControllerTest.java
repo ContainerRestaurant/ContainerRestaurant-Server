@@ -1,0 +1,106 @@
+package container.restaurant.server.web;
+
+import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.user.scrap.FeedScrap;
+import container.restaurant.server.domain.user.scrap.FeedScrapRepository;
+import container.restaurant.server.domain.user.scrap.FeedScrapService;
+import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
+
+    @Autowired
+    private FeedScrapRepository feedScrapRepository;
+
+    @Autowired
+    private FeedScrapService feedScrapService;
+
+    @AfterEach
+    public void afterEach() {
+        feedScrapRepository.deleteAll();
+        super.afterEach();
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("피드 스크랩하기")
+    void scrapFeed() throws Exception {
+        //given other 유저가 작성한 피드가 주어졌을 때
+
+        //when myself 유저 세션으로 주어진 피드를 스크랩하면
+        mvc.perform(
+                post("/api/scrap/{feedId}", othersFeed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent());
+
+        //then myself 의 스크랩 개수가 + 1 되고,
+        //     myself 와 주어진 피드가 관계된 하나의 FeedScrap 이 존재한다.
+        assertThat(
+                userRepository.findById(myself.getId())
+                        .orElseThrow(() -> {throw new ResourceNotFoundException("없는 유저군");})
+                        .getScrapCount())
+                .isEqualTo(myself.getScrapCount() + 1);
+
+        List<FeedScrap> scrapList = feedScrapRepository.findAllByUser(myself);
+        assertThat(scrapList.size()).isEqualTo(1);
+
+        FeedScrap scrap = scrapList.get(0);
+        assertThat(scrap.getUser().getId()).isEqualTo(myself.getId());
+        assertThat(scrap.getFeed().getId()).isEqualTo(othersFeed.getId());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("중복되는 피드 스크랩하기")
+    void failScrapFeed() throws Exception {
+        //given 유저가 이미 스크랩한 피드와 when 동작 전 시간이 주어졌을 때
+        feedScrapService.userScrapFeed(myself.getId(), othersFeed.getId());
+        myself = userRepository.findById(myself.getId())
+                .orElse(myself);
+        LocalDateTime now = LocalDateTime.now();
+
+        //when myself 유저 세션으로 주어진 피드를 스크랩하면
+        mvc.perform(
+                post("/api/scrap/{feedId}", othersFeed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent());
+
+        //then myself 의 스크랩 개수가 그대로이고,
+        //     이미 만들어져있던 FeedScrap 이 존재한다.
+        assertThat(
+                userRepository.findById(myself.getId())
+                        .orElseThrow(() -> {throw new ResourceNotFoundException("없는 유저군");})
+                        .getScrapCount())
+                .isEqualTo(myself.getScrapCount());
+
+        List<FeedScrap> scrapList = feedScrapRepository.findAllByUser(myself);
+        assertThat(scrapList.size()).isEqualTo(1);
+
+        FeedScrap scrap = scrapList.get(0);
+        assertThat(scrap.getCreatedDate()).isBefore(now);
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 유저의 스크랩 실패")
+    void failUnauthenticatedUser() throws Exception {
+        //given other 유저가 작성한 피드가 주어졌을 때
+
+        //then 인증되지 않은 유저가 주어진 피드를 스크랩하면 login 리다이렉트
+        mvc.perform(post("/api/scrap/{feedId}", othersFeed.getId()))
+                .andExpect(status().isFound());
+    }
+
+}
