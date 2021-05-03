@@ -32,4 +32,15 @@ public class FeedLikeService {
                         () -> feedLikeRepository.save(FeedLike.of(user, feed))
                 );
     }
+
+    @Transactional
+    public void userCancelLikeFeed(Long userId, Long feedId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
+
+        feedLikeRepository.findByUserAndFeed(user, feed)
+                .ifPresent(feedLikeRepository::delete);
+    }
 }

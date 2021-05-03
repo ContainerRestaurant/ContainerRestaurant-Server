@@ -5,10 +5,7 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.like.FeedLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +19,14 @@ public class FeedLikeController {
             @LoginUser SessionUser sessionUser, @PathVariable Long feedId
     ) {
         feedLikeService.userLikeFeed(sessionUser.getId(), feedId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{feedId}")
+    public ResponseEntity<?> userCancelLikeFeed(
+            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
+    ) {
+        feedLikeService.userCancelLikeFeed(sessionUser.getId(), feedId);
         return ResponseEntity.noContent().build();
     }
 

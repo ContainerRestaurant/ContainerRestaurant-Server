@@ -13,6 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -84,6 +85,27 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         //then 인증되지 않은 유저가 주어진 피드를 스크랩하면 login 리다이렉트
         mvc.perform(post("/api/like/feed/{feedId}", othersFeed.getId()))
                 .andExpect(status().isFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("피드 좋아요 취소")
+    void testUserCancelLikeFeed() throws Exception {
+        //given otherFeed 를 좋아요한 myself 가 주어졌을 때
+        feedLikeRepository.save(FeedLike.of(myself, othersFeed));
+        myself = userRepository.findById(myself.getId())
+                .orElse(myself);
+        int size = feedLikeRepository.findAllByFeed(othersFeed).size();
+
+        //when myself 유저 세션으로 주어진 피드를 좋아요 하면
+        mvc.perform(
+                delete("/api/like/feed/{feedId}", othersFeed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent());
+
+        //then FeedLike 가 하나 감소한다
+        List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
+        assertThat(likeList.size()).isEqualTo(size - 1);
     }
 
 }
