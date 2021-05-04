@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -45,10 +47,13 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 post("/api/scrap/{feedId}", othersFeed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                //then-1 status 200 에 self, cancel-scrap 링크가 반환된다.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
 
-        //then myself 의 스크랩 개수가 + 1 되고,
-        //     myself 와 주어진 피드가 관계된 하나의 FeedScrap 이 존재한다.
+        //then-2 myself 의 스크랩 개수가 + 1 되고,
+        //       myself 와 주어진 피드가 관계된 하나의 FeedScrap 이 존재한다.
         assertThat(
                 userRepository.findById(myself.getId())
                         .orElseThrow(() -> {throw new ResourceNotFoundException("없는 유저군");})
@@ -77,10 +82,13 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 post("/api/scrap/{feedId}", othersFeed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                //then-1 status 200 에 self, cancel-scrap 링크가 반환된다.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
 
-        //then myself 의 스크랩 개수가 그대로이고,
-        //     이미 만들어져있던 FeedScrap 이 존재한다.
+        //then-2 myself 의 스크랩 개수가 그대로이고,
+        //       이미 만들어져있던 FeedScrap 이 존재한다.
         assertThat(
                 userRepository.findById(myself.getId())
                         .orElseThrow(() -> {throw new ResourceNotFoundException("없는 유저군");})
@@ -117,7 +125,10 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 delete("/api/scrap/{feedId}", othersFeed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                //then-1 status 200 에 self, scrap 링크가 반환된다.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.scrap.href").exists());
 
         //then myself 의 스크랩 개수가 1개 줄어들고, 남은 FeedScrap 없어진다.
         assertThat(

@@ -15,6 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -41,7 +42,10 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 post("/api/like/feed/{feedId}", othersFeed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                //then-1 status 200 에 self, cancel-like 링크가 반환된다.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.cancel-like.href").exists());
 
         //then FeedLike 가 하나 증가하고, 관계가 잘 정의되어있다.
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
@@ -66,7 +70,10 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 post("/api/like/feed/{feedId}", othersFeed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                //then-1 status 200 에 self, cancel-like 링크가 반환된다.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.cancel-like.href").exists());
 
         //then FeedLike 사이즈가 변함없고, 관계가 잘 정의되어있다.
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
@@ -101,7 +108,10 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 delete("/api/like/feed/{feedId}", othersFeed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                //then-1 status 200 에 self, cancel-like 링크가 반환된다.
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.like.href").exists());
 
         //then FeedLike 가 하나 감소한다
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
