@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -17,6 +18,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,7 +93,14 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-scrap 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+                .andExpect(jsonPath("_links.cancel-scrap.href").exists())
+                .andDo(document("user-scrap",
+                        preprocessResponse(prettyPrint()),
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("cancel-scrap").description("본 스크랩을 취소하는 링크")
+                        )
+                ));
 
         //then-2 myself 의 스크랩 개수가 그대로이고,
         //       이미 만들어져있던 FeedScrap 이 존재한다.
@@ -128,7 +143,14 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, scrap 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.scrap.href").exists());
+                .andExpect(jsonPath("_links.scrap.href").exists())
+                .andDo(document("cancel-user-scrap",
+                        preprocessResponse(prettyPrint()),
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("scrap").description("다시 스크랩하는 링크")
+                        )
+                ));
 
         //then myself 의 스크랩 개수가 1개 줄어들고, 남은 FeedScrap 없어진다.
         assertThat(

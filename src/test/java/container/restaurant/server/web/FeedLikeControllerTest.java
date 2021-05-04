@@ -13,6 +13,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,7 +52,14 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-like 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-like.href").exists());
+                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andDo(document("feed-like",
+                        preprocessResponse(prettyPrint()),
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("cancel-like").description("본 좋아요를 취소하는 링크")
+                        )
+                ));
 
         //then FeedLike 가 하나 증가하고, 관계가 잘 정의되어있다.
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
@@ -111,7 +125,14 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-like 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.like.href").exists());
+                .andExpect(jsonPath("_links.like.href").exists())
+                .andDo(document("cancel-feed-like",
+                        preprocessResponse(prettyPrint()),
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("like").description("다시 좋아요 하는 링크")
+                        )
+                ));
 
         //then FeedLike 가 하나 감소한다
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
