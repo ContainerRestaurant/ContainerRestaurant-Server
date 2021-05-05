@@ -2,9 +2,9 @@ name: CICD
 
 on:
   push:
-    branches: [ test-deploy ]
+    branches: [ develop ]
   pull_request:
-    branches: [ test-deploy ]
+    branches: [ develop ]
 
 jobs:
   cicd:
