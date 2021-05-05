@@ -34,7 +34,7 @@ jobs:
         run: cp build/libs/*.jar for-deploy/
 
       - name: Copy script files
-        run: cp scripts/*.sh for-deploy/
+        run: cp scripts/test-deploy/*.sh for-deploy/
 
       - name: Copy appspec script file
         run: cp appspec.yml for-deploy/
