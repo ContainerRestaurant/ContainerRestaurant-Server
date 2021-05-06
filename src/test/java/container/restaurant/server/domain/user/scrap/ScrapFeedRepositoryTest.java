@@ -2,6 +2,8 @@ package container.restaurant.server.domain.user.scrap;
 
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.restaurant.Restaurant;
+import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -25,10 +27,14 @@ class ScrapFeedRepositoryTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    RestaurantRepository restaurantRepository;
+
     @AfterEach
     void afterEach() {
         scrapFeedRepository.deleteAll();
         feedRepository.deleteAll();
+        restaurantRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -40,8 +46,16 @@ class ScrapFeedRepositoryTest {
                 .profile("https://my.profile")
                 .build());
 
+        Restaurant restaurant = restaurantRepository.save(Restaurant.builder()
+                .name("restaurant")
+                .addr("address")
+                .lon(0f)
+                .lat(0f)
+                .build());
+
         Feed feed = feedRepository.save(Feed.builder()
                 .owner(user)
+                .restaurant(restaurant)
                 .difficulty(3)
                 .build());
 
