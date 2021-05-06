@@ -22,14 +22,11 @@ public class Image extends BaseEntity {
     @ManyToOne(optional = false)
     private Feed feed;
 
-    // TODO Restaurant
-
     @URL
     @NotEmpty
     @Column(nullable = false)
     private String url;
 
-    // TODO Restaurant
     @Builder
     public Image(Feed feed, String url) {
         this.feed = feed;
