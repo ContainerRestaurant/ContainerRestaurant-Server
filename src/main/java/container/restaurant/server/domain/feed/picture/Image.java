@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@Entity
+@Entity(name = "TB_IMAGE_INFO")
 public class Image extends BaseEntity {
 
     @NotNull

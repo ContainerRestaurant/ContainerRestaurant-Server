@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@Entity
+@Entity(name = "TB_SCRAP_FEED")
 public class ScrapFeed extends BaseCreatedTimeEntity {
 
     @NotNull
