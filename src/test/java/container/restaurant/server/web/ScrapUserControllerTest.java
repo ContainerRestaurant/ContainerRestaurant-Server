@@ -1,18 +1,16 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.domain.user.scrap.FeedScrap;
-import container.restaurant.server.domain.user.scrap.FeedScrapRepository;
-import container.restaurant.server.domain.user.scrap.FeedScrapService;
+import container.restaurant.server.domain.user.scrap.ScrapFeed;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
+import container.restaurant.server.domain.user.scrap.ScrapFeedService;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,25 +21,23 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
+class ScrapUserControllerTest extends BaseUserAndFeedControllerTest {
 
     @Autowired
-    private FeedScrapRepository feedScrapRepository;
+    private ScrapFeedRepository scrapFeedRepository;
 
     @Autowired
-    private FeedScrapService feedScrapService;
+    private ScrapFeedService scrapFeedService;
 
     @AfterEach
     public void afterEach() {
-        feedScrapRepository.deleteAll();
+        scrapFeedRepository.deleteAll();
         super.afterEach();
     }
 
@@ -68,10 +64,10 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
                         .getScrapCount())
                 .isEqualTo(myself.getScrapCount() + 1);
 
-        List<FeedScrap> scrapList = feedScrapRepository.findAllByUser(myself);
+        List<ScrapFeed> scrapList = scrapFeedRepository.findAllByUser(myself);
         assertThat(scrapList.size()).isEqualTo(1);
 
-        FeedScrap scrap = scrapList.get(0);
+        ScrapFeed scrap = scrapList.get(0);
         assertThat(scrap.getUser().getId()).isEqualTo(myself.getId());
         assertThat(scrap.getFeed().getId()).isEqualTo(othersFeed.getId());
     }
@@ -81,7 +77,7 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
     @DisplayName("중복되는 피드 스크랩하기")
     void failScrapFeed() throws Exception {
         //given 유저가 이미 스크랩한 피드와 when 동작 전 시간이 주어졌을 때
-        feedScrapService.userScrapFeed(myself.getId(), othersFeed.getId());
+        scrapFeedService.userScrapFeed(myself.getId(), othersFeed.getId());
         myself = userRepository.findById(myself.getId())
                 .orElse(myself);
         LocalDateTime now = LocalDateTime.now();
@@ -110,10 +106,10 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
                         .getScrapCount())
                 .isEqualTo(myself.getScrapCount());
 
-        List<FeedScrap> scrapList = feedScrapRepository.findAllByUser(myself);
+        List<ScrapFeed> scrapList = scrapFeedRepository.findAllByUser(myself);
         assertThat(scrapList.size()).isEqualTo(1);
 
-        FeedScrap scrap = scrapList.get(0);
+        ScrapFeed scrap = scrapList.get(0);
         assertThat(scrap.getCreatedDate()).isBefore(now);
     }
 
@@ -132,7 +128,7 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
     @DisplayName("스크랩 취소")
     void cancelScrapFeed() throws Exception {
         //given 유저가 이미 스크랩한 피드가 주어졌을 때
-        feedScrapService.userScrapFeed(myself.getId(), othersFeed.getId());
+        scrapFeedService.userScrapFeed(myself.getId(), othersFeed.getId());
         myself = userRepository.findById(myself.getId())
                 .orElse(myself);
 
@@ -159,7 +155,7 @@ class UserScrapControllerTest extends BaseUserAndFeedControllerTest {
                         .getScrapCount())
                 .isEqualTo(myself.getScrapCount() - 1);
 
-        List<FeedScrap> scrapList = feedScrapRepository.findAllByUser(myself);
+        List<ScrapFeed> scrapList = scrapFeedRepository.findAllByUser(myself);
         assertThat(scrapList.size()).isEqualTo(0);
     }
 

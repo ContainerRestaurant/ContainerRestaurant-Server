@@ -1,7 +1,7 @@
 package container.restaurant.server.config;
 
 import container.restaurant.server.web.linker.FeedLikeLinker;
-import container.restaurant.server.web.linker.UserScrapLinker;
+import container.restaurant.server.web.linker.ScrapFeedLinker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class LinkerConfig {
 
     @Bean
-    public UserScrapLinker userScrapLinker() {
-        return new UserScrapLinker();
+    public ScrapFeedLinker userScrapLinker() {
+        return new ScrapFeedLinker();
     }
 
     @Bean

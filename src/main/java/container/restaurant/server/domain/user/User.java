@@ -12,7 +12,7 @@ import javax.validation.constraints.Email;
 
 @Getter
 @NoArgsConstructor
-@Entity
+@Entity(name = "TB_USERS")
 public class User extends BaseCreatedTimeEntity {
 
     @Email(message = "잘못된 이메일 형식입니다.")

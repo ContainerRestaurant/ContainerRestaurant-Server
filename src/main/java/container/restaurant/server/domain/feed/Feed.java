@@ -1,15 +1,13 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseTimeEntity;
-import container.restaurant.server.domain.feed.picture.Picture;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -17,7 +15,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
-@Entity
+@Entity(name = "TB_FEED")
 public class Feed extends BaseTimeEntity {
 
     @NotNull
@@ -27,7 +25,7 @@ public class Feed extends BaseTimeEntity {
     // TODO Restaurant
 
     @OneToOne
-    private Picture thumbnail;
+    private Image thumbnail;
 
     @Size(max = 500)
     private String description;
@@ -50,7 +48,7 @@ public class Feed extends BaseTimeEntity {
 
     // TODO Restaurant
     @Builder
-    protected Feed(User owner, Picture thumbnail, String description, Boolean welcome, Integer difficulty) {
+    protected Feed(User owner, Image thumbnail, String description, Boolean welcome, Integer difficulty) {
         this.owner = owner;
         this.thumbnail = thumbnail;
         this.description = description;

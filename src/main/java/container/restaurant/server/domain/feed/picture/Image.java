@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@Entity
-public class Picture extends BaseEntity {
+@Entity(name = "TB_IMAGE_INFO")
+public class Image extends BaseEntity {
 
     @NotNull
     @ManyToOne(optional = false)
@@ -31,7 +31,7 @@ public class Picture extends BaseEntity {
 
     // TODO Restaurant
     @Builder
-    public Picture(Feed feed, String url) {
+    public Image(Feed feed, String url) {
         this.feed = feed;
         this.url = url;
     }

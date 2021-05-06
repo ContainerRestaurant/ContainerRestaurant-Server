@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity
+@Entity(name = "TB_FEED_LIKE")
 public class FeedLike extends BaseEntity {
 
     @NotNull
