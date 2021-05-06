@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.locationtech.jts.geom.Point;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
@@ -24,7 +23,6 @@ public class Restaurant extends BaseEntity {
     private String address;
 
     @JsonIgnore
-    @Column(nullable = false)
     private Point location;
 
     @NotNull
