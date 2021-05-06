@@ -14,10 +14,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class FeedScrapRepositoryTest {
+class ScrapFeedRepositoryTest {
 
     @Autowired
-    FeedScrapRepository feedScrapRepository;
+    ScrapFeedRepository scrapFeedRepository;
 
     @Autowired
     FeedRepository feedRepository;
@@ -27,7 +27,7 @@ class FeedScrapRepositoryTest {
 
     @AfterEach
     void afterEach() {
-        feedScrapRepository.deleteAll();
+        scrapFeedRepository.deleteAll();
         feedRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -46,16 +46,16 @@ class FeedScrapRepositoryTest {
                 .build());
 
         //when: 둘 사이에 FeedScrap 을 추가하면
-        feedScrapRepository.save(FeedScrap.of(user, feed));
+        scrapFeedRepository.save(ScrapFeed.of(user, feed));
 
         //then-1: user 를 이용해 스크랩을 찾을 수 있다.
-        List<FeedScrap> userScraps  = feedScrapRepository.findAllByUser(user);
-        assertThat(userScraps).isNotNull();
-        assertThat(userScraps.get(0).getUser().getId()).isEqualTo(user.getId());
-        assertThat(userScraps.get(0).getFeed().getId()).isEqualTo(feed.getId());
+        List<ScrapFeed> scraps  = scrapFeedRepository.findAllByUser(user);
+        assertThat(scraps).isNotNull();
+        assertThat(scraps.get(0).getUser().getId()).isEqualTo(user.getId());
+        assertThat(scraps.get(0).getFeed().getId()).isEqualTo(feed.getId());
 
         //then-2: 유저와 피드로 해당 스크랩을 찾을 수 있다.
-        FeedScrap scrap = feedScrapRepository.findByUserAndFeed(user, feed)
+        ScrapFeed scrap = scrapFeedRepository.findByUserAndFeed(user, feed)
                 .orElse(null);
         assertThat(scrap).isNotNull();
         assertThat(scrap.getUser().getId()).isEqualTo(user.getId());

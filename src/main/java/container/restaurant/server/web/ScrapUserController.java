@@ -2,8 +2,8 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.domain.user.scrap.FeedScrapService;
-import container.restaurant.server.web.linker.UserScrapLinker;
+import container.restaurant.server.domain.user.scrap.ScrapFeedService;
+import container.restaurant.server.web.linker.ScrapFeedLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.mediatype.hal.HalModelBuilder;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +14,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequestMapping("/api/scrap")
-public class UserScrapController {
+public class ScrapUserController {
 
-    private final FeedScrapService feedScrapService;
+    private final ScrapFeedService scrapFeedService;
 
-    private final UserScrapLinker userScrapLinker;
+    private final ScrapFeedLinker scrapFeedLinker;
 
     @PostMapping("{feedId}")
     public ResponseEntity<?> scrapFeed(
             @LoginUser SessionUser sessionUser, @PathVariable Long feedId
     ) {
-        feedScrapService.userScrapFeed(sessionUser.getId(), feedId);
+        scrapFeedService.userScrapFeed(sessionUser.getId(), feedId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
-                        .add(userScrapLinker.scrapFeed(feedId).withSelfRel())
-                        .add(userScrapLinker.cancelScrapFeed(feedId).withRel("cancel-scrap"))
+                        .add(scrapFeedLinker.scrapFeed(feedId).withSelfRel())
+                        .add(scrapFeedLinker.cancelScrapFeed(feedId).withRel("cancel-scrap"))
         );
     }
 
@@ -36,11 +36,11 @@ public class UserScrapController {
     public ResponseEntity<?> cancelScrapFeed(
             @LoginUser SessionUser sessionUser, @PathVariable Long feedId
     ) {
-        feedScrapService.userCancelScrapFeed(sessionUser.getId(), feedId);
+        scrapFeedService.userCancelScrapFeed(sessionUser.getId(), feedId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
-                        .add(userScrapLinker.cancelScrapFeed(feedId).withSelfRel())
-                        .add(userScrapLinker.scrapFeed(feedId).withRel("scrap"))
+                        .add(scrapFeedLinker.cancelScrapFeed(feedId).withSelfRel())
+                        .add(scrapFeedLinker.scrapFeed(feedId).withRel("scrap"))
         );
     }
 

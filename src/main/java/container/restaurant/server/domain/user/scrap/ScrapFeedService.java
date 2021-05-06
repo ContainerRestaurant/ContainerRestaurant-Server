@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-public class FeedScrapService {
+public class ScrapFeedService {
 
     private final UserRepository userRepository;
 
     private final FeedRepository feedRepository;
 
-    private final FeedScrapRepository feedScrapRepository;
+    private final ScrapFeedRepository scrapFeedRepository;
 
     @Transactional
     public void userScrapFeed(Long userId, Long feedId) {
@@ -26,11 +26,11 @@ public class FeedScrapService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
 
-        feedScrapRepository.findByUserAndFeed(user, feed)
+        scrapFeedRepository.findByUserAndFeed(user, feed)
                 .ifPresentOrElse(
-                        feedScrap -> {/* do nothing */},
+                        scrap -> {/* do nothing */},
                         () -> {
-                            feedScrapRepository.save(FeedScrap.of(user, feed));
+                            scrapFeedRepository.save(ScrapFeed.of(user, feed));
                             userRepository.save(user.scrapCountUp());
                         });
     }
@@ -42,9 +42,9 @@ public class FeedScrapService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
 
-        feedScrapRepository.findByUserAndFeed(user, feed)
-                .ifPresent(feedScrap -> {
-                    feedScrapRepository.delete(feedScrap);
+        scrapFeedRepository.findByUserAndFeed(user, feed)
+                .ifPresent(scrap -> {
+                    scrapFeedRepository.delete(scrap);
                     userRepository.save(user.scrapCountDown());
                 });
     }

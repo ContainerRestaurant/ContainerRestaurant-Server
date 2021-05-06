@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 @Entity
-public class FeedScrap extends BaseCreatedTimeEntity {
+public class ScrapFeed extends BaseCreatedTimeEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,13 +24,13 @@ public class FeedScrap extends BaseCreatedTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Feed feed;
 
-    private FeedScrap(User user, Feed feed) {
+    private ScrapFeed(User user, Feed feed) {
         this.user = user;
         this.feed = feed;
     }
 
-    public static FeedScrap of(User user, Feed feed) {
-        return new FeedScrap(user, feed);
+    public static ScrapFeed of(User user, Feed feed) {
+        return new ScrapFeed(user, feed);
     }
 
 }

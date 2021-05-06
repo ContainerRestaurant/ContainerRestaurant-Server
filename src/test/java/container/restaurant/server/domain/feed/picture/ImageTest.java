@@ -1,15 +1,12 @@
 package container.restaurant.server.domain.feed.picture;
 
 import container.restaurant.server.domain.feed.Feed;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-class PictureTest {
+class ImageTest {
 
     @Test
     @DisplayName("빌더 테스트")
@@ -18,10 +15,10 @@ class PictureTest {
         Feed feed = Feed.builder()
                 .description("description")
                 .build();
-        String url = "http://url.com";
+        String url = "https://url.com";
 
         //when
-        Picture picture = Picture.builder()
+        Image picture = Image.builder()
                 .feed(feed)
                 .url(url)
                 .build();
