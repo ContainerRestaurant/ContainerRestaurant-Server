@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPOSITORY=/home/ec2-user/container-restaurant
-PROJECT_NAME=springboot-web
+PROJECT_NAME=server
 
 echo "> Build 파일 복사"
 cp $REPOSITORY/zip/*.jar $REPOSITORY
@@ -27,10 +27,6 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 nohup java -jar \
-        -Dspring.config.location=\
-        classpath:/application.properties,\
-        classpath:/application-deploy.properties,\
-        /home/ec2-user/container-restaurant/profiles/application-deploy-oauth.properties,\
-        /home/ec2-user/container-restaurant/profiles/app/application-deploy-datasource.properties \
-        -Dspring.profiles.active=real \
+        -Dspring.config.location=classpath:/application.properties,classpath:/application-deploy.properties,/home/ec2-user/container-restaurant/profiles/application-deploy-oauth.properties,/home/ec2-user/container-restaurant/profiles/application-deploy-datasource.properties \
+        -Dspring.profiles.active=deploy \
         $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
