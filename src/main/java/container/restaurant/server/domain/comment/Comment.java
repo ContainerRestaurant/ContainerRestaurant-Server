@@ -1,8 +1,9 @@
 package container.restaurant.server.domain.comment;
 
 import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
-import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.base.BaseTimeEntity;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.domain.feed.Feed;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +16,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Entity(name = "TB_COMMENT")
 public class Comment extends BaseCreatedTimeEntity {
-
     @NotNull
     @ManyToOne
     private User owner;
-
     @NotNull
     @ManyToOne
     private Feed feed;
