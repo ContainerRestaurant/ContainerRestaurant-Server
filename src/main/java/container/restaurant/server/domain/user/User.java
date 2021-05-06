@@ -69,4 +69,14 @@ public class User extends BaseCreatedTimeEntity {
     public String getRoleKey() {
         return this.role.getKey();
     }
+
+    public User scrapCountUp() {
+        this.scrapCount++;
+        return this;
+    }
+
+    public User scrapCountDown() {
+        this.scrapCount--;
+        return this;
+    }
 }

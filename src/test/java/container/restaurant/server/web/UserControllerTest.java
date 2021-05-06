@@ -1,25 +1,15 @@
 package container.restaurant.server.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 
 import javax.validation.ConstraintViolationException;
 
@@ -36,46 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-class UserControllerTest {
-
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private MockHttpSession session;
-
-    @Autowired
-    private ObjectMapper mapper;
-
-    private User myself;
-    private User other;
-
-    @BeforeEach
-    public void beforeEach() {
-        myself = User.builder()
-                .email("me@test.com")
-                .profile("https://my.profile.path")
-                .build();
-        myself.setNickname("테스트닉네임");
-        myself = userRepository.save(myself);
-
-        session.setAttribute("user", SessionUser.from(myself));
-        other = userRepository.save(User.builder()
-                .email("you@test.com")
-                .profile("https://your.profile.path")
-                .build());
-    }
-
-    @AfterEach
-    public void afterEach() {
-        userRepository.deleteAll();
-        session.clearAttributes();
-    }
+class UserControllerTest extends BaseUserControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
@@ -83,7 +34,7 @@ class UserControllerTest {
     void testGetUserSelf() throws Exception {
         mvc.perform(
                 get("/api/user/{id}", myself.getId())
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
@@ -124,7 +75,7 @@ class UserControllerTest {
     void testGetUserOther() throws Exception {
         mvc.perform(
                 get("/api/user/{id}", other.getId())
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("email").value(other.getEmail()))
                 .andExpect(jsonPath("nickname").value(other.getNickname()))
@@ -145,7 +96,7 @@ class UserControllerTest {
     void testFailToGetInvalidUser() throws Exception {
         mvc.perform(
                 get("/api/user/{id}", -1)
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isNotFound())
                 .andExpect(
                         jsonPath("errorType")
@@ -160,7 +111,7 @@ class UserControllerTest {
     @DisplayName("사용자 닉네임, 프로필 업데이트")
     void testUpdateUser() throws Exception {
         String nickname = "this는nikname이라능a";
-        String profile = "http://profile.path";
+        String profile = "https://profile.path";
         UserUpdateDto userUpdateDto = UserUpdateDto.builder()
                 .nickname(nickname)
                 .profile(profile)
@@ -170,7 +121,7 @@ class UserControllerTest {
                 patch("/api/user/{id}", myself.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(userUpdateDto))
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(nickname))
@@ -207,7 +158,7 @@ class UserControllerTest {
                 patch("/api/user/{id}", myself.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(userUpdateDto))
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isBadRequest())
                 .andExpect(
                         jsonPath("errorType")
@@ -230,7 +181,7 @@ class UserControllerTest {
     @DisplayName("사용자 업데이트 실패 (403)")
     void testFailToUpdateUserBy403() throws Exception {
         String nickname = "this는nikname이라능a";
-        String profile = "http://profile.path";
+        String profile = "https://profile.path";
         UserUpdateDto userUpdateDto = UserUpdateDto.builder()
                 .nickname(nickname)
                 .profile(profile)
@@ -240,7 +191,7 @@ class UserControllerTest {
                 patch("/api/user/{id}", other.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(userUpdateDto))
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isForbidden())
                 .andExpect(
                         jsonPath("errorType")
@@ -256,7 +207,7 @@ class UserControllerTest {
     void testDeleteUser() throws Exception {
         mvc.perform(
                 delete("/api/user/{id}", myself.getId())
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isNoContent())
                 .andDo(document("delete-user"));
 
@@ -269,7 +220,7 @@ class UserControllerTest {
     void testFailToDeleteUser() throws Exception {
         mvc.perform(
                 delete("/api/user/{id}", other.getId())
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("errorType")
                         .value(FailedAuthorizationException.class.getSimpleName()))
