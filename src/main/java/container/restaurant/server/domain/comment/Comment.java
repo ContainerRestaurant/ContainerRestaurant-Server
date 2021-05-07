@@ -44,4 +44,8 @@ public class Comment extends BaseCreatedTimeEntity {
         this.isHaveReply = false;
         this.isBlind = false;
     }
+
+    public void setContent(String content){
+        this.content = content;
+    }
 }
