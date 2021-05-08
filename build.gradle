@@ -32,16 +32,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.24'
-
-//	implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.18.1'
-//	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.4.30.Final'
+	implementation 'org.locationtech.jts:jts-core'
+	implementation 'org.hibernate:hibernate-spatial:5.4.30.Final'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	runtimeOnly 'mysql:mysql-connector-java'
 
 	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 

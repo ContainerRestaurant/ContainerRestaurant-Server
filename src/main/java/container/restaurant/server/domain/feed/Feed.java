@@ -1,15 +1,14 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseTimeEntity;
-import container.restaurant.server.domain.feed.picture.Picture;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -17,17 +16,19 @@ import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
-@Entity
+@Entity(name = "TB_FEED")
 public class Feed extends BaseTimeEntity {
 
     @NotNull
     @ManyToOne
     private User owner;
 
-    // TODO Restaurant
+    @NotNull
+    @ManyToOne
+    private Restaurant restaurant;
 
     @OneToOne
-    private Picture thumbnail;
+    private Image thumbnail;
 
     @Size(max = 500)
     private String description;
@@ -44,14 +45,19 @@ public class Feed extends BaseTimeEntity {
 
     private Integer replyCount;
 
+    private Integer hits;
+
     private Boolean isBlind;
 
     private Boolean isDeleted;
 
-    // TODO Restaurant
     @Builder
-    protected Feed(User owner, Picture thumbnail, String description, Boolean welcome, Integer difficulty) {
+    protected Feed(
+            User owner, Restaurant restaurant, Image thumbnail,
+            String description, Boolean welcome, Integer difficulty
+    ) {
         this.owner = owner;
+        this.restaurant = restaurant;
         this.thumbnail = thumbnail;
         this.description = description;
         this.welcome = welcome != null ? welcome : false;
@@ -59,6 +65,7 @@ public class Feed extends BaseTimeEntity {
         this.likeCount = 0;
         this.scrapedCount = 0;
         this.replyCount = 0;
+        this.hits = 0;
         this.isBlind = false;
         this.isDeleted = false;
     }
