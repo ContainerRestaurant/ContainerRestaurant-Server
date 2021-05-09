@@ -9,13 +9,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@Entity(name = "TB_COMMENT")
-public class Comment extends BaseCreatedTimeEntity {
+@Entity(name = "tb_comment")
+public class Comment extends BaseCreatedTimeEntity{
     @NotNull
     @ManyToOne
     private User owner;
@@ -27,7 +28,7 @@ public class Comment extends BaseCreatedTimeEntity {
     private Integer likeCount;
 
     @ManyToOne
-    private Comment upperReply;
+    private Comment upperReplyId;
     private Boolean isDeleted;
     private Boolean isHaveReply;
     private Boolean isBlind;
@@ -38,7 +39,7 @@ public class Comment extends BaseCreatedTimeEntity {
         this.feed = feed;
         this.content = content;
         this.likeCount = 0;
-        this.upperReply = null;
+        this.upperReplyId = null;
         this.isDeleted = false;
         this.isHaveReply = false;
         this.isBlind = false;
