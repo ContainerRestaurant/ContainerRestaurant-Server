@@ -26,7 +26,7 @@ public class ImageController {
         Image imageInfo = imageService.upload(image);
         return ResponseEntity.ok(EntityModel.of(imageInfo)
                 .add(linkTo(getController().upload(image)).withSelfRel())
-                .add(linkTo(getController().upload(image)).slash(imageInfo.getUrl()).withRel("image_url")));
+                .add(linkTo(getController()).slash(imageInfo.getUrl()).withRel("image_url")));
     }
 
     @GetMapping(value = "{path}")
