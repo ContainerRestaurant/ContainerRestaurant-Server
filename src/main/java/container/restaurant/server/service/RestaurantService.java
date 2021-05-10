@@ -1,10 +1,9 @@
 package container.restaurant.server.service;
 
 import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.repository.RestaurantRepository;
+import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class RestaurantService {
                 .orElseThrow(() -> new NotFoundException("{" + id + "}에 해당하는 식당이 없습니다."));
     }
 
-    public List<Restaurant> findNearByRestaurants(float lat, float lon, long radius) {
+    public List<Restaurant> findNearByRestaurants(double lat, double lon, long radius) {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius);
     }
 }
