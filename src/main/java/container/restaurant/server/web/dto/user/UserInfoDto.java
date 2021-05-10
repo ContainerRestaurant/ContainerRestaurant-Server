@@ -2,9 +2,10 @@ package container.restaurant.server.web.dto.user;
 
 import container.restaurant.server.domain.user.User;
 import lombok.Getter;
+import org.springframework.hateoas.RepresentationModel;
 
 @Getter
-public class UserInfoDto {
+public class UserInfoDto extends RepresentationModel<UserInfoDto> {
 
     private final String email;
     private final String nickname;
