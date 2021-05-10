@@ -28,7 +28,7 @@ public class Comment extends BaseCreatedTimeEntity{
     private Integer likeCount;
 
     @ManyToOne
-    private Comment upperReplyId;
+    private Comment upperReply;
     private Boolean isDeleted;
     private Boolean isHaveReply;
     private Boolean isBlind;
@@ -39,7 +39,7 @@ public class Comment extends BaseCreatedTimeEntity{
         this.feed = feed;
         this.content = content;
         this.likeCount = 0;
-        this.upperReplyId = null;
+        this.upperReply = null;
         this.isDeleted = false;
         this.isHaveReply = false;
         this.isBlind = false;

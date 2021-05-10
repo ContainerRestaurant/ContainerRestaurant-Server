@@ -69,4 +69,6 @@ public class User extends BaseCreatedTimeEntity {
     public String getRoleKey() {
         return this.role.getKey();
     }
+
+
 }
