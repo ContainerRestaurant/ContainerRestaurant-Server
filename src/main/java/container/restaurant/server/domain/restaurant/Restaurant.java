@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@Entity(name = "TB_RESTAURANT")
+@Entity(name = "tb_restaurant")
 public class Restaurant extends BaseEntity {
 
     @NotNull
@@ -26,10 +26,10 @@ public class Restaurant extends BaseEntity {
     private Point location;
 
     @NotNull
-    private float latitude;
+    private double latitude;
 
     @NotNull
-    private float longitude;
+    private double longitude;
 
     @NotNull
     private Long image_ID;
@@ -38,7 +38,7 @@ public class Restaurant extends BaseEntity {
     private int vinishCount;
 
     @Builder
-    protected Restaurant(String name, String addr, Point loc, float lon, float lat) {
+    protected Restaurant(String name, String addr, Point loc, double lon, double lat) {
         this.name = name;
         this.address = addr;
         this.location = loc;
