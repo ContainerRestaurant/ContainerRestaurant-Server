@@ -1,53 +1,50 @@
 package container.restaurant.server.domain.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
-import lombok.*;
+import container.restaurant.server.domain.base.BaseEntity;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.locationtech.jts.geom.Point;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
 
-@Data
-@RequiredArgsConstructor
-@Entity
-@Table(name = "TB_RESTAURANT")
-public class Restaurant {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+@Getter
+@NoArgsConstructor
+@Entity(name = "TB_RESTAURANT")
+public class Restaurant extends BaseEntity {
 
     @NotNull
-    private String Name;
+    private String name;
 
     @NotNull
-    private String Address;
+    private String address;
 
     @JsonIgnore
-    @Column(nullable = false)
-    private Point Location;
+    private Point location;
 
     @NotNull
-    private float Latitude;
+    private float latitude;
 
     @NotNull
-    private float Longitude;
+    private float longitude;
 
     @NotNull
     private Long image_ID;
 
     @ColumnDefault("0")
-    private int VinishCount;
+    private int vinishCount;
 
     @Builder
-    public Restaurant(String name, String addr, Point loc, float lon, float lat) {
-        setName(name);
-        setAddress(addr);
-        setLocation(loc);
-        setLongitude(lon);
-        setLatitude(lat);
-        setImage_ID((long) 0);
+    protected Restaurant(String name, String addr, Point loc, float lon, float lat) {
+        this.name = name;
+        this.address = addr;
+        this.location = loc;
+        this.longitude = lon;
+        this.latitude = lat;
+        this.image_ID = 0L;
     }
 
 }
