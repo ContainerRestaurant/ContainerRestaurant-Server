@@ -27,11 +27,14 @@ public class Feed extends BaseTimeEntity {
     @ManyToOne
     private Restaurant restaurant;
 
-    @OneToOne
-    private Image thumbnail;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
+    private String thumbnailUrl;
 
     @Size(max = 500)
-    private String description;
+    private String content;
 
     private Boolean welcome;
 
@@ -53,13 +56,14 @@ public class Feed extends BaseTimeEntity {
 
     @Builder
     protected Feed(
-            User owner, Restaurant restaurant, Image thumbnail,
-            String description, Boolean welcome, Integer difficulty
+            User owner, Restaurant restaurant, Category category,
+            String thumbnailUrl, String content, Boolean welcome, Integer difficulty
     ) {
         this.owner = owner;
         this.restaurant = restaurant;
-        this.thumbnail = thumbnail;
-        this.description = description;
+        this.thumbnailUrl = thumbnailUrl;
+        this.category = category;
+        this.content = content;
         this.welcome = welcome != null ? welcome : false;
         this.difficulty = difficulty;
         this.likeCount = 0;

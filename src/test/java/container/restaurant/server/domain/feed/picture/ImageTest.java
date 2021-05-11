@@ -13,7 +13,7 @@ class ImageTest {
     void testBuilder() {
         //given
         Feed feed = Feed.builder()
-                .description("description")
+                .content("description")
                 .build();
         String url = "https://url.com";
 

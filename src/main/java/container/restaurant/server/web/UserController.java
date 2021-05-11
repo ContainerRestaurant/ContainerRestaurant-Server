@@ -8,18 +8,14 @@ import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.user.NicknameExistsDto;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.linker.FeedLinker;
+import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,15 +25,18 @@ public class UserController {
 
     private final UserService userService;
 
+    private final UserLinker userLinker;
+    private final FeedLinker feedLinker;
+
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(
             @PathVariable Long id, @LoginUser SessionUser sessionUser
     ) {
-        UserInfoDto dto = userService.findById(id);
-        List<Link> links = userInfoLinks(id, sessionUser);
+        Long loginId = sessionUser != null ? sessionUser.getId() : -1;
 
         return ResponseEntity.ok(
-                EntityModel.of(dto).add(links));
+                setLinks(userService.findById(id), loginId)
+        );
     }
 
     @PatchMapping("{id}")
@@ -48,11 +47,9 @@ public class UserController {
         if (!id.equals(sessionUser.getId()))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
-        UserInfoDto dto = userService.update(id, updateDto);
-        List<Link> links = userInfoLinks(id, sessionUser);
-
         return ResponseEntity.ok(
-                EntityModel.of(dto).add(links));
+                setLinks(userService.update(id, updateDto), sessionUser.getId())
+        );
     }
 
     @DeleteMapping("{id}")
@@ -71,27 +68,28 @@ public class UserController {
     public ResponseEntity<?> existsNickname(
             @NicknameConstraint @RequestParam String nickname
     ) {
-        return ResponseEntity.ok().body(
-                EntityModel.of(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
-                        .add(linkTo(getController().existsNickname(nickname)).withSelfRel()));
+        return ResponseEntity.ok(
+                setLinks(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
+        );
     }
 
-    private UserController getController() {
-        return methodOn(UserController.class);
+    private NicknameExistsDto setLinks(NicknameExistsDto dto) {
+        return dto.add(userLinker.existsNickname(dto.getNickname()).withSelfRel());
     }
 
-    private List<Link> userInfoLinks(Long id, SessionUser sessionUser) {
-        List<Link> links = new ArrayList<>();
-        links.add(linkTo(getController().getUserById(id, sessionUser)).withSelfRel());
-        if (id.equals(sessionUser.getId())) {
-            links.add(linkTo(getController().updateUserById(id, sessionUser, new UserUpdateDto()))
-                    .withRel("patch-user"));
-            links.add(linkTo(getController().deleteById(id, sessionUser))
-                    .withRel("delete-user"));
-            links.add(linkTo(getController().existsNickname(null))
-                    .withRel("check-nickname-exists"));
-        }
-        return links;
+    private UserInfoDto setLinks(UserInfoDto dto, Long loginId) {
+        return dto
+                .add(
+                        userLinker.getUserById(dto.getId()).withSelfRel(),
+                        feedLinker.selectUserFeed(dto.getId()).withRel("feeds")
+                )
+                .addAllIf(loginId.equals(dto.getId()), () -> List.of(
+                        userLinker.updateUserById(dto.getId()).withRel("patch"),
+                        userLinker.deleteById(dto.getId()).withRel("delete"),
+                        userLinker.existsNickname().withRel("nickname-exists"),
+                        feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps")
+                        // TODO favorite link
+                ));
     }
 
 }

@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.feed.like;
 
+import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
@@ -57,6 +58,7 @@ class FeedLikeRepositoryTest {
                 .owner(user)
                 .restaurant(restaurant)
                 .difficulty(3)
+                .category(Category.KOREAN)
                 .build());
 
         //when: 둘 사이에 FeedLike 을 추가하면
