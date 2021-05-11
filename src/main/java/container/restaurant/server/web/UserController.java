@@ -5,11 +5,17 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.web.dto.user.NicknameExistsDto;
+import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.linker.FeedLinker;
+import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,12 +25,18 @@ public class UserController {
 
     private final UserService userService;
 
+    private final UserLinker userLinker;
+    private final FeedLinker feedLinker;
+
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(
             @PathVariable Long id, @LoginUser SessionUser sessionUser
     ) {
-        Boolean self = sessionUser.getId().equals(id);
-        return ResponseEntity.ok(userService.findById(id, self));
+        Long loginId = sessionUser != null ? sessionUser.getId() : -1;
+
+        return ResponseEntity.ok(
+                setLinks(userService.findById(id), loginId)
+        );
     }
 
     @PatchMapping("{id}")
@@ -35,7 +47,9 @@ public class UserController {
         if (!id.equals(sessionUser.getId()))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
-        return ResponseEntity.ok(userService.update(id, updateDto));
+        return ResponseEntity.ok(
+                setLinks(userService.update(id, updateDto), sessionUser.getId())
+        );
     }
 
     @DeleteMapping("{id}")
@@ -46,6 +60,7 @@ public class UserController {
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         userService.deleteById(id);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -53,7 +68,28 @@ public class UserController {
     public ResponseEntity<?> existsNickname(
             @NicknameConstraint @RequestParam String nickname
     ) {
-        return ResponseEntity.ok(userService.existsUserByNickname(nickname));
+        return ResponseEntity.ok(
+                setLinks(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
+        );
+    }
+
+    private NicknameExistsDto setLinks(NicknameExistsDto dto) {
+        return dto.add(userLinker.existsNickname(dto.getNickname()).withSelfRel());
+    }
+
+    private UserInfoDto setLinks(UserInfoDto dto, Long loginId) {
+        return dto
+                .add(
+                        userLinker.getUserById(dto.getId()).withSelfRel(),
+                        feedLinker.selectUserFeed(dto.getId()).withRel("feeds")
+                )
+                .addAllIf(loginId.equals(dto.getId()), () -> List.of(
+                        userLinker.updateUserById(dto.getId()).withRel("patch"),
+                        userLinker.deleteById(dto.getId()).withRel("delete"),
+                        userLinker.existsNickname().withRel("nickname-exists"),
+                        feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps")
+                        // TODO favorite link
+                ));
     }
 
 }

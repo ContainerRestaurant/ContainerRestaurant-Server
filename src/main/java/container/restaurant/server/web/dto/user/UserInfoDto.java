@@ -7,6 +7,8 @@ import org.springframework.hateoas.RepresentationModel;
 @Getter
 public class UserInfoDto extends RepresentationModel<UserInfoDto> {
 
+    private final Long id;
+
     private final String email;
     private final String nickname;
     private final String profile;
@@ -20,6 +22,7 @@ public class UserInfoDto extends RepresentationModel<UserInfoDto> {
     }
 
     protected UserInfoDto(User user) {
+        this.id = user.getId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
         this.profile = user.getProfile();
