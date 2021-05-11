@@ -23,6 +23,6 @@ public class ImageService {
         JsonObject pathJob = (JsonObject) mu.finish();
 
         String path = pathJob.get("path").getAsString();
-        return imageRepository.save(new Image(null, path));
+        return imageRepository.save(new Image(path));
     }
 }
