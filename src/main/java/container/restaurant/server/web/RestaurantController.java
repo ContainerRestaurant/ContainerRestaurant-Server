@@ -27,6 +27,7 @@ public class RestaurantController {
         return ResponseEntity.ok(EntityModel.of(restaurantInfoDto)
                 .add(linkTo(getController().findById(id)).withSelfRel())
                 .add(linkTo(ImageController.class).slash(restaurantInfoDto.getImage_path()).withRel("image-url"))
+                .add(linkTo(getController().updateVanish(id)).withRel("restaurant-vanish"))
         );
     }
 
@@ -42,6 +43,7 @@ public class RestaurantController {
         return ResponseEntity.ok(new CollectionModel<>(restaurantService.findNearByRestaurants(lat, lon, radius)
                 .stream().map(restaurant -> EntityModel.of(restaurant)
                         .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
+                        .add(linkTo(getController().updateVanish(restaurant.getId())).withRel("restaurant-vanish"))
                         .add(linkTo(ImageController.class).slash(restaurant.getImage_path()).withRel("image-url"))
                 ).collect(Collectors.toList()))
                 .add(linkTo(getController().findNearByRestaurants(lat, lon, radius)).withSelfRel()));
