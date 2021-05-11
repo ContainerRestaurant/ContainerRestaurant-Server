@@ -36,6 +36,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 get("/api/user/{id}", myself.getId())
                         .session(myselfSession))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(myself.getId()))
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
                 .andExpect(jsonPath("profile").value(myself.getProfile()))
@@ -44,20 +45,21 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.patch-user.href").exists())
-                .andExpect(jsonPath("_links.delete-user.href").exists())
-                .andExpect(jsonPath("_links.check-nickname-exists.href").exists())
+                .andExpect(jsonPath("_links.patch.href").exists())
+                .andExpect(jsonPath("_links.delete.href").exists())
+                .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andDo(document("get-user",
                         preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
-                                linkWithRel("patch-user").description("본 사용자의 정보 업데이트 링크," +
+                                linkWithRel("patch").description("본 사용자의 정보 업데이트 링크," +
                                         "닉네임과 프로필만 수정 가능하다."),
-                                linkWithRel("delete-user").description("본 사용자의 계정 탈퇴 링크"),
-                                linkWithRel("check-nickname-exists").description("닉네임 중복 확인 링크, " +
+                                linkWithRel("delete").description("본 사용자의 계정 탈퇴 링크"),
+                                linkWithRel("nickname-exists").description("닉네임 중복 확인 링크, " +
                                         "템플릿으로 제공되어, {nickname}을 지정해야 사용이 가능하다.")
                         ),
                         responseFields(
+                                fieldWithPath("id").description("본 사용자의 구분자 ID"),
                                 fieldWithPath("email").description("본 사용자의 이메일 주소"),
                                 fieldWithPath("nickname").description("본 사용자의 닉네임"),
                                 fieldWithPath("profile").description("본 사용자의 프로필 경로"),
@@ -77,6 +79,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 get("/api/user/{id}", other.getId())
                         .session(myselfSession))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(other.getId()))
                 .andExpect(jsonPath("email").value(other.getEmail()))
                 .andExpect(jsonPath("nickname").value(other.getNickname()))
                 .andExpect(jsonPath("profile").value(other.getProfile()))
@@ -85,9 +88,9 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("scrapCount").value(other.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(other.getBookmarkedCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.patch-user.href").doesNotExist())
-                .andExpect(jsonPath("_links.delete-user.href").doesNotExist())
-                .andExpect(jsonPath("_links.check-nickname-exists.href").doesNotExist());
+                .andExpect(jsonPath("_links.patch.href").doesNotExist())
+                .andExpect(jsonPath("_links.delete.href").doesNotExist())
+                .andExpect(jsonPath("_links.nickname-exists.href").doesNotExist());
     }
 
     @Test
@@ -123,6 +126,7 @@ class UserControllerTest extends BaseUserControllerTest {
                         .content(mapper.writeValueAsString(userUpdateDto))
                         .session(myselfSession))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(myself.getId()))
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(nickname))
                 .andExpect(jsonPath("profile").value(profile))
@@ -131,9 +135,9 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.patch-user.href").exists())
-                .andExpect(jsonPath("_links.delete-user.href").exists())
-                .andExpect(jsonPath("_links.check-nickname-exists.href").exists())
+                .andExpect(jsonPath("_links.patch.href").exists())
+                .andExpect(jsonPath("_links.delete.href").exists())
+                .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andDo(document("patch-user",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),

@@ -1,12 +1,13 @@
 package container.restaurant.server.web.dto.user;
 
 import lombok.Getter;
+import org.springframework.hateoas.RepresentationModel;
 
 @Getter
-public class NicknameExistsDto {
+public class NicknameExistsDto extends RepresentationModel<NicknameExistsDto> {
 
-    private String nickname;
-    private Boolean exists;
+    private final String nickname;
+    private final Boolean exists;
 
     protected NicknameExistsDto(String nickname, Boolean exists) {
         this.nickname = nickname;
