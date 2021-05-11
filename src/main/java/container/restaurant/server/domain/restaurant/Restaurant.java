@@ -2,13 +2,14 @@ package container.restaurant.server.domain.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import container.restaurant.server.domain.base.BaseEntity;
+import container.restaurant.server.domain.feed.picture.Image;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.locationtech.jts.geom.Point;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -26,25 +27,26 @@ public class Restaurant extends BaseEntity {
     private Point location;
 
     @NotNull
-    private float latitude;
+    private double latitude;
 
     @NotNull
-    private float longitude;
+    private double longitude;
 
     @NotNull
-    private Long image_ID;
+    @OneToOne
+    private Image image;
 
     @ColumnDefault("0")
-    private int vinishCount;
+    private int vanishCount;
 
     @Builder
-    protected Restaurant(String name, String addr, Point loc, float lon, float lat) {
+    protected Restaurant(String name, String addr, Point loc, double lon, double lat, Image image) {
         this.name = name;
         this.address = addr;
         this.location = loc;
         this.longitude = lon;
         this.latitude = lat;
-        this.image_ID = 0L;
+        this.image = image;
     }
 
 }
