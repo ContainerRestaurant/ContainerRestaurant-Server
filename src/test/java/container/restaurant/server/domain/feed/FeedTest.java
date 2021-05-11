@@ -26,7 +26,7 @@ class FeedTest {
         //when
         Feed feed = Feed.builder()
                 .owner(user)
-                .description(description)
+                .content(description)
                 .welcome(welcome)
                 .difficulty(difficulty)
                 .build();
@@ -34,7 +34,7 @@ class FeedTest {
         //then
         assertThat(feed.getId()).isNull();
         assertThat(feed.getOwner()).isEqualTo(user);
-        assertThat(feed.getDescription()).isEqualTo(description);
+        assertThat(feed.getContent()).isEqualTo(description);
         assertThat(feed.getWelcome()).isEqualTo(welcome);
         assertThat(feed.getDifficulty()).isEqualTo(difficulty);
         assertThat(feed.getLikeCount()).isEqualTo(0);
