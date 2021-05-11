@@ -30,6 +30,7 @@ public class FeedController {
     private final FeedService feedService;
 
     private final FeedLinker feedLinker;
+    private final UserLinker userLinker;
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
@@ -103,8 +104,8 @@ public class FeedController {
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
         return dto
                 .add(
-                        feedLinker.getFeedDetail(dto.getId()).withSelfRel()
-                        // TODO owner link
+                        feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
+                        userLinker.getUserById(dto.getOwnerId()).withRel("owner")
                         // TODO restaurant link
                         // TODO comment link
                 )
