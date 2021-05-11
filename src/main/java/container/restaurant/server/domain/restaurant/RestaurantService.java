@@ -1,13 +1,8 @@
 package container.restaurant.server.domain.restaurant;
 
-import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageRepository;
-import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNameInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
-import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +30,9 @@ public class RestaurantService {
                 .stream()
                 .map(RestaurantNameInfoDto::from)
                 .collect(Collectors.toList());
+    }
+
+    public void updateVanish(Long id) {
+        restaurantRepository.updateVanish(id);
     }
 }

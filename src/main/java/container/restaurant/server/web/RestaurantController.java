@@ -5,6 +5,7 @@ import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.mediatype.hal.HalModelBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,7 @@ public class RestaurantController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        RestaurantInfoDto restaurantInfoDto = null;
-        restaurantInfoDto = restaurantService.findById(id);
+        RestaurantInfoDto restaurantInfoDto = restaurantService.findById(id);
         return ResponseEntity.ok(EntityModel.of(restaurantInfoDto)
                 .add(linkTo(getController().findById(id)).withSelfRel())
                 .add(linkTo(ImageController.class).slash(restaurantInfoDto.getImage_path()).withRel("image-url"))
@@ -54,6 +54,14 @@ public class RestaurantController {
                         .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
                 ).collect(Collectors.toList()))
                 .add(linkTo(getController().searchRestaurantName(name)).withSelfRel()));
+    }
+
+    @PostMapping("vanish/{id}")
+    public ResponseEntity<?> updateVanish(@PathVariable("id") Long id) {
+        restaurantService.updateVanish(id);
+        return ResponseEntity.ok(
+                HalModelBuilder.emptyHalModel().build()
+                        .add(linkTo(getController().updateVanish(id)).withSelfRel()));
     }
 
     private RestaurantController getController() {
