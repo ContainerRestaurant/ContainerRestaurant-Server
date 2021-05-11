@@ -3,6 +3,10 @@ package container.restaurant.server.web;
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.web.dto.feed.FeedDetailDto;
+import container.restaurant.server.web.linker.FeedLinker;
+import container.restaurant.server.web.linker.UserLinker;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +29,15 @@ public class FeedController {
 
     private final FeedService feedService;
 
-    @GetMapping("/{feedId}")
-    public ResponseEntity<?> getFeedDetail(@PathVariable Long feedId) {
+    private final FeedLinker feedLinker;
 
-        return ResponseEntity.notFound().build();
+    @GetMapping("{feedId}")
+    public ResponseEntity<?> getFeedDetail(
+            @PathVariable Long feedId, @LoginUser SessionUser sessionUser
+    ) {
+        Long loginId = sessionUser != null ? sessionUser.getId() : -1;
+        return ResponseEntity.ok(
+                setLinks(feedService.getFeedDetail(feedId), loginId));
     }
 
     @GetMapping
@@ -43,7 +52,7 @@ public class FeedController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("user/{userId}")
     public ResponseEntity<?> selectUserFeed(
             @PathVariable Long userId, Pageable pageable
     ) {
@@ -51,7 +60,7 @@ public class FeedController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/user/{userId}/scrap")
+    @GetMapping("user/{userId}/scrap")
     public ResponseEntity<?> selectUserScrapFeed(
             @PathVariable Long userId, Pageable pageable
     ) {
@@ -59,7 +68,7 @@ public class FeedController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/restaurant/{restaurantId}")
+    @GetMapping("restaurant/{restaurantId}")
     public ResponseEntity<?> selectRestaurantFeed(
             @PathVariable Long restaurantId, Pageable pageable
     ) {
@@ -89,6 +98,20 @@ public class FeedController {
     ) {
         // TODO
         return ResponseEntity.notFound().build();
+    }
+
+    private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
+        return dto
+                .add(
+                        feedLinker.getFeedDetail(dto.getId()).withSelfRel()
+                        // TODO owner link
+                        // TODO restaurant link
+                        // TODO comment link
+                )
+                .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
+                        feedLinker.updateFeed(dto.getId()).withRel("patch"),
+                        feedLinker.deleteFeed(dto.getId()).withRel("delete")
+                ));
     }
 
 }

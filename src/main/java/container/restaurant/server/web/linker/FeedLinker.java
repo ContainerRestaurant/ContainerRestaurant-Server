@@ -18,7 +18,7 @@ public class FeedLinker {
     SessionUser u = new SessionUser();
 
     public LinkBuilder getFeedDetail(Long feedId) {
-        return linkTo(proxy.getFeedDetail(feedId));
+        return linkTo(proxy.getFeedDetail(feedId, u));
     }
 
     public LinkBuilder selectFeed(Pageable pageable) {
