@@ -8,6 +8,7 @@ import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.user.NicknameExistsDto;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class UserController {
     private final UserService userService;
 
     private final UserLinker userLinker;
+    private final FeedLinker feedLinker;
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(
@@ -78,14 +80,14 @@ public class UserController {
     private UserInfoDto setLinks(UserInfoDto dto, Long loginId) {
         return dto
                 .add(
-                        userLinker.getUserById(dto.getId()).withSelfRel()
-                        // TODO feed link
+                        userLinker.getUserById(dto.getId()).withSelfRel(),
+                        feedLinker.selectUserFeed(dto.getId()).withRel("feeds")
                 )
                 .addAllIf(loginId.equals(dto.getId()), () -> List.of(
                         userLinker.updateUserById(dto.getId()).withRel("patch"),
                         userLinker.deleteById(dto.getId()).withRel("delete"),
-                        userLinker.existsNickname().withRel("nickname-exists")
-                        // TODO scrap link
+                        userLinker.existsNickname().withRel("nickname-exists"),
+                        feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps")
                         // TODO favorite link
                 ));
     }

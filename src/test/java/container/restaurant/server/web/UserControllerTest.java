@@ -45,18 +45,22 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.feeds.href").exists())
                 .andExpect(jsonPath("_links.patch.href").exists())
                 .andExpect(jsonPath("_links.delete.href").exists())
                 .andExpect(jsonPath("_links.nickname-exists.href").exists())
+                .andExpect(jsonPath("_links.scraps.href").exists())
                 .andDo(document("get-user",
                         preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("feeds").description("본 사용자가 작성한 피드 리스트"),
                                 linkWithRel("patch").description("본 사용자의 정보 업데이트 링크," +
                                         "닉네임과 프로필만 수정 가능하다."),
                                 linkWithRel("delete").description("본 사용자의 계정 탈퇴 링크"),
                                 linkWithRel("nickname-exists").description("닉네임 중복 확인 링크, " +
-                                        "템플릿으로 제공되어, {nickname}을 지정해야 사용이 가능하다.")
+                                        "템플릿으로 제공되어, {nickname}을 지정해야 사용이 가능하다."),
+                                linkWithRel("scraps").description("본 사용자가 스크랩한 피드 리스트")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("본 사용자의 구분자 ID"),
