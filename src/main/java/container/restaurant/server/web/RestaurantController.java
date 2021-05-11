@@ -1,15 +1,13 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.service.RestaurantService;
-import javassist.NotFoundException;
+import container.restaurant.server.domain.restaurant.RestaurantService;
+import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -22,26 +20,14 @@ public class RestaurantController {
 
     private final RestaurantService restaurantService;
 
-    @GetMapping
-    public List<ResponseEntity<?>> findAll() {
-        return restaurantService.findAll().stream().map(restaurant ->
-                ResponseEntity.ok().body(
-                        EntityModel.of(restaurant)
-                                .add(linkTo(getController().findById(restaurant.getId())).withSelfRel()))
-        ).collect(Collectors.toList());
-    }
-
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        try {
-            Restaurant restaurant = restaurantService.findById(id);
-            return ResponseEntity.ok(EntityModel.of(restaurant)
-                    .add(linkTo(getController().findById(restaurant.getId())).withSelfRel())
-            );
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
+        RestaurantInfoDto restaurantInfoDto = null;
+        restaurantInfoDto = restaurantService.findById(id);
+        return ResponseEntity.ok(EntityModel.of(restaurantInfoDto)
+                .add(linkTo(getController().findById(id)).withSelfRel())
+                .add(linkTo(ImageController.class).slash(restaurantInfoDto.getImage_path()).withRel("image-url"))
+        );
     }
 
     @GetMapping("/{lat}/{lon}/{radius}")
@@ -59,6 +45,15 @@ public class RestaurantController {
                         .add(linkTo(ImageController.class).slash(restaurant.getImage_path()).withRel("image-url"))
                 ).collect(Collectors.toList()))
                 .add(linkTo(getController().findNearByRestaurants(lat, lon, radius)).withSelfRel()));
+    }
+
+    @GetMapping("search/{name}")
+    public ResponseEntity<CollectionModel<?>> searchRestaurantName(@PathVariable("name") String name) {
+        return ResponseEntity.ok(new CollectionModel<>(restaurantService.searchRestaurantName(name)
+                .stream().map(restaurant -> EntityModel.of(restaurant)
+                        .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
+                ).collect(Collectors.toList()))
+                .add(linkTo(getController().searchRestaurantName(name)).withSelfRel()));
     }
 
     private RestaurantController getController() {

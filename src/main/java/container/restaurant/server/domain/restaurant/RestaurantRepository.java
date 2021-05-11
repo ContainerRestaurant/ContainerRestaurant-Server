@@ -13,4 +13,8 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
                     "WHERE MBRCONTAINS(ST_LINESTRINGFROMTEXT( getDiagonal(?1,?2,?3)), location)")
     List<Restaurant> findNearByRestaurants(double lat, double lon, long radius);
 
+    @Query(nativeQuery = true,
+            value = "SELECT * FROM tb_restaurant\n" +
+                    "WHERE name LIKE CONCAT('%',?1,'%')")
+    List<Restaurant> searchRestaurantName(String name);
 }
