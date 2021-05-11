@@ -38,7 +38,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     public void testGetMyFeedDetail() throws Exception {
         //given
         Feed feed = myFeed;
-        List<Image> detailImages = saveImages(feed);
 
         //expect
         mvc.perform(
@@ -52,9 +51,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("imageUrls").value(
-                        detailImages.stream().map(Image::getUrl).collect(Collectors.toList())
-                ))
+                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailUrl()))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -69,8 +66,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Test
     @DisplayName("남이 작성한 피드 상세")
     public void testGetOthersFeedDetail() throws Exception {
+        //given
         Feed feed = othersFeed;
-        List<Image> detailImages = saveImages(feed);
 
         //expect
         mvc.perform(get("/api/feed/{feedId}", feed.getId()))
@@ -81,9 +78,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("imageUrls").value(
-                        detailImages.stream().map(Image::getUrl).collect(Collectors.toList())
-                ))
+                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailUrl()))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -118,17 +113,5 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Test
     public void testSelectRestaurantFeed() throws Exception {
 
-    }
-
-    private List<Image> saveImages(Feed feed) {
-        List<Image> detailImages = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            detailImages.add(Image.builder()
-                    .feed(feed)
-                    .url("https://detail" + i)
-                    .build());
-        }
-        detailImages = imageRepository.saveAll(detailImages);
-        return detailImages;
     }
 }

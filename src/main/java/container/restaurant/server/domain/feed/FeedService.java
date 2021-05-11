@@ -15,13 +15,8 @@ public class FeedService {
 
     private final FeedRepository feedRepository;
 
-    private final ImageRepository imageRepository;
-
     public FeedDetailDto getFeedDetail(Long feedId) {
-        Feed feed = findById(feedId);
-        List<Image> images = imageRepository.findAllByFeed(feed);
-
-        return FeedDetailDto.from(feed, images);
+        return FeedDetailDto.from(findById(feedId));
     }
 
     public Feed findById(Long id) {

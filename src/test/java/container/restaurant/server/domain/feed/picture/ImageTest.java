@@ -19,12 +19,10 @@ class ImageTest {
 
         //when
         Image picture = Image.builder()
-                .feed(feed)
                 .url(url)
                 .build();
 
         //then
-        assertThat(picture.getFeed()).isEqualTo(feed);
         assertThat(picture.getUrl()).isEqualTo(url);
     }
 
