@@ -4,23 +4,21 @@ import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
+import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.UserLinker;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
  * TODO 필터 조건
  *  - 카테고리 필터링
- *
- * TODO 정렬 조건
- *  - 최신 순
- *  - 좋아요 많은 순
- *  - 난이도 쉽/어렵 순
  */
 @RequiredArgsConstructor
 @RestController
@@ -43,8 +41,8 @@ public class FeedController {
 
     @GetMapping
     public ResponseEntity<?> selectFeed(Pageable pageable) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                setLinks(feedService.findAll(pageable)));
     }
 
     @GetMapping("recommend")
@@ -113,6 +111,12 @@ public class FeedController {
                         feedLinker.updateFeed(dto.getId()).withRel("patch"),
                         feedLinker.deleteFeed(dto.getId()).withRel("delete")
                 ));
+    }
+
+    private CollectionModel<FeedPreviewDto> setLinks(CollectionModel<FeedPreviewDto> list) {
+        list.forEach(dto ->
+                dto.add(feedLinker.getFeedDetail(dto.getId()).withSelfRel()));
+        return list;
     }
 
 }
