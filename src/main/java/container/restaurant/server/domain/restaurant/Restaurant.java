@@ -33,20 +33,19 @@ public class Restaurant extends BaseEntity {
     private double longitude;
 
     @NotNull
-    @OneToOne
-    private Image image;
+    private Long image_ID;
 
     @ColumnDefault("0")
     private int vanishCount;
 
     @Builder
-    protected Restaurant(String name, String addr, Point loc, double lon, double lat, Image image) {
+    protected Restaurant(String name, String addr, Point loc, double lon, double lat, Long image_ID) {
         this.name = name;
         this.address = addr;
         this.location = loc;
         this.longitude = lon;
         this.latitude = lat;
-        this.image = image;
+        this.image_ID = image_ID;
     }
 
 }

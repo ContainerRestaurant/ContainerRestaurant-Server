@@ -1,5 +1,6 @@
 package container.restaurant.server.web.dto.restaurant;
 
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
@@ -14,17 +15,17 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
     private final double longitude;
     private final String image_path;
 
-    public static RestaurantNearInfoDto from(Restaurant restaurant) {
-        return new RestaurantNearInfoDto(restaurant);
+    public static RestaurantNearInfoDto from(Restaurant restaurant, Image image) {
+        return new RestaurantNearInfoDto(restaurant, image);
     }
 
-    protected RestaurantNearInfoDto(Restaurant restaurant) {
+    protected RestaurantNearInfoDto(Restaurant restaurant, Image image) {
         this.id = restaurant.getId();
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();
         this.longitude = restaurant.getLongitude();
-        this.image_path = restaurant.getImage().getUrl();
+        this.image_path = image.getUrl();
     }
 
 }

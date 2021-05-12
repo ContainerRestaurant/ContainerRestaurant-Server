@@ -1,5 +1,7 @@
 package container.restaurant.server.domain.restaurant;
 
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNameInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
@@ -14,14 +16,22 @@ import java.util.stream.Collectors;
 public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
 
+    private final ImageRepository imageRepository;
+
     public RestaurantInfoDto findById(Long id) {
-        return RestaurantInfoDto.from(restaurantRepository.findById(id).get());
+        Restaurant restaurant = restaurantRepository.findById(id).get();
+        Image image = imageRepository.getOne(restaurant.getImage_ID());
+
+        return RestaurantInfoDto.from(restaurant, image);
     }
 
     public List<RestaurantNearInfoDto> findNearByRestaurants(double lat, double lon, long radius) {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
-                .map(RestaurantNearInfoDto::from)
+                .map(restaurant -> {
+                    Image image = imageRepository.getOne(restaurant.getImage_ID());
+                    return RestaurantNearInfoDto.from(restaurant, image);
+                })
                 .collect(Collectors.toList());
     }
 
