@@ -1,4 +1,4 @@
-package container.restaurant.server.web;
+package container.restaurant.server.web.util;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
