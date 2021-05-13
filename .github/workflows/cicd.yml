@@ -19,7 +19,21 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-
+      
+      - name: Set test DB configuration
+        env:
+          TEST_DB_URL: ${{ secrets.TEST_DB_URL }}
+          TEST_DB_USER: ${{ secrets.TEST_DB_USER }}
+          TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+        run: >
+          printf
+          "
+          spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver\n
+          spring.datasource.url=$env:TEST_DB_URL\n
+          spring.datasource.username=$env:TEST_DB_USER\n
+          spring.datasource.password=$env:TEST_DB_PASSWORD\n
+          ">./src/test/resources/application-datasource.properties
+          
       # 여기서 부터는 CI 작업
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
