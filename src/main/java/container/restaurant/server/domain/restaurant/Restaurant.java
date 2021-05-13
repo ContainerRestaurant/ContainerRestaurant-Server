@@ -35,7 +35,7 @@ public class Restaurant extends BaseEntity {
     private Long image_ID;
 
     @ColumnDefault("0")
-    private int vinishCount;
+    private int vanishCount;
 
     @Builder
     protected Restaurant(String name, String addr, Point loc, float lon, float lat) {
