@@ -44,9 +44,9 @@ public class User extends BaseCreatedTimeEntity {
     private Boolean banned;
 
     @Builder
-    protected User(String email, String profile) {
+    protected User(String email, String profile, String nickname) {
         this.email = email;
-        this.nickname = null;
+        this.nickname = nickname;
         this.profile = profile;
         this.greeting = null;
         this.level = 1;
