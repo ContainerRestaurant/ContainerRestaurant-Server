@@ -37,7 +37,8 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
 
     @AfterEach
     public void afterEach() {
-        userRepository.deleteAll();
+        userRepository.delete(myself);
+        userRepository.delete(other);
         myselfSession.clearAttributes();
     }
 }

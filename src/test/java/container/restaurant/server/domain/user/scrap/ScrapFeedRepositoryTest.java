@@ -31,30 +31,35 @@ class ScrapFeedRepositoryTest {
     @Autowired
     RestaurantRepository restaurantRepository;
 
+    protected User user;
+    protected Restaurant restaurant;
+    protected Feed feed;
+
     @AfterEach
     void afterEach() {
         scrapFeedRepository.deleteAll();
-        feedRepository.deleteAll();
-        restaurantRepository.deleteAll();
-        userRepository.deleteAll();
+        feedRepository.delete(feed);
+        restaurantRepository.delete(restaurant);
+        userRepository.delete(user);
     }
 
     @Test
     void testExistsByUserAndFeed() {
         //given: user 와 feed 가 주어졌을 때
-        User user = userRepository.save(User.builder()
-                .email("test@test.com")
+        user = userRepository.save(User.builder()
+                .email("test1@test.com")
                 .profile("https://my.profile")
                 .build());
 
-        Restaurant restaurant = restaurantRepository.save(Restaurant.builder()
+        restaurant = restaurantRepository.save(Restaurant.builder()
                 .name("restaurant")
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
+                .image_ID(1l)
                 .build());
 
-        Feed feed = feedRepository.save(Feed.builder()
+        feed = feedRepository.save(Feed.builder()
                 .owner(user)
                 .restaurant(restaurant)
                 .difficulty(3)
@@ -65,7 +70,7 @@ class ScrapFeedRepositoryTest {
         scrapFeedRepository.save(ScrapFeed.of(user, feed));
 
         //then-1: user 를 이용해 스크랩을 찾을 수 있다.
-        List<ScrapFeed> scraps  = scrapFeedRepository.findAllByUser(user);
+        List<ScrapFeed> scraps = scrapFeedRepository.findAllByUser(user);
         assertThat(scraps).isNotNull();
         assertThat(scraps.get(0).getUser().getId()).isEqualTo(user.getId());
         assertThat(scraps.get(0).getFeed().getId()).isEqualTo(feed.getId());

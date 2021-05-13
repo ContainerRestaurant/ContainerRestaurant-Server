@@ -54,10 +54,11 @@ public class FeedRepositoryTest {
                 .build());
 
         restaurant = restaurantRepository.save(Restaurant.builder()
-                .name("restaurant")
-                .addr("address")
+                .name("restaurant3")
+                .addr("address3")
                 .lat(1f)
                 .lon(1f)
+                .image_ID(3l)
                 .build());
 
         lastIndex = feedRepository.saveAll(IntStream.range(0, 10)
@@ -75,11 +76,22 @@ public class FeedRepositoryTest {
                 .orElse(-1L);
     }
 
+    // 두번째 테스트 연결을 위해 사용된 사용자를 삭제
     @AfterEach
     void afterEach() {
-        feedRepository.deleteAll();
-        restaurantRepository.deleteAll();
-        userRepository.deleteAll();
+        deleteAllFeed();
+        restaurantRepository.delete(restaurant);
+        userRepository.delete(other);
+        userRepository.delete(myself);
+
+    }
+
+    void deleteAllFeed() {
+        long start = lastIndex - 9;
+        while (start <= lastIndex) {
+            feedRepository.deleteById(start);
+            start++;
+        }
     }
 
     @Test

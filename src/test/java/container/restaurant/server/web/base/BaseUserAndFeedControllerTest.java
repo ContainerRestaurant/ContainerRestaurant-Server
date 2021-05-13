@@ -30,6 +30,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
+                .image_ID(1l)
                 .build());
         myFeed = feedRepository.save(Feed.builder()
                 .owner(myself)
@@ -53,8 +54,9 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     @Override
     @AfterEach
     public void afterEach() {
-        feedRepository.deleteAll();
-        restaurantRepository.deleteAll();
+        feedRepository.delete(myFeed);
+        feedRepository.delete(othersFeed);
+        restaurantRepository.delete(restaurant);
         super.afterEach();
     }
 

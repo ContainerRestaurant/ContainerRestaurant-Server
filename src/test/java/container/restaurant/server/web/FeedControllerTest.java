@@ -28,7 +28,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
     @AfterEach
     public void afterEach() {
-        imageRepository.deleteAll();
+//        imageRepository.deleteAll();
         super.afterEach();
     }
 

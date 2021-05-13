@@ -31,30 +31,35 @@ class FeedLikeRepositoryTest {
     @Autowired
     RestaurantRepository restaurantRepository;
 
+    protected User user;
+    protected Restaurant restaurant;
+    protected Feed feed;
+
     @AfterEach
     void afterEach() {
         feedLikeRepository.deleteAll();
-        feedRepository.deleteAll();
-        restaurantRepository.deleteAll();
-        userRepository.deleteAll();
+        feedRepository.delete(feed);
+        restaurantRepository.delete(restaurant);
+        userRepository.delete(user);
     }
 
     @Test
     void testExistsByUserAndFeed() {
         //given: user 와 feed 가 주어졌을 때
-        User user = userRepository.save(User.builder()
-                .email("test@test.com")
+        user = userRepository.save(User.builder()
+                .email("test2@test.com")
                 .profile("https://my.profile")
                 .build());
 
-        Restaurant restaurant = restaurantRepository.save(Restaurant.builder()
-                .name("restaurant")
-                .addr("address")
+        restaurant = restaurantRepository.save(Restaurant.builder()
+                .name("restaurant2")
+                .addr("address2")
                 .lon(0f)
                 .lat(0f)
+                .image_ID(2l)
                 .build());
 
-        Feed feed = feedRepository.save(Feed.builder()
+        feed = feedRepository.save(Feed.builder()
                 .owner(user)
                 .restaurant(restaurant)
                 .difficulty(3)
@@ -65,7 +70,7 @@ class FeedLikeRepositoryTest {
         feedLikeRepository.save(FeedLike.of(user, feed));
 
         //then-1: feed 를 이용해 좋아요를 찾을 수 있다.
-        List<FeedLike> feedLikes  = feedLikeRepository.findAllByFeed(feed);
+        List<FeedLike> feedLikes = feedLikeRepository.findAllByFeed(feed);
         assertThat(feedLikes).isNotNull();
         assertThat(feedLikes.get(0).getFeed().getId()).isEqualTo(feed.getId());
         assertThat(feedLikes.get(0).getUser().getId()).isEqualTo(user.getId());
