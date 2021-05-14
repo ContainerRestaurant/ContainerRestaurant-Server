@@ -3,6 +3,8 @@ package container.restaurant.server.domain.user.scrap;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
@@ -31,35 +33,39 @@ class ScrapFeedRepositoryTest {
     @Autowired
     RestaurantRepository restaurantRepository;
 
-    protected User user;
-    protected Restaurant restaurant;
-    protected Feed feed;
+    @Autowired
+    ImageRepository imageRepository;
 
     @AfterEach
     void afterEach() {
         scrapFeedRepository.deleteAll();
-        feedRepository.delete(feed);
-        restaurantRepository.delete(restaurant);
-        userRepository.delete(user);
+        feedRepository.deleteAll();
+        restaurantRepository.deleteAll();
+        userRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
     @Test
     void testExistsByUserAndFeed() {
         //given: user 와 feed 가 주어졌을 때
-        user = userRepository.save(User.builder()
-                .email("test1@test.com")
+        User user = userRepository.save(User.builder()
+                .email("test@test.com")
                 .profile("https://my.profile")
                 .build());
 
-        restaurant = restaurantRepository.save(Restaurant.builder()
+        Image image = imageRepository.save(Image.builder()
+                .url("image_path_url")
+                .build());
+
+        Restaurant restaurant = restaurantRepository.save(Restaurant.builder()
                 .name("restaurant")
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(1l)
+                .image_ID(image.getId())
                 .build());
 
-        feed = feedRepository.save(Feed.builder()
+        Feed feed = feedRepository.save(Feed.builder()
                 .owner(user)
                 .restaurant(restaurant)
                 .difficulty(3)

@@ -3,6 +3,8 @@ package container.restaurant.server.web.base;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +19,9 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     @Autowired
     protected RestaurantRepository restaurantRepository;
 
+    @Autowired
+    protected ImageRepository imageRepository;
+
     protected Restaurant restaurant;
     protected Feed myFeed;
     protected Feed othersFeed;
@@ -25,12 +30,17 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     @BeforeEach
     public void beforeEach() {
         super.beforeEach();
+
+        Image image = imageRepository.save(Image.builder()
+                .url("image_path_url")
+                .build());
+
         restaurant = restaurantRepository.save(Restaurant.builder()
                 .name("restaurant")
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(1l)
+                .image_ID(image.getId())
                 .build());
         myFeed = feedRepository.save(Feed.builder()
                 .owner(myself)
@@ -54,9 +64,9 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     @Override
     @AfterEach
     public void afterEach() {
-        feedRepository.delete(myFeed);
-        feedRepository.delete(othersFeed);
-        restaurantRepository.delete(restaurant);
+        feedRepository.deleteAll();
+        restaurantRepository.deleteAll();
+        imageRepository.deleteAll();
         super.afterEach();
     }
 
