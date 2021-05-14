@@ -80,6 +80,7 @@ class ScrapUserControllerTest extends BaseUserAndFeedControllerTest {
         scrapFeedService.userScrapFeed(myself.getId(), othersFeed.getId());
         myself = userRepository.findById(myself.getId())
                 .orElse(myself);
+        Thread.sleep(0, 1);
         LocalDateTime now = LocalDateTime.now();
 
         //when myself 유저 세션으로 주어진 피드를 스크랩하면
