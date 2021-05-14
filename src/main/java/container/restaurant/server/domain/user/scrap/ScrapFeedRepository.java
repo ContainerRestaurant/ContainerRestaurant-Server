@@ -1,16 +1,17 @@
 package container.restaurant.server.domain.user.scrap;
 
-import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
 
-    List<ScrapFeed> findAllByUser(User user);
+    @EntityGraph(attributePaths = { "feed", "feed.owner" })
+    Page<ScrapFeed> findAllByUserId(Long userId, Pageable pageable);
 
-    Optional<ScrapFeed> findByUserAndFeed(User user, Feed feed);
+    Optional<ScrapFeed> findByUserIdAndFeedId(Long userId, Long feedId);
 
 }

@@ -13,6 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -76,13 +78,14 @@ class ScrapFeedRepositoryTest {
         scrapFeedRepository.save(ScrapFeed.of(user, feed));
 
         //then-1: user 를 이용해 스크랩을 찾을 수 있다.
-        List<ScrapFeed> scraps = scrapFeedRepository.findAllByUser(user);
-        assertThat(scraps).isNotNull();
-        assertThat(scraps.get(0).getUser().getId()).isEqualTo(user.getId());
-        assertThat(scraps.get(0).getFeed().getId()).isEqualTo(feed.getId());
+        Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(user.getId(), Pageable.unpaged());
+        List<ScrapFeed> list = scraps.getContent();
+        assertThat(list).isNotNull();
+        assertThat(list.get(0).getUser().getId()).isEqualTo(user.getId());
+        assertThat(list.get(0).getFeed().getId()).isEqualTo(feed.getId());
 
         //then-2: 유저와 피드로 해당 스크랩을 찾을 수 있다.
-        ScrapFeed scrap = scrapFeedRepository.findByUserAndFeed(user, feed)
+        ScrapFeed scrap = scrapFeedRepository.findByUserIdAndFeedId(user.getId(), feed.getId())
                 .orElse(null);
         assertThat(scrap).isNotNull();
         assertThat(scrap.getUser().getId()).isEqualTo(user.getId());
