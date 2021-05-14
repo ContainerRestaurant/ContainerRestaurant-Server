@@ -83,28 +83,21 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("답댓글 작성")
-    void createReplyComment() {
-        CommentCreateDto commentCreateDto = new CommentCreateDto("test", 2L);
-
-        SessionUser sessionUser = SessionUser.from(user);
-
-        CommentInfoDto dto = commentService.createComment(commentCreateDto, 2L, sessionUser.getId());
-
-        assertThat(dto.getContent()).isEqualTo("test");
-        assertThat(dto.getOwnerId()).isEqualTo(user.getId());
-    }
-
-    @Test
     @DisplayName("댓글 작성")
-    void createComment() {
-        CommentCreateDto commentCreateDto = new CommentCreateDto("test");
-
+    void createReplyComment() {
+        // 답댓글 작성
+        CommentCreateDto replyDto = new CommentCreateDto("test", 2L);
         SessionUser sessionUser = SessionUser.from(user);
+        CommentInfoDto replyInfoDto = commentService.createComment(replyDto, feeds.get(1).getId(), sessionUser.getId());
 
-        CommentInfoDto dto = commentService.createComment(commentCreateDto, 2L, sessionUser.getId());
+        assertThat(replyInfoDto.getContent()).isEqualTo("test");
+        assertThat(replyInfoDto.getOwnerId()).isEqualTo(user.getId());
 
-        assertThat(dto.getContent()).isEqualTo("test");
+        // 댓글 작성
+        CommentCreateDto commentCreateDto = new CommentCreateDto("test2");
+        CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), sessionUser.getId());
+
+        assertThat(dto.getContent()).isEqualTo("test2");
         assertThat(dto.getOwnerId()).isEqualTo(user.getId());
     }
 }
