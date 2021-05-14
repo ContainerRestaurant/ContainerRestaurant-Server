@@ -5,6 +5,8 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.comment.Comment;
 import container.restaurant.server.domain.comment.CommentService;
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
