@@ -3,6 +3,8 @@ package container.restaurant.server.domain.user.scrap;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
@@ -31,12 +33,16 @@ class ScrapFeedRepositoryTest {
     @Autowired
     RestaurantRepository restaurantRepository;
 
+    @Autowired
+    ImageRepository imageRepository;
+
     @AfterEach
     void afterEach() {
         scrapFeedRepository.deleteAll();
         feedRepository.deleteAll();
         restaurantRepository.deleteAll();
         userRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
     @Test
@@ -47,11 +53,16 @@ class ScrapFeedRepositoryTest {
                 .profile("https://my.profile")
                 .build());
 
+        Image image = imageRepository.save(Image.builder()
+                .url("image_path_url")
+                .build());
+
         Restaurant restaurant = restaurantRepository.save(Restaurant.builder()
                 .name("restaurant")
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
+                .image_ID(image.getId())
                 .build());
 
         Feed feed = feedRepository.save(Feed.builder()
@@ -65,7 +76,7 @@ class ScrapFeedRepositoryTest {
         scrapFeedRepository.save(ScrapFeed.of(user, feed));
 
         //then-1: user 를 이용해 스크랩을 찾을 수 있다.
-        List<ScrapFeed> scraps  = scrapFeedRepository.findAllByUser(user);
+        List<ScrapFeed> scraps = scrapFeedRepository.findAllByUser(user);
         assertThat(scraps).isNotNull();
         assertThat(scraps.get(0).getUser().getId()).isEqualTo(user.getId());
         assertThat(scraps.get(0).getFeed().getId()).isEqualTo(feed.getId());
