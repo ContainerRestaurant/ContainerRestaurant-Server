@@ -1,6 +1,8 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseEntity;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
@@ -34,6 +36,9 @@ public class FeedRepositoryTest {
     @Autowired
     RestaurantRepository restaurantRepository;
 
+    @Autowired
+    ImageRepository imageRepository;
+
     protected User myself;
     protected User other;
     protected Restaurant restaurant;
@@ -53,11 +58,16 @@ public class FeedRepositoryTest {
                 .profile("https://your.profile.path")
                 .build());
 
+        Image image = imageRepository.save(Image.builder()
+                .url("image_path_url")
+                .build());
+
         restaurant = restaurantRepository.save(Restaurant.builder()
                 .name("restaurant")
                 .addr("address")
                 .lat(1f)
                 .lon(1f)
+                .image_ID(image.getId())
                 .build());
 
         lastIndex = feedRepository.saveAll(IntStream.range(0, 10)
@@ -80,6 +90,7 @@ public class FeedRepositoryTest {
         feedRepository.deleteAll();
         restaurantRepository.deleteAll();
         userRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
     @Test
