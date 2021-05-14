@@ -1,13 +1,9 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
