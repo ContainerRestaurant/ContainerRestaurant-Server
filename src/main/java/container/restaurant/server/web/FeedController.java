@@ -55,8 +55,8 @@ public class FeedController {
     public ResponseEntity<?> selectUserFeed(
             @PathVariable Long userId, Pageable pageable
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                setLinks(feedService.findAllByUser(userId, pageable)));
     }
 
     @GetMapping("user/{userId}/scrap")
@@ -71,8 +71,8 @@ public class FeedController {
     public ResponseEntity<?> selectRestaurantFeed(
             @PathVariable Long restaurantId, Pageable pageable
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                setLinks(feedService.findAllByRestaurant(restaurantId, pageable)));
     }
 
     @PostMapping

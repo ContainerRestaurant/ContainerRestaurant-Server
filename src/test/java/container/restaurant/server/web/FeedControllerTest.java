@@ -3,6 +3,7 @@ package container.restaurant.server.web;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
+import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -117,12 +118,55 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    public void testSelectRecommendFeed() throws Exception {
+    @DisplayName("사용자 피드 가져오기")
+    public void testSelectUserFeed() throws Exception {
+        //given
+        List<Feed> list = saveFeeds();
+        Feed lastFeed = list.get(list.size() - 1);
 
+        //expect
+        mvc.perform(
+                get("/api/feed/user/{userId}", other.getId())
+                        .queryParam("page", "0")
+                        .queryParam("size", "3"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(LIST_PATH, hasSize(3)))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(lastFeed.getId()))
+                .andExpect(jsonPath(LIST_PATH + "[0].ownerNickname").value(lastFeed.getOwner().getNickname()))
+                .andExpect(jsonPath(LIST_PATH + "[0].content").value(lastFeed.getContent()))
+                .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
+                .andExpect(jsonPath("_links.self.href").exists());
     }
 
     @Test
-    public void testSelectUserFeed() throws Exception {
+    @DisplayName("식당 피드 가져오기")
+    public void testSelectRestaurantFeed() throws Exception {
+        //given
+        List<Feed> list = saveFeeds();
+        Feed lastFeed = list.get(list.size() - 1);
+
+        //expect
+        mvc.perform(
+                get("/api/feed/restaurant/{restaurantId}", restaurant.getId())
+                        .queryParam("page", "0")
+                        .queryParam("size", "3"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(LIST_PATH, hasSize(3)))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(lastFeed.getId()))
+                .andExpect(jsonPath(LIST_PATH + "[0].ownerNickname").value(lastFeed.getOwner().getNickname()))
+                .andExpect(jsonPath(LIST_PATH + "[0].content").value(lastFeed.getContent()))
+                .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
+                .andExpect(jsonPath("_links.self.href").exists());
+    }
+
+    @Test
+    public void testSelectRecommendFeed() throws Exception {
 
     }
 
@@ -131,25 +175,27 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
     }
 
-    @Test
-    public void testSelectRestaurantFeed() throws Exception {
-
-    }
-
     private List<Feed> saveFeeds() throws InterruptedException {
+        Restaurant tempRestaurant = restaurantRepository.save(Restaurant.builder()
+                .name("restaurant")
+                .addr("address")
+                .lon(0f)
+                .lat(0f)
+                .image_ID(image.getId())
+                .build());
+
         List<Feed> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-
             list.add(feedRepository.save(Feed.builder()
                     .owner(i % 2 == 0 ? myself : other)
-                    .restaurant(restaurant)
+                    .restaurant(i % 2 == 0? tempRestaurant : restaurant)
                     .difficulty(4)
                     .category(Category.JAPANESE)
                     .welcome(true)
                     .thumbnailUrl("https://my.thumbnail" + 1)
                     .content("Feed Content")
                     .build()));
-            // 피드간에 생성 시간 차이를 위해 구현
+            // 각 피드간에 생성시간차를 두기위해 잠시 대기
             Thread.sleep(0, 1);
         }
         return list;

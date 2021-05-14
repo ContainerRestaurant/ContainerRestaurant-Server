@@ -29,7 +29,17 @@ public class FeedService {
     }
 
     public PagedModel<FeedPreviewDto> findAll(Pageable pageable) {
+        return assembler.toModel(
+                feedRepository.findAll(pageable), FeedPreviewDto::from);
+    }
 
-        return assembler.toModel(feedRepository.findAll(pageable), FeedPreviewDto::from);
+    public PagedModel<FeedPreviewDto> findAllByUser(Long userId, Pageable pageable) {
+        return assembler.toModel(
+                feedRepository.findAllByOwnerId(userId, pageable), FeedPreviewDto::from);
+    }
+
+    public PagedModel<FeedPreviewDto> findAllByRestaurant(Long restaurantId, Pageable pageable) {
+        return assembler.toModel(
+                feedRepository.findAllByRestaurantId(restaurantId, pageable), FeedPreviewDto::from);
     }
 }

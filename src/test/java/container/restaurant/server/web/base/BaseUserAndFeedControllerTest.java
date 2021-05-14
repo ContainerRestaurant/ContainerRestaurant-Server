@@ -25,13 +25,14 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     protected Restaurant restaurant;
     protected Feed myFeed;
     protected Feed othersFeed;
+    protected Image image;
 
     @Override
     @BeforeEach
     public void beforeEach() {
         super.beforeEach();
 
-        Image image = imageRepository.save(Image.builder()
+        image = imageRepository.save(Image.builder()
                 .url("image_path_url")
                 .build());
 
