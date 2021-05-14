@@ -1,47 +1,45 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
-import container.restaurant.server.web.linker.CommentLinker;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.LinkedHashMap;
-import java.util.List;
+
+import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final FeedRepository feedRepository;
 
     @Transactional
     public Comment createComment(Comment comment){
         return commentRepository.save(comment);
     }
 
-    @Transactional
-    public LinkedHashMap<Long, CommentInfoDto> findAllByFeed(Feed feed, SessionUser sessionUser) throws ResourceNotFoundException{
-        LinkedHashMap<Long, CommentInfoDto> comment = new LinkedHashMap<>();
-        List<Comment> comments = commentRepository.findAllByFeed(feed);
-        for(Comment comment1 : comments){
-            if(comment1.getUpperReply()!=null){
-                comment.values().forEach(commentInfoDto -> {
-                    if(commentInfoDto.getId().equals(comment1.getUpperReply().getId())){
-                        try {
-                            if(sessionUser.getId().equals(comment1.getOwner().getId()))
-                                commentInfoDto.addCommentReply(setLinks(CommentInfoDto.from(comment1)));
-                        }catch (NullPointerException e){ commentInfoDto.addCommentReply(CommentInfoDto.from(comment1)); }
-                    }
-                });
-            }else{
-                comment.put(comment1.getId(), CommentInfoDto.from(comment1));
-            }
-        }
-        return comment;
+    @Transactional(readOnly = true)
+    public CollectionModel<CommentInfoDto> findAllByFeed(Long feedId) throws ResourceNotFoundException{
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 게시글입니다.(id:"+feedId+")"));
+
+        LinkedHashMap<Long, CommentInfoDto> commentDtoMap = new LinkedHashMap<>();
+
+        commentRepository.findAllByFeed(feed).forEach(comment ->
+                ofNullable(comment.getUpperReply()).ifPresentOrElse(
+                        upperReply -> commentDtoMap.get(upperReply.getId())
+                                .addCommentReply(CommentInfoDto.from(comment)),
+                        () -> commentDtoMap.put(comment.getId(), CommentInfoDto.from(comment))
+                ));
+
+        return CollectionModel.of(commentDtoMap.values());
     }
 
     @Transactional
@@ -52,14 +50,5 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+id+")"));
         commentUpdateDto.updateComment(comment);
-    }
-
-    private final CommentLinker commentLinker;
-    public CommentInfoDto setLinks(CommentInfoDto dto){
-        return dto
-                .add(
-                        commentLinker.updateComment(dto.getId()).withRel("patch"),
-                        commentLinker.deleteComment(dto.getId()).withRel("delete")
-                );
     }
 }

@@ -4,8 +4,6 @@ import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.comment.Comment;
 import container.restaurant.server.domain.comment.CommentService;
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
 import container.restaurant.server.web.linker.CommentLinker;
@@ -16,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,7 +22,6 @@ import java.util.LinkedHashMap;
 @RequestMapping("/api/comment")
 public class CommentController {
     private final CommentService commentService;
-    private final FeedRepository feedRepository;
     private final CommentLinker commentLinker;
 
     @PostMapping
@@ -41,19 +38,11 @@ public class CommentController {
             @PathVariable Long feedId,
             @LoginUser SessionUser sessionUser
     ){
-        LinkedHashMap<Long, CommentInfoDto> comments = commentService.findAllByFeed(
-                feedRepository.findById(feedId).orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 게시글입니다.(id:"+feedId+")"))
-                , sessionUser
-        );
-        comments.values().forEach(dto -> {
-            try{
-                if(dto.getOwnerId().equals(sessionUser.getId()))
-                    commentService.setLinks(dto);
-            }catch (NullPointerException e){  }
-        });
+        Long userID = sessionUser != null ? sessionUser.getId() : null;
 
         return ResponseEntity.ok(
-                CollectionModel.of(comments).add(commentLinker.getCommentByFeed(feedId).withSelfRel())
+                setLinks(commentService.findAllByFeed(feedId), userID)
+                        .add(commentLinker.getCommentByFeed(feedId).withSelfRel())
         );
     }
 
@@ -72,5 +61,21 @@ public class CommentController {
     ){
         commentService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private CollectionModel<CommentInfoDto> setLinks(CollectionModel<CommentInfoDto> collection, Long userId){
+        collection.forEach(dto -> {
+            setLinks(dto, userId);
+            dto.ifHasReply(commentInfoDto -> setLinks(commentInfoDto, userId));
+        });
+
+        return collection;
+    }
+
+    private void setLinks(CommentInfoDto dto, Long userId){
+        dto.addAllIf(dto.getOwnerId().equals(userId), () -> List.of(
+                commentLinker.updateComment(dto.getId()).withRel("patch"),
+                commentLinker.deleteComment(dto.getId()).withRel("delete"))
+        );
     }
 }

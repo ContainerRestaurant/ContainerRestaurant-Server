@@ -7,6 +7,7 @@ import org.springframework.hateoas.RepresentationModel;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
@@ -37,5 +38,10 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
 
     public void addCommentReply(CommentInfoDto commentInfoDto){
         commentReply.add(commentInfoDto);
+    }
+
+    public void ifHasReply(Consumer<CommentInfoDto> consumer) {
+        if (commentReply.size() == 0) return;
+        commentReply.forEach(consumer);
     }
 }
