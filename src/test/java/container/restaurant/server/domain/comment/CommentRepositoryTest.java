@@ -53,6 +53,7 @@ class CommentRepositoryTest {
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
+                .image_ID(1L)
                 .build());
 
         for (int i = 0; i < 3; i++) {
@@ -66,10 +67,10 @@ class CommentRepositoryTest {
 
         for (int i = 0; i < 10; i++) {
             comments.add(commentRepository.save(Comment.builder()
-                .content("test")
-                .feed(feeds.get(i % 3))
-                .owner(user)
-                .build()));
+                    .content("test")
+                    .feed(feeds.get(i % 3))
+                    .owner(user)
+                    .build()));
         }
     }
 
