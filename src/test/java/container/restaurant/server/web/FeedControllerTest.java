@@ -4,6 +4,8 @@ import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
+import container.restaurant.server.domain.user.scrap.ScrapFeed;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,8 +31,12 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private ScrapFeedRepository scrapFeedRepository;
+
     @AfterEach
     public void afterEach() {
+        scrapFeedRepository.deleteAll();
         imageRepository.deleteAll();
         super.afterEach();
     }
@@ -166,12 +172,37 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    public void testSelectRecommendFeed() throws Exception {
+    @DisplayName("사용자가 스크랩한 피드 가져오기")
+    public void testSelectUserScrapFeed() throws Exception {
+        //given
+        List<Feed> list = saveFeeds();
+        Feed lastFeed = null;
+        for (int i = 0; i < 10; i+=3) {
+            scrapFeedRepository.save(ScrapFeed.of(myself, list.get(i)));
+            lastFeed = list.get(i);
+            // 각 스크랩간에 생성 시간차를 두기위해 잠시 대기
+            Thread.sleep(0, 1);
+        }
 
+        //expect
+        mvc.perform(
+                get("/api/feed/user/{userId}/scrap", myself.getId())
+                        .queryParam("page", "0")
+                        .queryParam("size", "2"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(LIST_PATH, hasSize(2)))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(lastFeed.getId()))
+                .andExpect(jsonPath(LIST_PATH + "[0].ownerNickname").value(lastFeed.getOwner().getNickname()))
+                .andExpect(jsonPath(LIST_PATH + "[0].content").value(lastFeed.getContent()))
+                .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
+                .andExpect(jsonPath("_links.self.href").exists());
     }
 
     @Test
-    public void testSelectUserScrapFeed() throws Exception {
+    public void testSelectRecommendFeed() throws Exception {
 
     }
 

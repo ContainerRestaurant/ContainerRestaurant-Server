@@ -1,6 +1,7 @@
 package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.NonNull;
@@ -21,7 +22,14 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
 
     @NonNull
     public static FeedPreviewDto from(Feed feed) {
+
         return new FeedPreviewDto(feed);
+    }
+
+    @NonNull
+    public static FeedPreviewDto from(ScrapFeed scrapFeed)
+    {
+        return new FeedPreviewDto(scrapFeed.getFeed());
     }
 
     protected FeedPreviewDto(Feed feed) {

@@ -63,8 +63,8 @@ public class FeedController {
     public ResponseEntity<?> selectUserScrapFeed(
             @PathVariable Long userId, Pageable pageable
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                setLinks(feedService.findAllByUserScrap(userId, pageable)));
     }
 
     @GetMapping("restaurant/{restaurantId}")
