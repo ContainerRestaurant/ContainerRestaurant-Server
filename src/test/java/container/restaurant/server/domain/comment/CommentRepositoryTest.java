@@ -7,7 +7,6 @@ import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,22 +24,21 @@ public class CommentService {
     }
 
     @Transactional
-    public List<CommentInfoDto> findAllByFeed(Feed feed, SessionUser sessionUser) throws ResourceNotFoundException{
-        List<CommentInfoDto> comment = new ArrayList<>();
+    public LinkedHashMap<Long, CommentInfoDto> findAllByFeed(Feed feed, SessionUser sessionUser) throws ResourceNotFoundException{
+        LinkedHashMap<Long, CommentInfoDto> comment = new LinkedHashMap<>();
         List<Comment> comments = commentRepository.findAllByFeed(feed);
         for(Comment comment1 : comments){
             if(comment1.getUpperReply()!=null){
-                for(CommentInfoDto commentInfoDto : comment){
+                comment.values().forEach(commentInfoDto -> {
                     if(commentInfoDto.getId().equals(comment1.getUpperReply().getId())){
-                        try{
+                        try {
                             if(sessionUser.getId().equals(comment1.getOwner().getId()))
-                                commentInfoDto.getCommentReply().add(setLinks(CommentInfoDto.from(comment1)));
-
-                        }catch (NullPointerException e){ commentInfoDto.getCommentReply().add(CommentInfoDto.from(comment1)); }
+                                commentInfoDto.addCommentReply(setLinks(CommentInfoDto.from(comment1)));
+                        }catch (NullPointerException e){ commentInfoDto.addCommentReply(CommentInfoDto.from(comment1)); }
                     }
-                }
+                });
             }else{
-                comment.add(CommentInfoDto.from(comment1));
+                comment.put(comment1.getId(), CommentInfoDto.from(comment1));
             }
         }
         return comment;
@@ -56,7 +55,7 @@ public class CommentService {
     }
 
     private final CommentLinker commentLinker;
-    private CommentInfoDto setLinks(CommentInfoDto dto){
+    public CommentInfoDto setLinks(CommentInfoDto dto){
         return dto
                 .add(
                         commentLinker.updateComment(dto.getId()).withRel("patch"),

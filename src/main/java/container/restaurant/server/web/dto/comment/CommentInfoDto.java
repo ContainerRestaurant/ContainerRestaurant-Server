@@ -2,14 +2,12 @@ package container.restaurant.server.web.dto.comment;
 
 import container.restaurant.server.domain.comment.Comment;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
 public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     private final Long id;
@@ -35,5 +33,9 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.ownerProfile = comment.getOwner().getProfile();
         this.ownerLevel = comment.getOwner().getLevel();
         this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("MM.dd"));
+    }
+
+    public void addCommentReply(CommentInfoDto commentInfoDto){
+        commentReply.add(commentInfoDto);
     }
 }

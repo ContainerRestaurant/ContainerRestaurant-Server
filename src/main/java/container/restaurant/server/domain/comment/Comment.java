@@ -8,15 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
-@Entity(name = "tb_comment")
-public class Comment extends BaseCreatedTimeEntity{
+@Entity(name = "TB_COMMENT")
+public class Comment extends BaseCreatedTimeEntity {
 
     @NotNull
     @ManyToOne
