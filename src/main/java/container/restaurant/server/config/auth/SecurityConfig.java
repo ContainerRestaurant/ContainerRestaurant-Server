@@ -1,6 +1,7 @@
 package container.restaurant.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -27,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .frameOptions().disable()
                 )
                 .authorizeRequests(a -> a
-                        .antMatchers(PERMITTED_ALL_PATH).permitAll()
+                        .antMatchers(HttpMethod.GET, PERMITTED_ALL_PATH).permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout(l -> l
