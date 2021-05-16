@@ -21,9 +21,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -254,6 +254,54 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                         .content(mapper.writeValueAsString(dto))
                         .session(myselfSession))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 삭제")
+    public void testDeleteFeed() throws Exception {
+        //given
+        Feed feed = myFeed;
+
+        //when
+        mvc.perform(
+                delete("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent());
+
+        //expect
+        assertThat(feedRepository.existsById(feed.getId())).isFalse();
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 삭제 실패 - 존재않는 피드")
+    public void testFailedDeleteFeedById() throws Exception {
+        //given
+        Long invalidId = -1L;
+
+        //when
+        mvc.perform(
+                delete("/api/feed/{feedId}", invalidId)
+                        .session(myselfSession))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 삭제 실패 - 다른 사용자의 피드")
+    public void testFailedDeleteFeedBySession() throws Exception {
+        //given
+        Feed feed = othersFeed;
+
+        //when
+        mvc.perform(
+                delete("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isForbidden());
+
+        //expect
+        assertThat(feedRepository.existsById(feed.getId())).isTrue();
     }
 
     private List<Feed> saveFeeds() throws InterruptedException {

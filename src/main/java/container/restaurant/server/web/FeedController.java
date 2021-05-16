@@ -94,8 +94,8 @@ public class FeedController {
     public ResponseEntity<?> deleteFeed(
             @LoginUser SessionUser sessionUser, @PathVariable Long feedId
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        feedService.delete(feedId, sessionUser.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("{feedId}")

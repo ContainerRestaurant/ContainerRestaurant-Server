@@ -7,6 +7,7 @@ import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
+import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
@@ -64,6 +65,14 @@ public class FeedService {
     public PagedModel<FeedPreviewDto> findAllByUserScrap(Long userId, Pageable pageable) {
         return scrapAssembler.toModel(
                 scrapFeedRepository.findAllByUserId(userId, pageable), FeedPreviewDto::from);
+    }
+
+    @Transactional
+    public void delete(Long feedId, Long userId) {
+        Feed feed = findById(feedId);
+        if (!feed.getOwner().getId().equals(userId))
+            throw new FailedAuthorizationException("해당 피드를 삭제할 수 없습니다.");
+        feedRepository.delete(feed);
     }
 
     @Transactional
