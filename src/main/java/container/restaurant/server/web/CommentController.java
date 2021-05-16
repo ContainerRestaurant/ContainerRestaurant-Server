@@ -2,14 +2,13 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.domain.comment.Comment;
 import container.restaurant.server.domain.comment.CommentService;
+import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
 import container.restaurant.server.web.linker.CommentLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +23,16 @@ public class CommentController {
     private final CommentService commentService;
     private final CommentLinker commentLinker;
 
-    @PostMapping
+    @PostMapping("{feedId}")
     public ResponseEntity<?> createComment(
-            @RequestBody Comment comment
+            @RequestBody CommentCreateDto commentCreateDto,
+            @PathVariable Long feedId,
+            @LoginUser SessionUser sessionUser
     ){
+        CommentInfoDto commentInfoDto = commentService.createComment(commentCreateDto, feedId, sessionUser.getId());
         return ResponseEntity.ok(
-                EntityModel.of(commentService.createComment(comment))
+                setLinks(commentInfoDto)
+                        .add(commentLinker.createComment(feedId).withSelfRel())
         );
     }
 
@@ -77,5 +80,13 @@ public class CommentController {
                 commentLinker.updateComment(dto.getId()).withRel("patch"),
                 commentLinker.deleteComment(dto.getId()).withRel("delete"))
         );
+    }
+
+    private CommentInfoDto setLinks(CommentInfoDto commentInfoDto){
+        return commentInfoDto
+                .add(
+                        commentLinker.updateComment(commentInfoDto.getId()).withRel("patch"),
+                        commentLinker.deleteComment(commentInfoDto.getId()).withRel("delete")
+                );
     }
 }
