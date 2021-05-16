@@ -5,6 +5,7 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
+import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class FeedController {
 
     private final FeedLinker feedLinker;
     private final UserLinker userLinker;
+    private final CommentLinker commentLinker;
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
@@ -103,9 +105,9 @@ public class FeedController {
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
-                        userLinker.getUserById(dto.getOwnerId()).withRel("owner")
+                        userLinker.getUserById(dto.getOwnerId()).withRel("owner"),
                         // TODO restaurant link
-                        // TODO comment link
+                        commentLinker.getCommentByFeed(dto.getId()).withRel("comments")
                 )
                 .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
                         feedLinker.updateFeed(dto.getId()).withRel("patch"),

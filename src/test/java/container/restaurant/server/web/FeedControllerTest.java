@@ -68,6 +68,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").exists())
                 .andExpect(jsonPath("_links.delete.href").exists());
     }
@@ -95,6 +96,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").doesNotExist())
                 .andExpect(jsonPath("_links.delete.href").doesNotExist());
     }
