@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
@@ -64,7 +66,8 @@ class ScrapUserControllerTest extends BaseUserAndFeedControllerTest {
                         .getScrapCount())
                 .isEqualTo(myself.getScrapCount() + 1);
 
-        List<ScrapFeed> scrapList = scrapFeedRepository.findAllByUser(myself);
+        Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(myself.getId(), Pageable.unpaged());
+        List<ScrapFeed> scrapList = scraps.getContent();
         assertThat(scrapList.size()).isEqualTo(1);
 
         ScrapFeed scrap = scrapList.get(0);
@@ -80,6 +83,7 @@ class ScrapUserControllerTest extends BaseUserAndFeedControllerTest {
         scrapFeedService.userScrapFeed(myself.getId(), othersFeed.getId());
         myself = userRepository.findById(myself.getId())
                 .orElse(myself);
+        Thread.sleep(0, 1);
         LocalDateTime now = LocalDateTime.now();
 
         //when myself 유저 세션으로 주어진 피드를 스크랩하면
@@ -106,7 +110,8 @@ class ScrapUserControllerTest extends BaseUserAndFeedControllerTest {
                         .getScrapCount())
                 .isEqualTo(myself.getScrapCount());
 
-        List<ScrapFeed> scrapList = scrapFeedRepository.findAllByUser(myself);
+        Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(myself.getId(), Pageable.unpaged());
+        List<ScrapFeed> scrapList = scraps.getContent();
         assertThat(scrapList.size()).isEqualTo(1);
 
         ScrapFeed scrap = scrapList.get(0);
@@ -155,7 +160,8 @@ class ScrapUserControllerTest extends BaseUserAndFeedControllerTest {
                         .getScrapCount())
                 .isEqualTo(myself.getScrapCount() - 1);
 
-        List<ScrapFeed> scrapList = scrapFeedRepository.findAllByUser(myself);
+        Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(myself.getId(), Pageable.unpaged());
+        List<ScrapFeed> scrapList = scraps.getContent();
         assertThat(scrapList.size()).isEqualTo(0);
     }
 

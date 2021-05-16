@@ -24,7 +24,7 @@ public class Feed extends BaseTimeEntity {
     private User owner;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Restaurant restaurant;
 
     @NotNull
