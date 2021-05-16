@@ -19,7 +19,8 @@ public class FeedLinker {
     FeedInfoDto dto =
             DummyInvocationUtils.methodOn(FeedInfoDto.class);
 
-    SessionUser u = new SessionUser();
+    SessionUser u =
+            DummyInvocationUtils.methodOn(SessionUser.class);
 
     public LinkBuilder getFeedDetail(Long feedId) {
         return linkTo(proxy.getFeedDetail(feedId, u));
@@ -66,7 +67,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder updateFeed(Long feedId) {
-        return linkTo(proxy.updateFeed(u, feedId));
+        return linkTo(proxy.updateFeed(dto, u, feedId));
     }
 
 }

@@ -86,4 +86,19 @@ public class FeedService {
         return feedRepository.save(dto.toEntityWith(user, restaurant))
                 .getId();
     }
+
+    @Transactional
+    public void updateFeed(Long feedId, FeedInfoDto dto, Long userId) {
+        Feed feed = findById(feedId);
+        if (!feed.getOwner().getId().equals(userId))
+            throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
+
+        Restaurant restaurant = feed.getRestaurant().getId().equals(dto.getRestaurantId()) ? null :
+                restaurantRepository.findById(dto.getRestaurantId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "존재하지 않는 식당입니다.(id:" + dto.getRestaurantId() + ")"));
+        if (restaurant != null)
+            feed.setRestaurant(restaurant);
+        dto.update(feed);
+    }
 }

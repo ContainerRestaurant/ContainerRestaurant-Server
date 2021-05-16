@@ -258,6 +258,73 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
     @Test
     @WithMockUser(username = "USER")
+    @DisplayName("피드 수정")
+    public void testUpdateFeed() throws Exception {
+        //given
+        Feed feed = myFeed;
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(restaurant.getId())
+                .category(Category.KOREAN)
+                .difficulty(myFeed.getDifficulty() + 1)
+                .welcome(!myFeed.getWelcome())
+                .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
+                .content("update feed!")
+                .build();
+
+        //when
+        mvc.perform(
+                patch("/api/feed/{feedId}", feed.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isOk());
+
+        //then
+        feed = feedRepository.findById(feed.getId())
+                .orElseThrow(() -> new RuntimeException(""));
+
+        assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
+        assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
+        assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
+        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getContent()).isEqualTo(dto.getContent());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 수정 실패")
+    public void testFailedUpdateFeed() throws Exception {
+        //given
+        Feed feed = myFeed;
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .category(Category.KOREAN)
+                .difficulty(myFeed.getDifficulty() + 1)
+                .welcome(!myFeed.getWelcome())
+                .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
+                .content("update feed!")
+                .build();
+
+        //when
+        mvc.perform(
+                patch("/api/feed/{feedId}", feed.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isBadRequest());
+
+        //then
+        feed = feedRepository.findById(feed.getId())
+                .orElseThrow(() -> new RuntimeException(""));
+
+        assertThat(feed.getCategory()).isNotEqualTo(dto.getCategory());
+        assertThat(feed.getDifficulty()).isNotEqualTo(dto.getDifficulty());
+        assertThat(feed.getWelcome()).isNotEqualTo(dto.getWelcome());
+        assertThat(feed.getThumbnailUrl()).isNotEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getContent()).isNotEqualTo(dto.getContent());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
     @DisplayName("피드 삭제")
     public void testDeleteFeed() throws Exception {
         //given

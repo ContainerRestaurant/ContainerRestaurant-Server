@@ -43,4 +43,19 @@ public class FeedInfoDto {
                 .build();
     }
 
+    // TODO Menu
+    public Feed update(Feed feed) {
+        if (!category.equals(feed.getCategory()))
+            feed.setCategory(category);
+        if (!difficulty.equals(feed.getDifficulty()))
+            feed.setDifficulty(difficulty);
+        if (!welcome.equals(feed.getWelcome()))
+            feed.setWelcome(welcome);
+        if (!thumbnailUrl.equals(feed.getThumbnailUrl()))
+            feed.setThumbnailUrl(thumbnailUrl);
+        if (!content.equals(feed.getContent()))
+            feed.setContent(content);
+        return feed;
+    }
+
 }

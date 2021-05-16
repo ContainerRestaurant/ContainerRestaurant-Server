@@ -90,20 +90,21 @@ public class FeedController {
                 .build();
     }
 
+    @PatchMapping("{feedId}")
+    public ResponseEntity<?> updateFeed(
+            @Valid @RequestBody FeedInfoDto dto, @LoginUser SessionUser sessionUser,
+            @PathVariable Long feedId
+    ) {
+        feedService.updateFeed(feedId, dto, sessionUser.getId());
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("{feedId}")
     public ResponseEntity<?> deleteFeed(
             @LoginUser SessionUser sessionUser, @PathVariable Long feedId
     ) {
         feedService.delete(feedId, sessionUser.getId());
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("{feedId}")
-    public ResponseEntity<?> updateFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
-    ) {
-        // TODO
-        return ResponseEntity.notFound().build();
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
