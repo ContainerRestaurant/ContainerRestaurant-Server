@@ -7,11 +7,14 @@ import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -20,8 +23,8 @@ import java.util.List;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 class FeedControllerTest extends BaseUserAndFeedControllerTest {
@@ -206,6 +209,51 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Test
     public void testSelectRecommendFeed() throws Exception {
 
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 쓰기")
+    public void testCreateFeed() throws Exception {
+        //given
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(restaurant.getId())
+                .category(Category.KOREAN)
+                .difficulty(3)
+                .welcome(true)
+                .thumbnailUrl("https://test.feed.thumbnail")
+                .content("this is feed's content")
+                .build();
+
+        //when
+        mvc.perform(
+                post("/api/feed")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isCreated())
+                .andExpect(header()
+                        .string("Location", Matchers.containsString("/api/feed/")));
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 쓰기 실패")
+    public void testCreateFeedFailed() throws Exception {
+        //given
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .welcome(true)
+                .thumbnailUrl("https://test.feed.thumbnail")
+                .content("this is feed's content")
+                .build();
+
+        //when
+        mvc.perform(
+                post("/api/feed")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isBadRequest());
     }
 
     private List<Feed> saveFeeds() throws InterruptedException {

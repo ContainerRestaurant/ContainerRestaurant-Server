@@ -4,6 +4,7 @@ import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.FeedLinker;
@@ -14,6 +15,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -79,10 +81,13 @@ public class FeedController {
 
     @PostMapping
     public ResponseEntity<?> createFeed(
-            @LoginUser SessionUser sessionUser
+            @Valid @RequestBody FeedInfoDto dto, @LoginUser SessionUser sessionUser
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        Long newFeedId = feedService.createFeed(dto, sessionUser.getId());
+
+        return ResponseEntity
+                .created(feedLinker.getFeedDetail(newFeedId).toUri())
+                .build();
     }
 
     @DeleteMapping("{feedId}")
