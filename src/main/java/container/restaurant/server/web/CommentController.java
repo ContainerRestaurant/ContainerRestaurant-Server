@@ -34,7 +34,6 @@ public class CommentController {
         CommentInfoDto commentInfoDto = commentService.createComment(commentCreateDto, feedId, sessionUser.getId());
         return ResponseEntity.ok(
                 setLinks(commentInfoDto)
-                        .add(commentLinker.createComment(feedId).withSelfRel())
         );
     }
 
