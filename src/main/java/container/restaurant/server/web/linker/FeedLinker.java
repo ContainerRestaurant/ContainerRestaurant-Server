@@ -71,4 +71,8 @@ public class FeedLinker {
         return linkTo(proxy.updateFeed(dto, u, feedId));
     }
 
+    public LinkBuilder getCategoryList() {
+        return linkTo(proxy.getCategoryList());
+    }
+
 }

@@ -9,6 +9,7 @@ import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.FeedLinker;
+import container.restaurant.server.web.linker.RestaurantLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class FeedController {
 
     private final FeedLinker feedLinker;
     private final UserLinker userLinker;
+    private final RestaurantLinker restaurantLinker;
     private final CommentLinker commentLinker;
 
     @GetMapping("{feedId}")
@@ -125,7 +127,7 @@ public class FeedController {
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
                         userLinker.getUserById(dto.getOwnerId()).withRel("owner"),
-                        // TODO restaurant link
+                        restaurantLinker.findById(dto.getRestaurantId()).withRel("restaurant"),
                         commentLinker.getCommentByFeed(dto.getId()).withRel("comments")
                 )
                 .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
@@ -137,6 +139,9 @@ public class FeedController {
     private CollectionModel<FeedPreviewDto> setLinks(CollectionModel<FeedPreviewDto> list) {
         list.forEach(dto ->
                 dto.add(feedLinker.getFeedDetail(dto.getId()).withSelfRel()));
+        list.add(
+                feedLinker.createFeed().withRel("create"),
+                feedLinker.getCategoryList().withRel("category-list"));
         return list;
     }
 

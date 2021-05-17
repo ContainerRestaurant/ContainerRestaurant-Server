@@ -76,6 +76,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.owner.href").exists())
+                .andExpect(jsonPath("_links.restaurant.href").exists())
                 .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").exists())
                 .andExpect(jsonPath("_links.delete.href").exists());
@@ -104,6 +106,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.owner.href").exists())
+                .andExpect(jsonPath("_links.restaurant.href").exists())
                 .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").doesNotExist())
                 .andExpect(jsonPath("_links.delete.href").doesNotExist());
@@ -130,7 +134,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -154,7 +160,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -178,7 +186,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -208,7 +218,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -217,7 +229,10 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(get("/api/feed?category=korean"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(LIST_PATH, hasSize(1)))
-                .andExpect(jsonPath(LIST_PATH + "[0].id").value(othersFeed.getId()));
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(othersFeed.getId()))
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
