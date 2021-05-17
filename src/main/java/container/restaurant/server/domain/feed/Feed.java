@@ -78,4 +78,27 @@ public class Feed extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setWelcome(Boolean welcome) {
+        this.welcome = welcome;
+    }
+
+    public void setDifficulty(Integer difficulty) {
+        this.difficulty = difficulty;
+    }
 }

@@ -8,11 +8,14 @@ import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -25,9 +28,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 class FeedControllerTest extends BaseUserAndFeedControllerTest {
@@ -74,6 +76,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").exists())
                 .andExpect(jsonPath("_links.delete.href").exists());
     }
@@ -101,6 +104,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").doesNotExist())
                 .andExpect(jsonPath("_links.delete.href").doesNotExist());
     }
@@ -216,6 +220,166 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Test
     public void testSelectRecommendFeed() throws Exception {
 
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 쓰기")
+    public void testCreateFeed() throws Exception {
+        //given
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(restaurant.getId())
+                .category(Category.KOREAN)
+                .difficulty(3)
+                .welcome(true)
+                .thumbnailUrl("https://test.feed.thumbnail")
+                .content("this is feed's content")
+                .build();
+
+        //when
+        mvc.perform(
+                post("/api/feed")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isCreated())
+                .andExpect(header()
+                        .string("Location", Matchers.containsString("/api/feed/")));
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 쓰기 실패")
+    public void testCreateFeedFailed() throws Exception {
+        //given
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .welcome(true)
+                .thumbnailUrl("https://test.feed.thumbnail")
+                .content("this is feed's content")
+                .build();
+
+        //when
+        mvc.perform(
+                post("/api/feed")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 수정")
+    public void testUpdateFeed() throws Exception {
+        //given
+        Feed feed = myFeed;
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(restaurant.getId())
+                .category(Category.KOREAN)
+                .difficulty(myFeed.getDifficulty() + 1)
+                .welcome(!myFeed.getWelcome())
+                .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
+                .content("update feed!")
+                .build();
+
+        //when
+        mvc.perform(
+                patch("/api/feed/{feedId}", feed.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isOk());
+
+        //then
+        feed = feedRepository.findById(feed.getId())
+                .orElseThrow(() -> new RuntimeException(""));
+
+        assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
+        assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
+        assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
+        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getContent()).isEqualTo(dto.getContent());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 수정 실패")
+    public void testFailedUpdateFeed() throws Exception {
+        //given
+        Feed feed = myFeed;
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .category(Category.KOREAN)
+                .difficulty(myFeed.getDifficulty() + 1)
+                .welcome(!myFeed.getWelcome())
+                .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
+                .content("update feed!")
+                .build();
+
+        //when
+        mvc.perform(
+                patch("/api/feed/{feedId}", feed.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto))
+                        .session(myselfSession))
+                .andExpect(status().isBadRequest());
+
+        //then
+        feed = feedRepository.findById(feed.getId())
+                .orElseThrow(() -> new RuntimeException(""));
+
+        assertThat(feed.getCategory()).isNotEqualTo(dto.getCategory());
+        assertThat(feed.getDifficulty()).isNotEqualTo(dto.getDifficulty());
+        assertThat(feed.getWelcome()).isNotEqualTo(dto.getWelcome());
+        assertThat(feed.getThumbnailUrl()).isNotEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getContent()).isNotEqualTo(dto.getContent());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 삭제")
+    public void testDeleteFeed() throws Exception {
+        //given
+        Feed feed = myFeed;
+
+        //when
+        mvc.perform(
+                delete("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent());
+
+        //expect
+        assertThat(feedRepository.existsById(feed.getId())).isFalse();
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 삭제 실패 - 존재않는 피드")
+    public void testFailedDeleteFeedById() throws Exception {
+        //given
+        Long invalidId = -1L;
+
+        //when
+        mvc.perform(
+                delete("/api/feed/{feedId}", invalidId)
+                        .session(myselfSession))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "USER")
+    @DisplayName("피드 삭제 실패 - 다른 사용자의 피드")
+    public void testFailedDeleteFeedBySession() throws Exception {
+        //given
+        Feed feed = othersFeed;
+
+        //when
+        mvc.perform(
+                delete("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andExpect(status().isForbidden());
+
+        //expect
+        assertThat(feedRepository.existsById(feed.getId())).isTrue();
     }
 
     @Test

@@ -3,6 +3,7 @@ package container.restaurant.server.web.linker;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.web.FeedController;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
@@ -15,6 +16,9 @@ public class FeedLinker {
 
     FeedController proxy =
             DummyInvocationUtils.methodOn(FeedController.class);
+
+    FeedInfoDto dto =
+            DummyInvocationUtils.methodOn(FeedInfoDto.class);
 
     SessionUser u =
             DummyInvocationUtils.methodOn(SessionUser.class);
@@ -56,7 +60,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder createFeed() {
-        return linkTo(proxy.createFeed(u));
+        return linkTo(proxy.createFeed(dto, u));
     }
 
     public LinkBuilder deleteFeed(Long feedId) {
@@ -64,7 +68,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder updateFeed(Long feedId) {
-        return linkTo(proxy.updateFeed(u, feedId));
+        return linkTo(proxy.updateFeed(dto, u, feedId));
     }
 
 }
