@@ -208,6 +208,12 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    public void testCategoryFilter() throws Exception{
+        mvc.perform(get("/api/feed?category=korean"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void testSelectRecommendFeed() throws Exception {
 
     }

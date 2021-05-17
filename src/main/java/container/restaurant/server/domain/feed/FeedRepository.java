@@ -23,4 +23,16 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @Query("select f from TB_FEED f join f.scrapedBy s where s.user.id = ?1")
     Page<Feed> findAllByScraperId(Long userId, Pageable pageable);
 
+    @EntityGraph(attributePaths = { "owner" })
+    Page<Feed> findAllByCategory(Pageable pageable, Category category);
+
+    @EntityGraph(attributePaths = { "owner" })
+    Page<Feed> findAllByOwnerIdAndCategory(Long userId, Pageable pageable, Category category);
+
+    @EntityGraph(attributePaths = { "owner" })
+    Page<Feed> findAllByRestaurantIdAndCategory(Long restaurantId, Pageable pageable, Category category);
+
+    @Query("select f from TB_FEED f join f.scrapedBy s where s.user.id = ?1 and f.category = ?2")
+    Page<Feed> findAllByScraperIdAndCategory(Long userId, Pageable pageable, Category category);
+
 }

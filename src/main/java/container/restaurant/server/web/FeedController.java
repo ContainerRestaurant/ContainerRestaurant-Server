@@ -43,9 +43,10 @@ public class FeedController {
     }
 
     @GetMapping
-    public ResponseEntity<?> selectFeed(Pageable pageable) {
+    public ResponseEntity<?> selectFeed(Pageable pageable, Category category) {
+
         return ResponseEntity.ok(
-                setLinks(feedService.findAll(pageable)));
+                setLinks(feedService.findAll(pageable, category)));
     }
 
     @GetMapping("recommend")
@@ -56,26 +57,26 @@ public class FeedController {
 
     @GetMapping("user/{userId}")
     public ResponseEntity<?> selectUserFeed(
-            @PathVariable Long userId, Pageable pageable
+            @PathVariable Long userId, Pageable pageable, Category category
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByUser(userId, pageable)));
+                setLinks(feedService.findAllByUser(userId, pageable, category)));
     }
 
     @GetMapping("user/{userId}/scrap")
     public ResponseEntity<?> selectUserScrapFeed(
-            @PathVariable Long userId, Pageable pageable
+            @PathVariable Long userId, Pageable pageable, Category category
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByUserScrap(userId, pageable)));
+                setLinks(feedService.findAllByUserScrap(userId, pageable, category)));
     }
 
     @GetMapping("restaurant/{restaurantId}")
     public ResponseEntity<?> selectRestaurantFeed(
-            @PathVariable Long restaurantId, Pageable pageable
+            @PathVariable Long restaurantId, Pageable pageable, Category category
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByRestaurant(restaurantId, pageable)));
+                setLinks(feedService.findAllByRestaurant(restaurantId, pageable, category)));
     }
 
     @PostMapping
