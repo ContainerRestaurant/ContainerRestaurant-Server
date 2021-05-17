@@ -1,11 +1,10 @@
 package container.restaurant.server.domain.feed;
 
-import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
@@ -20,5 +19,8 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @EntityGraph(attributePaths = { "owner" })
     Page<Feed> findAllByRestaurantId(Long restaurantId, Pageable pageable);
+
+    @Query("select f from TB_FEED f join f.scrapedBy s where s.user.id = ?1")
+    Page<Feed> findAllByScraperId(Long userId, Pageable pageable);
 
 }
