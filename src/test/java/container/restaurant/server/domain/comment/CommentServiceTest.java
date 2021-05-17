@@ -120,12 +120,11 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글 작성")
     void createComment() {
-        SessionUser sessionUser = SessionUser.from( users.get(0) );
-        CommentCreateDto commentCreateDto1 = new CommentCreateDto("test");
+        CommentCreateDto commentCreateDto = new CommentCreateDto("test");
 
-        CommentInfoDto dto1 = commentService.createComment(commentCreateDto1, 2L, sessionUser.getId());
+        CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
 
-        assertThat(dto1.getContent()).isEqualTo("test");
-        assertThat(dto1.getOwnerId()).isEqualTo(users.get(0).getId());
+        assertThat(dto.getContent()).isEqualTo("test");
+        assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
     }
 }
