@@ -5,6 +5,8 @@ import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
@@ -25,53 +27,84 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class CommentServiceTest {
+    private static final Category[] CATEGORY_ARR = {
+            Category.KOREAN, Category.JAPANESE, Category.INSTANT
+    };
+
     @Autowired
-    CommentService commentService;
+    FeedRepository feedRepository;
 
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     RestaurantRepository restaurantRepository;
+
     @Autowired
-    FeedRepository feedRepository;
+    ImageRepository imageRepository;
+
     @Autowired
     CommentRepository commentRepository;
 
-    protected User user;
-    protected Restaurant restaurant;
-    List<Feed> feeds = new ArrayList<>();
-    List<Comment> comments = new ArrayList<>();
+    @Autowired
+    CommentService commentService;
+
+    protected List<User> users;
+    protected List<Restaurant> restaurants;
+    protected List<Feed> feeds;
+    protected List<Comment> comments;
 
     @BeforeEach
     void beforeEach() {
-        user = userRepository.save(User.builder()
-                .email("test@test.com")
-                .profile("https://test")
-                .build());
-
-        restaurant = restaurantRepository.save(Restaurant.builder()
-                .name("restaurant")
-                .addr("address")
-                .lon(0f)
-                .lat(0f)
-                .image_ID(1L)
-                .build());
-
+        // 3명의 유저
+        users = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
+            users.add(User.builder()
+                    .email("me" + i + "@test.com")
+                    .profile("https://my" + i + ".profile.path")
+                    .nickname("TestNickname" + i)
+                    .build());
+        }
+        users = userRepository.saveAll(users);
+
+        Image image = imageRepository.save(Image.builder()
+                .url("image_path_url")
+                .build());
+
+        // 5개의 식당
+        restaurants = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            restaurants.add(restaurantRepository.save(Restaurant.builder()
+                    .name("restaurant")
+                    .addr("address")
+                    .lat(1f)
+                    .lon(1f)
+                    .image_ID(image.getId())
+                    .build()));
+        }
+        restaurants = restaurantRepository.saveAll(restaurants);
+
+        // 15 개의 피드
+        feeds = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
             feeds.add(feedRepository.save(Feed.builder()
-                    .owner(user)
-                    .restaurant(restaurant)
-                    .difficulty(3)
-                    .category(Category.KOREAN)
+                    .owner(users.get(i % 3))
+                    .restaurant(restaurants.get(i % 5))
+                    // 식당과 서로소가 되도록 1~4를 사용
+                    .difficulty(i % 4 + 1)
+                    .content("Feed Content" + i)
+                    .category(CATEGORY_ARR[i % 3])
                     .build()));
         }
 
-        for (int i = 0; i < 10; i++) {
+        comments = new ArrayList<>();
+        for(int i=0; i<10; i++){
             comments.add(commentRepository.save(Comment.builder()
-                    .content("test")
-                    .feed(feeds.get(i % 3))
-                    .owner(user)
-                    .build()));
+                .owner(users.get(i%3))
+                .feed(feeds.get(i%3))
+                .content("test")
+                .build()
+            ));
         }
     }
 
@@ -81,6 +114,7 @@ class CommentServiceTest {
         feedRepository.deleteAll();
         restaurantRepository.deleteAll();
         userRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
     @Test
