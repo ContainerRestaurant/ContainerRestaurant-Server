@@ -3,6 +3,7 @@ package container.restaurant.server.domain.comment;
 import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +46,20 @@ public class Comment extends BaseCreatedTimeEntity {
         this.isBlind = false;
     }
 
+    protected Comment(CommentCreateDto commentCreateDto, Feed feed, User owner, Comment upperReply){
+        this.owner = owner;
+        this.feed = feed;
+        this.content = commentCreateDto.getContent();
+        this.likeCount = 0;
+        this.upperReply = upperReply;
+        this.isDeleted = false;
+        this.isHaveReply = false;
+        this.isBlind = false;
+    }
+
     public void setContent(String content){
         this.content = content;
     }
+
+    public void setIsHaveReply() { this.isHaveReply = true; }
 }
