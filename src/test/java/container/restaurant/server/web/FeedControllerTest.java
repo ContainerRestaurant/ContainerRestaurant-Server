@@ -212,9 +212,12 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @DisplayName("카테고리 필터링 테스트")
     public void testCategoryFilter() throws Exception{
         mvc.perform(get("/api/feed?category=korean"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(LIST_PATH, hasSize(1)))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(othersFeed.getId()));
     }
 
     @Test
@@ -383,6 +386,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @DisplayName("카테고리 리스트 테스트")
     public void testGetCategoryList() throws Exception {
         //given
         MvcResult res = mvc.perform(get("/api/feed/category"))
