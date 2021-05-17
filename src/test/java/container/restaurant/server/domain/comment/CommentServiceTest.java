@@ -120,12 +120,12 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글 작성")
     void createComment() {
-        SessionUser sessionUser = SessionUser.from(userRepository.findById(1L).orElseThrow(()->new ResourceNotFoundException("No User")));
+        SessionUser sessionUser = SessionUser.from( users.get(0) );
         CommentCreateDto commentCreateDto1 = new CommentCreateDto("test");
 
         CommentInfoDto dto1 = commentService.createComment(commentCreateDto1, 2L, sessionUser.getId());
 
         assertThat(dto1.getContent()).isEqualTo("test");
-        assertThat(dto1.getOwnerId()).isEqualTo(1L);
+        assertThat(dto1.getOwnerId()).isEqualTo(users.get(0).getId());
     }
 }
