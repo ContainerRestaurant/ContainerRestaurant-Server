@@ -127,4 +127,15 @@ class CommentServiceTest {
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
     }
+
+    @Test
+    @DisplayName("대댓글 작성")
+    void createReplyComment() {
+        CommentCreateDto commentCreateDto = new CommentCreateDto("test", comments.get(0).getId());
+
+        CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+
+        assertThat(dto.getContent()).isEqualTo("test");
+        assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
+    }
 }
