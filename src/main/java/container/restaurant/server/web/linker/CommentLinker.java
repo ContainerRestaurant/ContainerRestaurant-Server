@@ -2,6 +2,7 @@ package container.restaurant.server.web.linker;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.CommentController;
+import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
@@ -13,6 +14,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class CommentLinker {
     CommentController proxy = DummyInvocationUtils.methodOn(CommentController.class);
     CommentUpdateDto commentUpdateDto;
+    CommentCreateDto commentCreateDto;
     SessionUser u = new SessionUser();
 
     public LinkBuilder getCommentByFeed(Long id){ return linkTo(proxy.getCommentByFeed(id, u)); }
@@ -24,4 +26,6 @@ public class CommentLinker {
     public LinkBuilder deleteComment(Long id){
         return linkTo(proxy.deleteCommentById(id));
     }
+
+    public LinkBuilder createComment(Long id) { return linkTo(proxy.createComment(commentCreateDto,id,u)); }
 }
