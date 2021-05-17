@@ -2,6 +2,7 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
@@ -13,7 +14,9 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -97,6 +100,15 @@ public class FeedController {
     ) {
         // TODO
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("category")
+    public ResponseEntity<?> getCategoryList() {
+        return ResponseEntity.ok(
+                Arrays.stream(Category.values())
+                        .collect(Collectors.toMap(
+                                category -> category,
+                                Category::getKorean)));
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {

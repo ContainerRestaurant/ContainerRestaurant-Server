@@ -1,5 +1,6 @@
 package container.restaurant.server.web;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
@@ -13,11 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -204,6 +210,27 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Test
     public void testSelectRecommendFeed() throws Exception {
 
+    }
+
+    @Test
+    public void testGetCategoryList() throws Exception {
+        //given
+        MvcResult res = mvc.perform(get("/api/feed/category"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Map<String, String> map =
+                mapper.readValue(
+                        res.getResponse().getContentAsString(StandardCharsets.UTF_8),
+                        new TypeReference<HashMap<String, String>>(){});
+
+        //expect
+        for (Category category : Category.values()) {
+            assertThat(map.remove(category.name()))
+                    .isEqualTo(category.getKorean());
+        }
+        assertThat(map.size()).isEqualTo(0);
     }
 
     private List<Feed> saveFeeds() throws InterruptedException {

@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 public class FeedRepositoryTest {
 
     private static final Category[] CATEGORY_ARR = {
-            Category.KOREAN, Category.JAPANESE, Category.INSTANT
+            Category.KOREAN, Category.JAPANESE, Category.NIGHT_MEAL
     };
 
     @Autowired
