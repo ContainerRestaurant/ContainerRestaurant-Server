@@ -4,7 +4,9 @@ import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
+import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -29,6 +32,7 @@ public class FeedController {
 
     private final FeedLinker feedLinker;
     private final UserLinker userLinker;
+    private final CommentLinker commentLinker;
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
@@ -77,35 +81,39 @@ public class FeedController {
 
     @PostMapping
     public ResponseEntity<?> createFeed(
-            @LoginUser SessionUser sessionUser
+            @Valid @RequestBody FeedInfoDto dto, @LoginUser SessionUser sessionUser
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        Long newFeedId = feedService.createFeed(dto, sessionUser.getId());
+
+        return ResponseEntity
+                .created(feedLinker.getFeedDetail(newFeedId).toUri())
+                .build();
+    }
+
+    @PatchMapping("{feedId}")
+    public ResponseEntity<?> updateFeed(
+            @Valid @RequestBody FeedInfoDto dto, @LoginUser SessionUser sessionUser,
+            @PathVariable Long feedId
+    ) {
+        feedService.updateFeed(feedId, dto, sessionUser.getId());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("{feedId}")
     public ResponseEntity<?> deleteFeed(
             @LoginUser SessionUser sessionUser, @PathVariable Long feedId
     ) {
-        // TODO
-        return ResponseEntity.notFound().build();
-    }
-
-    @PatchMapping("{feedId}")
-    public ResponseEntity<?> updateFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
-    ) {
-        // TODO
-        return ResponseEntity.notFound().build();
+        feedService.delete(feedId, sessionUser.getId());
+        return ResponseEntity.noContent().build();
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
-                        userLinker.getUserById(dto.getOwnerId()).withRel("owner")
+                        userLinker.getUserById(dto.getOwnerId()).withRel("owner"),
                         // TODO restaurant link
-                        // TODO comment link
+                        commentLinker.getCommentByFeed(dto.getId()).withRel("comments")
                 )
                 .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
                         feedLinker.updateFeed(dto.getId()).withRel("patch"),
