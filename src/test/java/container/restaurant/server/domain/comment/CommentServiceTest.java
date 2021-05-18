@@ -1,6 +1,5 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
@@ -13,6 +12,8 @@ import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
+import container.restaurant.server.web.dto.comment.CommentUpdateDto;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -137,5 +138,29 @@ class CommentServiceTest {
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
+    }
+
+    @Test
+    @DisplayName("댓글 수정")
+    void updateComment(){
+        CommentUpdateDto commentUpdateDto = new CommentUpdateDto("수정");
+        CommentInfoDto commentInfoDto = commentService.update(comments.get(0).getId(), commentUpdateDto, users.get(0).getId());
+
+        assertThat(commentUpdateDto.getContent()).isEqualTo(commentInfoDto.getContent());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제")
+    void deleteComment(){
+        commentService.deleteById(
+                commentRepository.findById(comments.get(0).getId())
+                        .orElseThrow(()->new ResourceNotFoundException("댓글 없음1")).getId(),
+                users.get(0).getId()
+        );
+        Assertions.assertThatThrownBy(()->
+            commentRepository.findById(comments.get(0).getId())
+                    .orElseThrow(()->new ResourceNotFoundException("댓글 없음2"))
+        ).isInstanceOf(ResourceNotFoundException.class);
+
     }
 }

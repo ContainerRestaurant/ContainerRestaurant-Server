@@ -50,20 +50,24 @@ public class CommentController {
         );
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("{commentId}")
     public ResponseEntity<?> updateCommentById(
-            @PathVariable Long id,
-            @RequestBody CommentUpdateDto updateDto
+            @PathVariable Long commentId,
+            @RequestBody CommentUpdateDto updateDto,
+            @LoginUser SessionUser sessionUser
     ){
-        commentService.update(id, updateDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                setLinks(commentService.update(commentId, updateDto, sessionUser.getId()))
+                    .add(commentLinker.updateComment(commentId).withSelfRel())
+        );
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteCommentById(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @LoginUser SessionUser sessionUser
     ){
-        commentService.deleteById(id);
+        commentService.deleteById(id, sessionUser.getId());
         return ResponseEntity.noContent().build();
     }
 
