@@ -21,5 +21,4 @@ public class Report extends BaseCreatedTimeEntity {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     protected User reporter;
-
 }
