@@ -1,10 +1,9 @@
 package container.restaurant.server.domain.restaurant.favorite;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.domain.restaurant.RestaurantRepository;
+import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.restaurant.favorite.RestaurantFavoriteDto;
@@ -19,19 +18,17 @@ import java.util.stream.Collectors;
 @Service
 public class RestaurantFavoriteService {
 
-    private final RestaurantRepository restaurantRepository;
-
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
     private final ImageRepository imageRepository;
 
     private final UserService userService;
+    private final RestaurantService restaurantService;
 
     @Transactional
     public void userFavoriteRestaurant(Long userId, Long restaurantId) {
         User user = userService.findById(userId);
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 식당입니다.(id:" + restaurantId + ")"));
+        Restaurant restaurant = restaurantService.findById(restaurantId);
 
         restaurantFavoriteRepository.findByUserAndRestaurant(user, restaurant)
                 .ifPresentOrElse(
@@ -43,8 +40,7 @@ public class RestaurantFavoriteService {
     @Transactional
     public void userCancelFavoriteRestaurant(Long userId, Long restaurantId) {
         User user = userService.findById(userId);
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 식당입니다.(id:" + restaurantId + ")"));
+        Restaurant restaurant = restaurantService.findById(restaurantId);
 
         restaurantFavoriteRepository.findByUserAndRestaurant(user, restaurant)
                 .ifPresent(restaurantFavoriteRepository::delete);

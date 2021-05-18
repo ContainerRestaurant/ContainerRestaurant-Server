@@ -23,7 +23,7 @@ public class RestaurantController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        RestaurantInfoDto restaurantInfoDto = restaurantService.findById(id);
+        RestaurantInfoDto restaurantInfoDto = restaurantService.getRestaurantInfoById(id);
         return ResponseEntity.ok(EntityModel.of(restaurantInfoDto)
                 .add(linkTo(getController().findById(id)).withSelfRel())
                 .add(linkTo(ImageController.class).slash(restaurantInfoDto.getImage_path()).withRel("image-url"))
