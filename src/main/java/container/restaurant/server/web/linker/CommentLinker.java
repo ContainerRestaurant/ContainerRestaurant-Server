@@ -20,11 +20,11 @@ public class CommentLinker {
     public LinkBuilder getCommentByFeed(Long id){ return linkTo(proxy.getCommentByFeed(id, u)); }
 
     public LinkBuilder updateComment(Long id){
-        return linkTo(proxy.updateCommentById(id, commentUpdateDto));
+        return linkTo(proxy.updateCommentById(id, commentUpdateDto, u));
     }
 
     public LinkBuilder deleteComment(Long id){
-        return linkTo(proxy.deleteCommentById(id));
+        return linkTo(proxy.deleteCommentById(id, u));
     }
 
     public LinkBuilder createComment(Long id) { return linkTo(proxy.createComment(commentCreateDto,id,u)); }

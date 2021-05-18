@@ -11,7 +11,7 @@ public class CommentUpdateDto {
     private String content;
 
     @Builder
-    protected CommentUpdateDto(String content){
+    public CommentUpdateDto(String content){
         this.content = content;
     }
 
