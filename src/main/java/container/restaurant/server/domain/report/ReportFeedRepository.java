@@ -4,4 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReportFeedRepository extends JpaRepository<ReportFeed, Long> {
 
+    boolean existsDistinctByReporterIdAndFeedId(Long reporterId, Long feedId);
+
 }
