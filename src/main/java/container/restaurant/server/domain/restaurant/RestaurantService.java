@@ -2,7 +2,7 @@ package container.restaurant.server.domain.restaurant;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageRepository;
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNameInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
@@ -19,11 +19,11 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
 
-    private final ImageRepository imageRepository;
+    private final ImageService imageService;
 
     public RestaurantInfoDto getRestaurantInfoById(Long id) {
         Restaurant restaurant = findById(id);
-        Image image = imageRepository.getOne(restaurant.getImage_ID());
+        Image image = imageService.findById(restaurant.getImage_ID());
 
         return RestaurantInfoDto.from(restaurant, image);
     }
@@ -32,7 +32,7 @@ public class RestaurantService {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
                 .map(restaurant -> {
-                    Image image = imageRepository.getOne(restaurant.getImage_ID());
+                    Image image = imageService.findById(restaurant.getImage_ID());
                     return RestaurantNearInfoDto.from(restaurant, image);
                 })
                 .collect(Collectors.toList());
