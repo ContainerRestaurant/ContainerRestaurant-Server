@@ -1,10 +1,9 @@
 package container.restaurant.server.domain.feed.like;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
+import container.restaurant.server.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,16 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FeedLikeService {
 
-    private final UserRepository userRepository;
-
     private final FeedRepository feedRepository;
 
     private final FeedLikeRepository feedLikeRepository;
 
+    private final UserService userService;
+
     @Transactional
     public void userLikeFeed(Long userId, Long feedId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+        User user = userService.findById(userId);
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
 
@@ -35,8 +33,7 @@ public class FeedLikeService {
 
     @Transactional
     public void userCancelLikeFeed(Long userId, Long feedId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+        User user = userService.findById(userId);
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
 

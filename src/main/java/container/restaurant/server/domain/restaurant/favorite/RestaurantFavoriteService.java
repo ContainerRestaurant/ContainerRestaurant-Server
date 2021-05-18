@@ -6,7 +6,7 @@ import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
+import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.restaurant.favorite.RestaurantFavoriteDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,18 +19,17 @@ import java.util.stream.Collectors;
 @Service
 public class RestaurantFavoriteService {
 
-    private final UserRepository userRepository;
-
     private final RestaurantRepository restaurantRepository;
 
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
     private final ImageRepository imageRepository;
 
+    private final UserService userService;
+
     @Transactional
     public void userFavoriteRestaurant(Long userId, Long restaurantId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+        User user = userService.findById(userId);
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 식당입니다.(id:" + restaurantId + ")"));
 
@@ -43,8 +42,7 @@ public class RestaurantFavoriteService {
 
     @Transactional
     public void userCancelFavoriteRestaurant(Long userId, Long restaurantId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+        User user = userService.findById(userId);
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 식당입니다.(id:" + restaurantId + ")"));
 
@@ -54,8 +52,7 @@ public class RestaurantFavoriteService {
 
     @Transactional
     public List<RestaurantFavoriteDto> userFindAllFavoriteRestaurant(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + userId + ")"));
+        User user = userService.findById(userId);
 
         return restaurantFavoriteRepository.findAllByUser(user)
                 .stream()

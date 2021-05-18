@@ -4,8 +4,7 @@ import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
-import container.restaurant.server.domain.user.scrap.ScrapFeed;
+import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
@@ -25,11 +24,11 @@ public class FeedService {
 
     private final FeedRepository feedRepository;
 
-    private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
 
+    private final UserService userService;
+
     private final PagedResourcesAssembler<Feed> feedAssembler;
-    private final PagedResourcesAssembler<ScrapFeed> scrapAssembler;
 
     @Transactional(readOnly = true)
     public FeedDetailDto getFeedDetail(Long feedId) {
@@ -96,9 +95,7 @@ public class FeedService {
 
     @Transactional
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
-        User user = userRepository.findById(ownerId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "존재하지 않는 사용자입니다.(id:" + ownerId + ")"));
+        User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantRepository.findById(dto.getRestaurantId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "존재하지 않는 식당입니다.(id:" + dto.getRestaurantId() + ")"));

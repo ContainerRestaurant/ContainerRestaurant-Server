@@ -4,7 +4,7 @@ import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
+import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
@@ -22,14 +22,14 @@ import static java.util.Optional.ofNullable;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final FeedRepository feedRepository;
-    private final UserRepository userRepository;
+
+    private final UserService userService;
 
     @Transactional
     public CommentInfoDto createComment(CommentCreateDto commentCreateDto, Long feedId, Long userId){
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 게시글입니다.(id:" +feedId+")"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 유저입니다.(id:"+userId+")"));
+        User user = userService.findById(userId);
 
         Comment comment;
         if(commentCreateDto.getUpperReplyId() == null){
