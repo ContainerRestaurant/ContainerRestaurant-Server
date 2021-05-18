@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
@@ -51,7 +50,6 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andExpect(jsonPath("_links.scraps.href").exists())
                 .andDo(document("get-user",
-                        preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("feeds").description("본 사용자가 작성한 피드 리스트"),
@@ -143,8 +141,6 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("_links.delete.href").exists())
                 .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andDo(document("patch-user",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("nickname").description("변경할 닉네임"),
                                 fieldWithPath("profile").description("변경할 프로필 사진 경로")
@@ -250,7 +246,6 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("exists").value(true))
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andDo(document("check-nickname-exists",
-                        preprocessResponse(prettyPrint()),
                         requestParameters(
                                 parameterWithName("nickname").description("중복 검사를 진행할 닉네임")
                         ),

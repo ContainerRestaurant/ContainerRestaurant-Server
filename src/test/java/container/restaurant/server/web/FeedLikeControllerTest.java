@@ -16,8 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,7 +50,6 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.cancel-like.href").exists())
                 .andDo(document("feed-like",
-                        preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("cancel-like").description("본 좋아요를 취소하는 링크")
@@ -137,7 +134,6 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.like.href").exists())
                 .andDo(document("cancel-feed-like",
-                        preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("like").description("다시 좋아요 하는 링크")
