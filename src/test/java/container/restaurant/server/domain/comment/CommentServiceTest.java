@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class CommentServiceTest {
     private static final Category[] CATEGORY_ARR = {
-            Category.KOREAN, Category.JAPANESE, Category.INSTANT
+            Category.KOREAN, Category.JAPANESE, Category.FAST_FOOD
     };
 
     @Autowired

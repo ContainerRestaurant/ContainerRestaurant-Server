@@ -1,9 +1,9 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseTimeEntity;
-import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +13,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -20,7 +21,7 @@ import javax.validation.constraints.Size;
 public class Feed extends BaseTimeEntity {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
     @NotNull
@@ -54,6 +55,9 @@ public class Feed extends BaseTimeEntity {
 
     private Boolean isDeleted;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed")
+    private List<ScrapFeed> scrapedBy;
+
     @Builder
     protected Feed(
             User owner, Restaurant restaurant, Category category,
@@ -74,4 +78,27 @@ public class Feed extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setWelcome(Boolean welcome) {
+        this.welcome = welcome;
+    }
+
+    public void setDifficulty(Integer difficulty) {
+        this.difficulty = difficulty;
+    }
 }
