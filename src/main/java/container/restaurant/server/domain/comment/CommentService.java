@@ -2,9 +2,9 @@ package container.restaurant.server.domain.comment;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.UserRepository;
+import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
@@ -21,15 +21,14 @@ import static java.util.Optional.ofNullable;
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final FeedRepository feedRepository;
-    private final UserRepository userRepository;
+
+    private final UserService userService;
+    private final FeedService feedService;
 
     @Transactional
     public CommentInfoDto createComment(CommentCreateDto commentCreateDto, Long feedId, Long userId){
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 게시글입니다.(id:" +feedId+")"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 유저입니다.(id:"+userId+")"));
+        Feed feed = feedService.findById(feedId);
+        User user = userService.findById(userId);
 
         Comment comment;
         if(commentCreateDto.getUpperReplyId() == null){
@@ -46,8 +45,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public CollectionModel<CommentInfoDto> findAllByFeed(Long feedId) throws ResourceNotFoundException{
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 게시글입니다.(id:"+feedId+")"));
+        Feed feed = feedService.findById(feedId);
 
         LinkedHashMap<Long, CommentInfoDto> commentDtoMap = new LinkedHashMap<>();
 

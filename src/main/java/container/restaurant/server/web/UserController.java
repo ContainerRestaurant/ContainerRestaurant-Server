@@ -35,7 +35,7 @@ public class UserController {
         Long loginId = sessionUser != null ? sessionUser.getId() : -1;
 
         return ResponseEntity.ok(
-                setLinks(userService.findById(id), loginId)
+                setLinks(userService.getUserInfoById(id), loginId)
         );
     }
 

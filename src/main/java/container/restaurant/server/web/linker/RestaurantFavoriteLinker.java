@@ -18,7 +18,8 @@ public class RestaurantFavoriteLinker {
     private final RestaurantController restaurantProxy =
             DummyInvocationUtils.methodOn(RestaurantController.class);
 
-    private final SessionUser u = new SessionUser();
+    private final SessionUser u =
+            DummyInvocationUtils.methodOn(SessionUser.class);
 
     public LinkBuilder userFavoriteRestaurant(Long restaurantId) {
         return linkTo(proxy.userFavoriteRestaurant(u, restaurantId));

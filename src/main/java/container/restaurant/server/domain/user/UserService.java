@@ -28,20 +28,23 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfoDto findById(Long id) throws ResourceNotFoundException {
-        return userRepository.findById(id)
-                .map(UserInfoDto::from)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + id + ")"));
+    public UserInfoDto getUserInfoById(Long id) throws ResourceNotFoundException {
+
+        return UserInfoDto.from(findById(id));
     }
 
     @Transactional
     public UserInfoDto update(Long id, UserUpdateDto updateDto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("존재하지 않는 사용자입니다.(id:" + id + ")"));
+        User user = findById(id);
         updateDto.updateUser(user);
         return UserInfoDto.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "존재하지 않는 사용자입니다.(id:" + id + ")"));
     }
 
     @Transactional
