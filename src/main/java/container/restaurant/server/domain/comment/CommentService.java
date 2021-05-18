@@ -65,10 +65,10 @@ public class CommentService {
     public void deleteById(Long id, Long userId){
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+id+")"));
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 유저입니다.(id:"+userId+")"));
 
-        if(!comment.getOwner().getId().equals(user.getId()))
+        if(!comment.getOwner().getId().equals(userId))
             throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
 
         commentRepository.deleteById(id);
@@ -78,10 +78,10 @@ public class CommentService {
     public CommentInfoDto update(Long commentId, CommentUpdateDto commentUpdateDto, Long userId){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+commentId+")"));
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 유저입니다.(id:"+userId+")"));
 
-        if(!comment.getOwner().getId().equals(user.getId()))
+        if(!comment.getOwner().getId().equals(userId))
             throw new ResourceNotFoundException("수정 할 수 있는 유저가 아닙니다.");
 
         return CommentInfoDto.from(comment.setContent(commentUpdateDto.getContent()));

@@ -58,7 +58,6 @@ public class CommentController {
     ){
         return ResponseEntity.ok(
                 setLinks(commentService.update(commentId, updateDto, sessionUser.getId()))
-                    .add(commentLinker.updateComment(commentId).withSelfRel())
         );
     }
 
