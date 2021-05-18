@@ -40,7 +40,7 @@ public class RestaurantController {
             사용자 정보를 PathVariable 형태로 받는 형태로 구현 추후 입력방식 변경 가능
          */
 
-        return ResponseEntity.ok(new CollectionModel<>(restaurantService.findNearByRestaurants(lat, lon, radius)
+        return ResponseEntity.ok(CollectionModel.of(restaurantService.findNearByRestaurants(lat, lon, radius)
                 .stream().map(restaurant -> EntityModel.of(restaurant)
                         .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
                         .add(linkTo(getController().updateVanish(restaurant.getId())).withRel("restaurant-vanish"))
@@ -51,7 +51,7 @@ public class RestaurantController {
 
     @GetMapping("search/{name}")
     public ResponseEntity<CollectionModel<?>> searchRestaurantName(@PathVariable("name") String name) {
-        return ResponseEntity.ok(new CollectionModel<>(restaurantService.searchRestaurantName(name)
+        return ResponseEntity.ok(CollectionModel.of(restaurantService.searchRestaurantName(name)
                 .stream().map(restaurant -> EntityModel.of(restaurant)
                         .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
                 ).collect(Collectors.toList()))
