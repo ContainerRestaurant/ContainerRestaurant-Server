@@ -1,8 +1,7 @@
 package container.restaurant.server.domain.user.scrap;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,16 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ScrapFeedService {
 
-    private final FeedRepository feedRepository;
-
     private final ScrapFeedRepository scrapFeedRepository;
 
     private final UserService userService;
+    private final FeedService feedService;
 
     @Transactional
     public void userScrapFeed(Long userId, Long feedId) {
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
+        Feed feed = feedService.findById(feedId);
         User user = userService.findById(userId);
 
         scrapFeedRepository.findByUserIdAndFeedId(userId, feedId)

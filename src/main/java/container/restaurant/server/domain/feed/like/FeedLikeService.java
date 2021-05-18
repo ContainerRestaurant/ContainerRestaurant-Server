@@ -1,7 +1,7 @@
 package container.restaurant.server.domain.feed.like;
 
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,17 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FeedLikeService {
 
-    private final FeedRepository feedRepository;
-
     private final FeedLikeRepository feedLikeRepository;
 
     private final UserService userService;
+    private final FeedService feedService;
 
     @Transactional
     public void userLikeFeed(Long userId, Long feedId) {
         User user = userService.findById(userId);
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
+        Feed feed = feedService.findById(feedId);
 
         feedLikeRepository.findByUserAndFeed(user, feed)
                 .ifPresentOrElse(
@@ -34,8 +32,7 @@ public class FeedLikeService {
     @Transactional
     public void userCancelLikeFeed(Long userId, Long feedId) {
         User user = userService.findById(userId);
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 피드입니다.(id:" + feedId + ")"));
+        Feed feed = feedService.findById(feedId);
 
         feedLikeRepository.findByUserAndFeed(user, feed)
                 .ifPresent(feedLikeRepository::delete);
