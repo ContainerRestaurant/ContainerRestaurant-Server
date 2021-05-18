@@ -1,7 +1,5 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
@@ -28,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class CommentServiceTest {
     private static final Category[] CATEGORY_ARR = {
-            Category.KOREAN, Category.JAPANESE, Category.INSTANT
+            Category.KOREAN, Category.JAPANESE, Category.FAST_FOOD
     };
 
     @Autowired
