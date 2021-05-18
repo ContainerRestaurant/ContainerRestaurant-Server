@@ -12,10 +12,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 public class CommentLinker {
-    CommentController proxy = DummyInvocationUtils.methodOn(CommentController.class);
-    CommentUpdateDto commentUpdateDto;
-    CommentCreateDto commentCreateDto;
-    SessionUser u = new SessionUser();
+
+    CommentController proxy =
+            DummyInvocationUtils.methodOn(CommentController.class);
+
+    CommentUpdateDto commentUpdateDto =
+            DummyInvocationUtils.methodOn(CommentUpdateDto.class);
+
+    CommentCreateDto commentCreateDto=
+            DummyInvocationUtils.methodOn(CommentCreateDto.class);
+
+    SessionUser u =
+            DummyInvocationUtils.methodOn(SessionUser.class);
 
     public LinkBuilder getCommentByFeed(Long id){ return linkTo(proxy.getCommentByFeed(id, u)); }
 

@@ -12,7 +12,8 @@ public class ScrapFeedLinker {
     private final ScrapUserController proxy =
             DummyInvocationUtils.methodOn(ScrapUserController.class);
 
-    private final SessionUser u = new SessionUser();
+    private final SessionUser u =
+            DummyInvocationUtils.methodOn(SessionUser.class);
 
     public LinkBuilder scrapFeed(Long feedId) {
         return linkTo(proxy.scrapFeed(u, feedId));
