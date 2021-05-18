@@ -1,5 +1,6 @@
 package container.restaurant.server.web;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
@@ -16,10 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -71,6 +76,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.owner.href").exists())
+                .andExpect(jsonPath("_links.restaurant.href").exists())
                 .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").exists())
                 .andExpect(jsonPath("_links.delete.href").exists());
@@ -99,6 +106,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.owner.href").exists())
+                .andExpect(jsonPath("_links.restaurant.href").exists())
                 .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").doesNotExist())
                 .andExpect(jsonPath("_links.delete.href").doesNotExist());
@@ -125,7 +134,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -149,7 +160,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -173,7 +186,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -203,7 +218,21 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
-                .andExpect(jsonPath("_links.self.href").exists());
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
+    }
+
+    @Test
+    @DisplayName("카테고리 필터링 테스트")
+    public void testCategoryFilter() throws Exception{
+        mvc.perform(get("/api/feed?category=korean"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(LIST_PATH, hasSize(1)))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(othersFeed.getId()))
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.create.href").exists())
+                .andExpect(jsonPath("_links.category-list.href").exists());
     }
 
     @Test
@@ -369,6 +398,28 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
         //expect
         assertThat(feedRepository.existsById(feed.getId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("카테고리 리스트 테스트")
+    public void testGetCategoryList() throws Exception {
+        //given
+        MvcResult res = mvc.perform(get("/api/feed/category"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Map<String, String> map =
+                mapper.readValue(
+                        res.getResponse().getContentAsString(StandardCharsets.UTF_8),
+                        new TypeReference<HashMap<String, String>>(){});
+
+        //expect
+        for (Category category : Category.values()) {
+            assertThat(map.remove(category.name()))
+                    .isEqualTo(category.getKorean());
+        }
+        assertThat(map.size()).isEqualTo(0);
     }
 
     private List<Feed> saveFeeds() throws InterruptedException {

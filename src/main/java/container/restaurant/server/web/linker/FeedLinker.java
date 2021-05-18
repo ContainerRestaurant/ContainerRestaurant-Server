@@ -1,6 +1,7 @@
 package container.restaurant.server.web.linker;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.web.FeedController;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectFeed(Pageable pageable) {
-        return linkTo(proxy.selectFeed(pageable));
+        return linkTo(proxy.selectFeed(pageable, null));
     }
 
     public LinkBuilder selectFeed() {
@@ -35,7 +36,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectUserFeed(Long userId, Pageable pageable) {
-        return linkTo(proxy.selectUserFeed(userId, pageable));
+        return linkTo(proxy.selectUserFeed(userId, pageable, null));
     }
 
     public LinkBuilder selectUserFeed(Long userId) {
@@ -43,7 +44,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectUserScrapFeed(Long userId, Pageable pageable) {
-        return linkTo(proxy.selectUserScrapFeed(userId, pageable));
+        return linkTo(proxy.selectUserScrapFeed(userId, pageable, null));
     }
 
     public LinkBuilder selectUserScrapFeed(Long userId) {
@@ -51,7 +52,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectRestaurantFeed(Long restaurantId, Pageable pageable) {
-        return linkTo(proxy.selectRestaurantFeed(restaurantId, pageable));
+        return linkTo(proxy.selectRestaurantFeed(restaurantId, pageable, null));
     }
 
     public LinkBuilder selectRestaurantFeed(Long restaurantId) {
@@ -68,6 +69,10 @@ public class FeedLinker {
 
     public LinkBuilder updateFeed(Long feedId) {
         return linkTo(proxy.updateFeed(dto, u, feedId));
+    }
+
+    public LinkBuilder getCategoryList() {
+        return linkTo(proxy.getCategoryList());
     }
 
 }

@@ -6,6 +6,8 @@ import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
+import container.restaurant.server.domain.user.scrap.ScrapFeed;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,12 +24,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.domain.Pageable.unpaged;
 
 @SpringBootTest
 public class FeedRepositoryTest {
 
     private static final Category[] CATEGORY_ARR = {
-            Category.KOREAN, Category.JAPANESE, Category.INSTANT
+            Category.KOREAN, Category.JAPANESE, Category.NIGHT_MEAL
     };
 
     @Autowired
@@ -38,6 +41,9 @@ public class FeedRepositoryTest {
 
     @Autowired
     RestaurantRepository restaurantRepository;
+
+    @Autowired
+    ScrapFeedRepository scrapFeedRepository;
 
     @Autowired
     ImageRepository imageRepository;
@@ -94,6 +100,7 @@ public class FeedRepositoryTest {
 
     @AfterEach
     void afterEach() {
+        scrapFeedRepository.deleteAll();
         feedRepository.deleteAll();
         restaurantRepository.deleteAll();
         userRepository.deleteAll();
@@ -144,6 +151,46 @@ public class FeedRepositoryTest {
 
         //then-2 최신 순으로 정렬되어 나온다.
         assertThat(list.get(0).getCreatedDate()).isAfter(list.get(1).getCreatedDate());
+    }
+
+    @Test
+    @DisplayName("스크랩한 피드 찾기")
+    void testScrapedFeed() {
+        //given 각각의 유저가 3개씩 스크랩 했을 때
+        for (int i = 0; i < 3; i++) {
+            for (int o = 0; o < 3; o++) {
+                scrapFeedRepository.save(ScrapFeed.of(users.get(i), feeds.get(i + o)));
+            }
+        }
+
+        //when 두 번째 유저의 스크랩 피드를 조회하면
+        List<Feed> res = feedRepository.findAllByScraperId(users.get(1).getId(), unpaged()).getContent();
+
+        //then 3 개가 조회되고, 2, 3, 4 번째 피드다.
+        assertThat(res.size()).isEqualTo(3);
+        assertThat(res.get(0).getId()).isEqualTo(feeds.get(1).getId());
+        assertThat(res.get(1).getId()).isEqualTo(feeds.get(2).getId());
+        assertThat(res.get(2).getId()).isEqualTo(feeds.get(3).getId());
+    }
+
+    @Test
+    @DisplayName("스크랩한 피드 카테고리 필터링 찾기")
+    void testScrapedFeedWithCategory() {
+        //given 각각의 유저가 3개씩 스크랩 했을 때
+        for (int i = 0; i < 3; i++) {
+            for (int o = 0; o < 3; o++) {
+                scrapFeedRepository.save(ScrapFeed.of(users.get(i), feeds.get(i + o)));
+            }
+        }
+
+        //when 두 번째 유저의 스크랩 피드를 조회하면
+        List<Feed> res = feedRepository.findAllByScraperIdAndCategory(
+                        users.get(1).getId(), unpaged(), CATEGORY_ARR[0])
+                .getContent();
+
+        //then 1 개가 조회되고, 필터링한 카테고리를 갖는다.
+        assertThat(res.size()).isEqualTo(1);
+        assertThat(res.get(0).getCategory()).isEqualTo(CATEGORY_ARR[0]);
     }
 
 }

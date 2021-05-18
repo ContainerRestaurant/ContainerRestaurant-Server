@@ -2,12 +2,14 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.FeedLinker;
+import container.restaurant.server.web.linker.RestaurantLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -32,6 +36,7 @@ public class FeedController {
 
     private final FeedLinker feedLinker;
     private final UserLinker userLinker;
+    private final RestaurantLinker restaurantLinker;
     private final CommentLinker commentLinker;
 
     @GetMapping("{feedId}")
@@ -44,9 +49,10 @@ public class FeedController {
     }
 
     @GetMapping
-    public ResponseEntity<?> selectFeed(Pageable pageable) {
+    public ResponseEntity<?> selectFeed(Pageable pageable, Category category) {
+
         return ResponseEntity.ok(
-                setLinks(feedService.findAll(pageable)));
+                setLinks(feedService.findAll(pageable, category)));
     }
 
     @GetMapping("recommend")
@@ -57,26 +63,26 @@ public class FeedController {
 
     @GetMapping("user/{userId}")
     public ResponseEntity<?> selectUserFeed(
-            @PathVariable Long userId, Pageable pageable
+            @PathVariable Long userId, Pageable pageable, Category category
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByUser(userId, pageable)));
+                setLinks(feedService.findAllByUser(userId, pageable, category)));
     }
 
     @GetMapping("user/{userId}/scrap")
     public ResponseEntity<?> selectUserScrapFeed(
-            @PathVariable Long userId, Pageable pageable
+            @PathVariable Long userId, Pageable pageable, Category category
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByUserScrap(userId, pageable)));
+                setLinks(feedService.findAllByUserScrap(userId, pageable, category)));
     }
 
     @GetMapping("restaurant/{restaurantId}")
     public ResponseEntity<?> selectRestaurantFeed(
-            @PathVariable Long restaurantId, Pageable pageable
+            @PathVariable Long restaurantId, Pageable pageable, Category category
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByRestaurant(restaurantId, pageable)));
+                setLinks(feedService.findAllByRestaurant(restaurantId, pageable, category)));
     }
 
     @PostMapping
@@ -107,12 +113,21 @@ public class FeedController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("category")
+    public ResponseEntity<?> getCategoryList() {
+        return ResponseEntity.ok(
+                Arrays.stream(Category.values())
+                        .collect(Collectors.toMap(
+                                category -> category,
+                                Category::getKorean)));
+    }
+
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
                         userLinker.getUserById(dto.getOwnerId()).withRel("owner"),
-                        // TODO restaurant link
+                        restaurantLinker.findById(dto.getRestaurantId()).withRel("restaurant"),
                         commentLinker.getCommentByFeed(dto.getId()).withRel("comments")
                 )
                 .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
@@ -124,6 +139,9 @@ public class FeedController {
     private CollectionModel<FeedPreviewDto> setLinks(CollectionModel<FeedPreviewDto> list) {
         list.forEach(dto ->
                 dto.add(feedLinker.getFeedDetail(dto.getId()).withSelfRel()));
+        list.add(
+                feedLinker.createFeed().withRel("create"),
+                feedLinker.getCategoryList().withRel("category-list"));
         return list;
     }
 

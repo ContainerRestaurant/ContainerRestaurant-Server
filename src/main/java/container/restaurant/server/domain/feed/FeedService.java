@@ -6,10 +6,9 @@ import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
-import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
-import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,14 +17,16 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static java.util.Optional.ofNullable;
+
 @RequiredArgsConstructor
 @Service
 public class FeedService {
 
     private final FeedRepository feedRepository;
-    private final ScrapFeedRepository scrapFeedRepository;
-    private final RestaurantRepository restaurantRepository;
+
     private final UserRepository userRepository;
+    private final RestaurantRepository restaurantRepository;
 
     private final PagedResourcesAssembler<Feed> feedAssembler;
     private final PagedResourcesAssembler<ScrapFeed> scrapAssembler;
@@ -44,27 +45,45 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public PagedModel<FeedPreviewDto> findAll(Pageable pageable) {
+    public PagedModel<FeedPreviewDto> findAll(Pageable pageable, Category categoryFilter) {
         return feedAssembler.toModel(
-                feedRepository.findAll(pageable), FeedPreviewDto::from);
+                ofNullable(categoryFilter)
+                        .map(category -> feedRepository.findAllByCategory(pageable, categoryFilter))
+                        .orElseGet(() -> feedRepository.findAll(pageable)),
+                FeedPreviewDto::from);
     }
 
     @Transactional(readOnly = true)
-    public PagedModel<FeedPreviewDto> findAllByUser(Long userId, Pageable pageable) {
+    public PagedModel<FeedPreviewDto> findAllByUser(
+            Long userId, Pageable pageable, Category categoryFilter) {
         return feedAssembler.toModel(
-                feedRepository.findAllByOwnerId(userId, pageable), FeedPreviewDto::from);
+                ofNullable(categoryFilter)
+                        .map(category -> feedRepository.findAllByOwnerIdAndCategory(
+                                userId, pageable, categoryFilter))
+                        .orElseGet(() -> feedRepository.findAllByOwnerId(userId, pageable)),
+                FeedPreviewDto::from);
     }
 
     @Transactional(readOnly = true)
-    public PagedModel<FeedPreviewDto> findAllByRestaurant(Long restaurantId, Pageable pageable) {
+    public PagedModel<FeedPreviewDto> findAllByRestaurant(
+            Long restaurantId, Pageable pageable, Category categoryFilter) {
         return feedAssembler.toModel(
-                feedRepository.findAllByRestaurantId(restaurantId, pageable), FeedPreviewDto::from);
+                ofNullable(categoryFilter)
+                        .map(category -> feedRepository.findAllByRestaurantIdAndCategory(
+                                restaurantId, pageable, categoryFilter))
+                        .orElseGet(() -> feedRepository.findAllByRestaurantId(restaurantId, pageable)),
+                FeedPreviewDto::from);
     }
 
     @Transactional(readOnly = true)
-    public PagedModel<FeedPreviewDto> findAllByUserScrap(Long userId, Pageable pageable) {
-        return scrapAssembler.toModel(
-                scrapFeedRepository.findAllByUserId(userId, pageable), FeedPreviewDto::from);
+    public PagedModel<FeedPreviewDto> findAllByUserScrap(
+            Long userId, Pageable pageable, Category categoryFilter) {
+        return feedAssembler.toModel(
+                ofNullable(categoryFilter)
+                        .map(category -> feedRepository.findAllByScraperIdAndCategory(
+                                userId, pageable, categoryFilter))
+                        .orElseGet(() -> feedRepository.findAllByScraperId(userId, pageable)),
+                FeedPreviewDto::from);
     }
 
     @Transactional
