@@ -19,9 +19,7 @@ import javax.validation.constraints.NotNull;
 public class Report extends BaseCreatedTimeEntity {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     protected User reporter;
-
-    protected String description;
 
 }
