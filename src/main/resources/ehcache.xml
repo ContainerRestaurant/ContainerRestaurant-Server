@@ -6,7 +6,7 @@
             http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
 
     <!-- 가장 최근 피드를 작성한 유저 저장 캐시 -->
-    <cache alias="latestFeedCreateUserCache">
+    <cache alias="RecentFeedUsersCache">
         <value-type>java.util.List</value-type>
         <expiry>
             <!-- 해당 캐시는 5분동안 유지 됨 -->
@@ -14,6 +14,29 @@
         </expiry>
 
         <!-- 캐시 저장 디버깅 용도의 리스너-->
+        <listeners>
+            <listener>
+                <class>container.restaurant.server.utils.CacheEventLogger</class>
+                <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+                <event-ordering-mode>UNORDERED</event-ordering-mode>
+                <events-to-fire-on>CREATED</events-to-fire-on>
+                <events-to-fire-on>EXPIRED</events-to-fire-on>
+            </listener>
+        </listeners>
+
+        <resources>
+            <heap unit="entries">10</heap>
+            <offheap unit="MB">10</offheap>
+        </resources>
+    </cache>
+
+    <!-- 가장 많은 피드를 작성한 유저 저장 캐시 -->
+    <cache alias="MostFeedUsersCache">
+        <value-type>java.util.List</value-type>
+        <expiry>
+            <ttl unit="minutes">5</ttl>
+        </expiry>
+
         <listeners>
             <listener>
                 <class>container.restaurant.server.utils.CacheEventLogger</class>
