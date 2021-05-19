@@ -43,7 +43,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.welcome = feed.getWelcome();
         this.difficulty = feed.getDifficulty();
         this.likeCount = feed.getLikeCount();
-        this.scrapCount = feed.getScrapedCount();
+        this.scrapCount = feed.getScrapCount();
         this.replyCount = feed.getReplyCount();
     }
 
