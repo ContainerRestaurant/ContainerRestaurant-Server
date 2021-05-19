@@ -33,7 +33,6 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public FeedDetailDto getFeedDetail(Long feedId) {
-
         return FeedDetailDto.from(findById(feedId));
     }
 
@@ -115,7 +114,7 @@ public class FeedService {
     }
 
     @Transactional
-    public List<Feed> findByLatestFeedUsers() {
+    public List<Feed> findByLatestFeeds() {
         return feedRepository.findByLatestFeed();
     }
 }

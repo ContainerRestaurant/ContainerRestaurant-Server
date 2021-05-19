@@ -7,18 +7,18 @@ import org.springframework.hateoas.RepresentationModel;
 import java.io.Serializable;
 
 @Getter
-public class LatestFeedUserInfoDto extends RepresentationModel<LatestFeedUserInfoDto> implements Serializable {
+public class StatisticsUserInfoDto extends RepresentationModel<StatisticsUserInfoDto> implements Serializable {
 
     private final Long id;
     private final String email;
     private final String nickname;
     private final String profile;
 
-    public static LatestFeedUserInfoDto from(User user) {
-        return new LatestFeedUserInfoDto(user);
+    public static StatisticsUserInfoDto from(User user) {
+        return new StatisticsUserInfoDto(user);
     }
 
-    protected LatestFeedUserInfoDto(User user) {
+    protected StatisticsUserInfoDto(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
