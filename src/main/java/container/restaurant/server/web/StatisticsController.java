@@ -20,11 +20,19 @@ public class StatisticsController {
     private final StatisticsLinker statisticsLinker;
 
     @GetMapping("/latest")
-    public ResponseEntity<?> getLatestFeedCreateUser() {
-        return ResponseEntity.ok(CollectionModel.of(statisticsService.latestFeedCreateUsers()
+    public ResponseEntity<?> getRecentFeedUsers() {
+        return ResponseEntity.ok(CollectionModel.of(statisticsService.getRecentFeedUsers()
                 .stream().map(latestFeedUserInfoDto -> EntityModel.of(latestFeedUserInfoDto))
                 .collect(Collectors.toList()))
-                .add(statisticsLinker.getLatestFeedCreateUser().withSelfRel()));
+                .add(statisticsLinker.getRecentFeedUsers().withSelfRel()));
+    }
+
+    @GetMapping("/most")
+    public ResponseEntity<?> getMostFeedUsers() {
+        return ResponseEntity.ok(CollectionModel.of(statisticsService.getMostFeedUsers()
+                .stream().map(latestFeedUserInfoDto -> EntityModel.of(latestFeedUserInfoDto))
+                .collect(Collectors.toList()))
+                .add(statisticsLinker.getMostFeedUsers().withSelfRel()));
     }
 
 }
