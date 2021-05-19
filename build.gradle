@@ -31,6 +31,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.ehcache:ehcache:3.9.3'
+	implementation 'javax.cache:cache-api:1.0.0'
 
 	implementation 'org.locationtech.jts:jts-core'
 	implementation 'org.hibernate:hibernate-spatial:5.4.30.Final'
