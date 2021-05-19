@@ -44,6 +44,12 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
+    public Comment findById(Long id){
+        return commentRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+id+")"));
+    }
+
+    @Transactional(readOnly = true)
     public CollectionModel<CommentInfoDto> findAllByFeed(Long feedId) throws ResourceNotFoundException{
         Feed feed = feedService.findById(feedId);
 
@@ -79,5 +85,17 @@ public class CommentService {
             throw new ResourceNotFoundException("수정 할 수 있는 유저가 아닙니다.");
 
         return CommentInfoDto.from(comment.setContent(commentUpdateDto.getContent()));
+    }
+
+    @Transactional
+    public void likeCountUp(Long commentId){
+        Comment comment = findById(commentId);
+        comment.likeCountUp();
+    }
+
+    @Transactional
+    public void likeCountDown(Long commentId){
+        Comment comment = findById(commentId);
+        comment.likeCountDown();
     }
 }
