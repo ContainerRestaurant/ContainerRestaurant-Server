@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequestMapping("/api/scrap")
-public class ScrapUserController {
+public class ScrapFeedController {
 
     private final ScrapFeedService scrapFeedService;
 
