@@ -78,6 +78,14 @@ public class Feed extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
+    public void likeCountUp() {
+        this.likeCount++;
+    }
+
+    public void likeCountDown() {
+        this.likeCount--;
+    }
+
     public void scrapCountUp() {
         this.scrapCount++;
     }
