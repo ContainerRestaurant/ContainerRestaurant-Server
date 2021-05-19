@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -17,16 +18,16 @@ import javax.validation.constraints.NotNull;
 public class ReportFeed extends Report {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Feed feed;
 
-    private ReportFeed(User user, Feed feed, String description) {
-        super(user, description);
+    private ReportFeed(User user, Feed feed) {
+        super(user);
         this.feed = feed;
     }
 
-    public static ReportFeed of(User user, Feed feed, String description) {
-        return new ReportFeed(user, feed, description);
+    public static ReportFeed of(User user, Feed feed) {
+        return new ReportFeed(user, feed);
     }
 
 }
