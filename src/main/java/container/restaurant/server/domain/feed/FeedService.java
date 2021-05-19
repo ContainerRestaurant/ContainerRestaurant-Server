@@ -16,6 +16,8 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -110,5 +112,10 @@ public class FeedService {
         if (restaurant != null)
             feed.setRestaurant(restaurant);
         dto.update(feed);
+    }
+
+    @Transactional
+    public List<Feed> findByLatestFeedUsers() {
+        return feedRepository.findByLatestFeed();
     }
 }
