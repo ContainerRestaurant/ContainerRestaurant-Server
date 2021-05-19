@@ -1,10 +1,14 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.feed.like.FeedLikeRepository;
+import container.restaurant.server.domain.feed.like.FeedLikeService;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
+import container.restaurant.server.domain.user.scrap.ScrapFeedService;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
@@ -26,13 +30,18 @@ public class FeedService {
 
     private final UserService userService;
     private final RestaurantService restaurantService;
+    private final FeedLikeRepository feedLikeRepository;
+    private final ScrapFeedRepository scrapFeedRepository;
 
     private final PagedResourcesAssembler<Feed> feedAssembler;
 
     @Transactional(readOnly = true)
-    public FeedDetailDto getFeedDetail(Long feedId) {
+    public FeedDetailDto getFeedDetail(Long feedId, Long loginId) {
 
-        return FeedDetailDto.from(findById(feedId));
+        return FeedDetailDto.from(
+                findById(feedId),
+                feedLikeRepository.existsByUserIdAndFeedId(loginId, feedId),
+                scrapFeedRepository.existsByUserIdAndFeedId(loginId, feedId));
     }
 
     @Transactional(readOnly = true)

@@ -26,11 +26,14 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final Integer scrapCount;
     private final Integer replyCount;
 
-    public static FeedDetailDto from(Feed feed) {
-        return new FeedDetailDto(feed);
+    private final Boolean isLike;
+    private final Boolean isScraped;
+
+    public static FeedDetailDto from(Feed feed, Boolean isLike, Boolean isScraped) {
+        return new FeedDetailDto(feed, isLike, isScraped);
     }
 
-    private FeedDetailDto(Feed feed) {
+    private FeedDetailDto(Feed feed, Boolean isLike, Boolean isScraped) {
         this.id = feed.getId();
         this.ownerId = feed.getOwner().getId();
         this.restaurantId = feed.getRestaurant().getId();
@@ -45,6 +48,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.likeCount = feed.getLikeCount();
         this.scrapCount = feed.getScrapCount();
         this.replyCount = feed.getReplyCount();
+
+        this.isLike = isLike;
+        this.isScraped = isScraped;
     }
 
 }
