@@ -17,7 +17,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/docs/index.html",
             "/auth/list",
             "/api/user/nickname/**/exists",
-            "/api/feed/**"
+            "/api/feed/**",
+            "/api/statistics/**"
     };
 
     @Override
