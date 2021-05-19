@@ -39,6 +39,7 @@ public class CommentService {
             upperReply.setIsHaveReply();
             comment = new Comment(commentCreateDto, feed, user, upperReply);
         }
+        feed.commentCountUp();
 
         return CommentInfoDto.from(commentRepository.save(comment));
     }
@@ -68,6 +69,7 @@ public class CommentService {
             throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
 
         commentRepository.deleteById(id);
+        comment.getFeed().commentCountDown();
     }
 
     @Transactional

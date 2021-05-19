@@ -86,6 +86,14 @@ public class Feed extends BaseTimeEntity {
         this.scrapCount--;
     }
 
+    public void commentCountUp() {
+        this.replyCount++;
+    }
+
+    public void commentCountDown() {
+        this.replyCount--;
+    }
+
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }

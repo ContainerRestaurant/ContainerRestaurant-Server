@@ -121,23 +121,29 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글 작성")
     void createComment() {
+        int orgCommentCount = feeds.get(0).getReplyCount();
         CommentCreateDto commentCreateDto = new CommentCreateDto("test");
 
         CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
+        assertThat(feedRepository.findById(feeds.get(0).getId()).get().getReplyCount())
+                .isEqualTo(orgCommentCount + 1);
     }
 
     @Test
     @DisplayName("대댓글 작성")
     void createReplyComment() {
+        int orgCommentCount = feeds.get(0).getReplyCount();
         CommentCreateDto commentCreateDto = new CommentCreateDto("test", comments.get(0).getId());
 
         CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
+        assertThat(feedRepository.findById(feeds.get(0).getId()).get().getReplyCount())
+                .isEqualTo(orgCommentCount + 1);
     }
 
     @Test
@@ -161,6 +167,6 @@ class CommentServiceTest {
             commentRepository.findById(comments.get(0).getId())
                     .orElseThrow(()->new ResourceNotFoundException("댓글 없음2"))
         ).isInstanceOf(ResourceNotFoundException.class);
-
     }
+
 }
