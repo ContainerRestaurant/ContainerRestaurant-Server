@@ -15,7 +15,7 @@ import java.util.UUID;
 import static container.restaurant.server.utils.JsonUtils.JsonStringBufferParse;
 
 public class MultipartUtility {
-    private final String URL = "http://dlwfp.synology.me:22304/api/v1/restaurant/image/upload";
+    private final String URL = "http://dlwfp.synology.me:22304/api/image/upload";
     private final String UserAgent = "ContainerRestaurant Agent";
     private final String LINE_FEED = "\r\n";
     private String boundary = "--------------------------";
