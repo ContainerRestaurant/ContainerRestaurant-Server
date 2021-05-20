@@ -49,7 +49,7 @@ public class Feed extends BaseTimeEntity {
 
     private Integer replyCount;
 
-    private Integer hits;
+    private Integer hitCount;
 
     private Boolean isBlind;
 
@@ -73,7 +73,7 @@ public class Feed extends BaseTimeEntity {
         this.likeCount = 0;
         this.scrapCount = 0;
         this.replyCount = 0;
-        this.hits = 0;
+        this.hitCount = 0;
         this.isBlind = false;
         this.isDeleted = false;
     }
@@ -100,6 +100,10 @@ public class Feed extends BaseTimeEntity {
 
     public void commentCountDown() {
         this.replyCount--;
+    }
+
+    public void hit() {
+        this.hitCount++;
     }
 
     public void setRestaurant(Restaurant restaurant) {
