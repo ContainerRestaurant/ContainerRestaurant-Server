@@ -3,7 +3,6 @@ package container.restaurant.server.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
@@ -24,7 +23,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import javax.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,9 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
     private static final String LIST_PATH = "_embedded.feedPreviewDtoList";
-
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     private ImageRepository imageRepository;
