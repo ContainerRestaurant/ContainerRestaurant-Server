@@ -118,7 +118,7 @@ public class FeedController {
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
-        boolean isOwner = loginId.equals(dto.getOwnerId());
+        boolean isOwner = dto.getOwnerId().equals(loginId);
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
