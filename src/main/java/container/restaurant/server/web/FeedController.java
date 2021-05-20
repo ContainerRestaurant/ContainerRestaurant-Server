@@ -32,6 +32,7 @@ public class FeedController {
     private final CommentLinker commentLinker;
     private final FeedLikeLinker feedLikeLinker;
     private final ScrapFeedLinker scrapFeedLinker;
+    private final ReportLinker reportLinker;
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
@@ -117,6 +118,7 @@ public class FeedController {
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
+        boolean isOwner = loginId.equals(dto.getOwnerId());
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
@@ -130,9 +132,12 @@ public class FeedController {
                                 scrapFeedLinker.cancelScrapFeed(dto.getId()).withRel("cancel-scrap") :
                                 scrapFeedLinker.scrapFeed(dto.getId()).withRel("scrap")
                 )
-                .addAllIf(dto.getOwnerId().equals(loginId), () -> List.of(
+                .addAllIf(isOwner, () -> List.of(
                         feedLinker.updateFeed(dto.getId()).withRel("patch"),
                         feedLinker.deleteFeed(dto.getId()).withRel("delete")
+                ))
+                .addAllIf(!isOwner, () -> List.of(
+                        reportLinker.reportFeed(dto.getId()).withRel("report")
                 ));
     }
 

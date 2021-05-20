@@ -8,6 +8,7 @@ import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
 import container.restaurant.server.web.linker.CommentLinker;
+import container.restaurant.server.web.linker.ReportLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -22,8 +23,11 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/comment")
 public class CommentController {
+
     private final CommentService commentService;
+
     private final CommentLinker commentLinker;
+    private final ReportLinker reportLinker;
 
     @PostMapping("{feedId}")
     public ResponseEntity<?> createComment(
@@ -80,10 +84,14 @@ public class CommentController {
     }
 
     private void setLinks(CommentInfoDto dto, Long userId){
-        dto.addAllIf(dto.getOwnerId().equals(userId), () -> List.of(
-                commentLinker.updateComment(dto.getId()).withRel("patch"),
-                commentLinker.deleteComment(dto.getId()).withRel("delete"))
-        );
+        boolean isOwner = dto.getOwnerId().equals(userId);
+        dto
+                .addAllIf(isOwner, () -> List.of(
+                        commentLinker.updateComment(dto.getId()).withRel("patch"),
+                        commentLinker.deleteComment(dto.getId()).withRel("delete")))
+                .addAllIf(!isOwner, () -> List.of(
+                        reportLinker.reportComment(dto.getId()).withRel("report")
+                ));
     }
 
     private CommentInfoDto setLinks(CommentInfoDto commentInfoDto){
