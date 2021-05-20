@@ -10,6 +10,7 @@ import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.RestaurantLinker;
+import container.restaurant.server.web.linker.ReportLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +39,7 @@ public class FeedController {
     private final UserLinker userLinker;
     private final RestaurantLinker restaurantLinker;
     private final CommentLinker commentLinker;
+    private final ReportLinker reportLinker;
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
@@ -123,6 +125,7 @@ public class FeedController {
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
+        boolean isOwner = loginId.equals(dto.getOwnerId());
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
@@ -130,9 +133,12 @@ public class FeedController {
                         restaurantLinker.findById(dto.getRestaurantId()).withRel("restaurant"),
                         commentLinker.getCommentByFeed(dto.getId()).withRel("comments")
                 )
-                .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
+                .addAllIf(isOwner, () -> List.of(
                         feedLinker.updateFeed(dto.getId()).withRel("patch"),
                         feedLinker.deleteFeed(dto.getId()).withRel("delete")
+                ))
+                .addAllIf(!isOwner, () -> List.of(
+                        reportLinker.reportFeed(dto.getId()).withRel("report")
                 ));
     }
 
