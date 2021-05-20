@@ -43,6 +43,12 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
+    public Comment findById(Long id){
+        return commentRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+id+")"));
+    }
+
+    @Transactional(readOnly = true)
     public CollectionModel<CommentInfoDto> findAllByFeed(Long feedId) throws ResourceNotFoundException{
         Feed feed = feedService.findById(feedId);
 
@@ -78,9 +84,15 @@ public class CommentService {
         return CommentInfoDto.from(comment.setContent(commentUpdateDto.getContent()));
     }
 
-    @Transactional(readOnly = true)
-    public Comment findById(Long commentId) {
-        return commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:" + commentId + ")"));
+    @Transactional
+    public void likeCountUp(Long commentId){
+        Comment comment = findById(commentId);
+        comment.likeCountUp();
+    }
+
+    @Transactional
+    public void likeCountDown(Long commentId){
+        Comment comment = findById(commentId);
+        comment.likeCountDown();
     }
 }
