@@ -32,6 +32,7 @@ public class CommentLikeService {
                 );
     }
 
+    @Transactional
     public void userCancelLikeComment(Long userId, Long commentId){
         User user = userService.findById(userId);
         Comment comment = commentService.findById(commentId);
