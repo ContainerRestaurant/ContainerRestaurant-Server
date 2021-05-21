@@ -64,6 +64,10 @@ public class Comment extends BaseCreatedTimeEntity {
 
     public void setIsHaveReply() { this.isHaveReply = true; }
 
+    public void unSetIsHaveReply() { this.isHaveReply = false; }
+
+    public void setIsDeleted() { this.isDeleted = true; }
+
     public void likeCountUp() { this.likeCount++; }
 
     public void likeCountDown() { this.likeCount--; }
