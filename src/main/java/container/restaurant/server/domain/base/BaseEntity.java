@@ -2,12 +2,8 @@ package container.restaurant.server.domain.base;
 
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import java.time.LocalDateTime;
+import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * {@link Entity} 클래스의 기반 클래스
@@ -24,4 +20,23 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || id == null || getClass() != o.getClass()) return false;
+        BaseEntity that = (BaseEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "id=" + id +
+                '}';
+    }
 }
