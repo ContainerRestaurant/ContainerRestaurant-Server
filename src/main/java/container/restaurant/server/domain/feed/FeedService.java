@@ -14,11 +14,14 @@ import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 import static java.util.Optional.ofNullable;
 
@@ -137,4 +140,10 @@ public class FeedService {
     public boolean checkHit(Long loginId, Long feedId) {
         return feedHitRepository.existsByUserIdAndFeedId(loginId, feedId);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Feed> findForUpdatingRecommend(LocalDateTime from, LocalDateTime to, Pageable pageable) {
+        return feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
+    }
+
 }
