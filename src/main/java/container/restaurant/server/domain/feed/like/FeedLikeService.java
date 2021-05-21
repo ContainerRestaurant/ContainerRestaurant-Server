@@ -23,10 +23,11 @@ public class FeedLikeService {
         Feed feed = feedService.findById(feedId);
 
         feedLikeRepository.findByUserAndFeed(user, feed)
-                .ifPresentOrElse(
-                        feedLike -> {/* do nothing*/},
-                        () -> feedLikeRepository.save(FeedLike.of(user, feed))
-                );
+                .orElseGet(() -> {
+                    feedLikeRepository.save(FeedLike.of(user, feed));
+                    feed.likeCountUp();
+                    return null;
+                });
     }
 
     @Transactional
@@ -35,6 +36,9 @@ public class FeedLikeService {
         Feed feed = feedService.findById(feedId);
 
         feedLikeRepository.findByUserAndFeed(user, feed)
-                .ifPresent(feedLikeRepository::delete);
+                .ifPresent(feedLike -> {
+                    feedLikeRepository.delete(feedLike);
+                    feed.likeCountDown();
+                });
     }
 }

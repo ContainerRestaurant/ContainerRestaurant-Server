@@ -38,7 +38,7 @@ class FeedTest {
         assertThat(feed.getWelcome()).isEqualTo(welcome);
         assertThat(feed.getDifficulty()).isEqualTo(difficulty);
         assertThat(feed.getLikeCount()).isEqualTo(0);
-        assertThat(feed.getScrapedCount()).isEqualTo(0);
+        assertThat(feed.getScrapCount()).isEqualTo(0);
         assertThat(feed.getReplyCount()).isEqualTo(0);
         assertThat(feed.getIsBlind()).isFalse();
         assertThat(feed.getIsDeleted()).isFalse();
