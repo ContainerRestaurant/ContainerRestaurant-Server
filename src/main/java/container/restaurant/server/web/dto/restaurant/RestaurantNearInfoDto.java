@@ -14,6 +14,8 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
     private final double latitude;
     private final double longitude;
     private final String image_path;
+    private final Integer feedCount;
+    private final Float difficultyAvg;
 
     public static RestaurantNearInfoDto from(Restaurant restaurant, Image image) {
         return new RestaurantNearInfoDto(restaurant, image);
@@ -25,7 +27,10 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();
         this.longitude = restaurant.getLongitude();
+        this.feedCount = restaurant.getFeedCount();
+        this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = image.getUrl();
+
     }
 
 }

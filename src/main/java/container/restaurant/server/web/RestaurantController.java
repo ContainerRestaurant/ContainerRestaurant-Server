@@ -16,7 +16,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/restaurant/")
+@RequestMapping("/api/restaurant")
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
@@ -31,7 +31,7 @@ public class RestaurantController {
         );
     }
 
-    @GetMapping("/{lat}/{lon}/{radius}")
+    @GetMapping("{lat}/{lon}/{radius}")
     public ResponseEntity<CollectionModel<?>> findNearByRestaurants(
             @PathVariable("lat") double lat,
             @PathVariable("lon") double lon,
@@ -49,18 +49,12 @@ public class RestaurantController {
                 .add(linkTo(getController().findNearByRestaurants(lat, lon, radius)).withSelfRel()));
     }
 
-    @GetMapping("search/{name}")
-    public ResponseEntity<CollectionModel<?>> searchRestaurantName(@PathVariable("name") String name) {
-        return ResponseEntity.ok(CollectionModel.of(restaurantService.searchRestaurantName(name)
-                .stream().map(restaurant -> EntityModel.of(restaurant)
-                        .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
-                ).collect(Collectors.toList()))
-                .add(linkTo(getController().searchRestaurantName(name)).withSelfRel()));
-    }
+    // 식당 이름 검색 비활성화
+    
 
     @PostMapping("vanish/{id}")
     public ResponseEntity<?> updateVanish(@PathVariable("id") Long id) {
-        restaurantService.updateVanish(id);
+        restaurantService.restaurantVanish(id);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(linkTo(getController().updateVanish(id)).withSelfRel()));

@@ -32,7 +32,10 @@ public class RestaurantFavoriteService {
         restaurantFavoriteRepository.findByUserAndRestaurant(user, restaurant)
                 .ifPresentOrElse(
                         restaurantFavorite -> {/* do nothing*/},
-                        () -> restaurantFavoriteRepository.save(RestaurantFavorite.of(user, restaurant))
+                        () -> {
+                            restaurantFavoriteRepository.save(RestaurantFavorite.of(user, restaurant));
+                            restaurant.favoriteCountUp();
+                        }
                 );
     }
 
@@ -42,10 +45,13 @@ public class RestaurantFavoriteService {
         Restaurant restaurant = restaurantService.findById(restaurantId);
 
         restaurantFavoriteRepository.findByUserAndRestaurant(user, restaurant)
-                .ifPresent(restaurantFavoriteRepository::delete);
+                .ifPresent(restaurantFavorite -> {
+                    restaurantFavoriteRepository.delete(restaurantFavorite);
+                    restaurant.favoriteCountDown();
+                });
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<RestaurantFavoriteDto> userFindAllFavoriteRestaurant(Long userId) {
         User user = userService.findById(userId);
 
