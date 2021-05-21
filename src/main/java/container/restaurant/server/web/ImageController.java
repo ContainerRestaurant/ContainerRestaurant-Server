@@ -4,6 +4,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.web.linker.ImageLinker;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,10 @@ import java.net.URISyntaxException;
 @RestController
 @RequestMapping("/api/image")
 public class ImageController {
-    private final String REDIRECT_URL = "http://dlwfp.synology.me:22304/api/image/";
+
+    @Value("${server.image.base.url}")
+    private String BASE_URL;
+    private final String DEFAULT_PATH = "/api/image/";
     final private ImageService imageService;
 
     final private ImageLinker imageLinker;
@@ -35,7 +39,7 @@ public class ImageController {
 
     @GetMapping(value = "{path}")
     public ResponseEntity<?> getImageFile(@PathVariable String path) throws URISyntaxException {
-        URI redirectUri = new URI(REDIRECT_URL + path);
+        URI redirectUri = new URI(BASE_URL + DEFAULT_PATH + path);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(redirectUri);
         return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);

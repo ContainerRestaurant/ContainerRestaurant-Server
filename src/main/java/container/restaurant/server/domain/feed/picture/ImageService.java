@@ -17,12 +17,13 @@ import java.io.IOException;
 @Log4j2
 public class ImageService {
     private final ImageRepository imageRepository;
+    private final MultipartUtility multipartUtility;
 
     public Image upload(MultipartFile imageFile) throws IOException {
-        MultipartUtility mu = new MultipartUtility();
-        mu.addFilePart("image", imageFile);
+        multipartUtility.init();
+        multipartUtility.addFilePart("image", imageFile);
 
-        JsonObject pathJob = (JsonObject) mu.finish();
+        JsonObject pathJob = (JsonObject) multipartUtility.finish();
 
         String path = pathJob.get("path").getAsString();
         return imageRepository.save(new Image(path));
