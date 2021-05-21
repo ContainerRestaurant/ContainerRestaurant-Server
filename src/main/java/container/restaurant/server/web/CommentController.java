@@ -46,7 +46,6 @@ public class CommentController {
     ){
         Long userID = sessionUser != null ? sessionUser.getId() : null;
 
-        // TODO 대댓글이 있는 댓글 삭제시 본 댓글은 안보이고 대댓글만 보이도록 GET 수정
         return ResponseEntity.ok(
                 setLinks(commentService.findAllByFeed(feedId), userID)
                         .add(commentLinker.getCommentByFeed(feedId).withSelfRel())
@@ -83,6 +82,7 @@ public class CommentController {
     }
 
     private void setLinks(CommentInfoDto dto, Long userId){
+        if(dto.getOwnerId() == null) return;
         boolean isOwner = dto.getOwnerId().equals(userId);
         dto
                 .addAllIf(isOwner, () -> List.of(

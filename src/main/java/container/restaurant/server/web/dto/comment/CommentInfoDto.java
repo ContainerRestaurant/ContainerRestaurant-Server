@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     private final Long id;
     private final String content;
+    private final Boolean isDeleted;
     private final Integer likeCount;
     private final Long ownerId;
     private final String ownerNickName;
@@ -22,18 +23,33 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     private final List<CommentInfoDto> commentReply = new ArrayList<>();
 
     public static CommentInfoDto from(Comment comment){
+        if(comment.getIsDeleted())
+            return new CommentInfoDto(comment.getId());
         return new CommentInfoDto(comment);
     }
 
     protected CommentInfoDto(Comment comment){
         this.id = comment.getId();
         this.content = comment.getContent();
+        this.isDeleted = false;
         this.likeCount = comment.getLikeCount();
         this.ownerId = comment.getOwner().getId();
         this.ownerNickName = comment.getOwner().getNickname();
         this.ownerProfile = comment.getOwner().getProfile();
         this.ownerLevel = comment.getOwner().getLevel();
         this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("MM.dd"));
+    }
+
+    protected CommentInfoDto(Long id){
+        this.id = id;
+        this.content = null;
+        this.isDeleted = true;
+        this.likeCount = null;
+        this.ownerId = null;
+        this.ownerNickName = null;
+        this.ownerProfile = null;
+        this.ownerLevel = null;
+        this.createdDate = null;
     }
 
     public void addCommentReply(CommentInfoDto commentInfoDto){
