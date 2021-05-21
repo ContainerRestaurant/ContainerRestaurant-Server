@@ -10,6 +10,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import static container.restaurant.server.utils.SpatialUtils.createPointType;
@@ -40,6 +41,15 @@ public class Restaurant extends BaseEntity {
     @ColumnDefault("0")
     private int vanishCount;
 
+    @ColumnDefault("0")
+    private int favoriteCount;
+
+    @ColumnDefault("0")
+    private int feedCount;
+
+    @Transient
+    private float difficultyAvg;
+
     @SneakyThrows
     @Builder
     protected Restaurant(String name, String addr, double lon, double lat, Long image_ID) {
@@ -51,4 +61,27 @@ public class Restaurant extends BaseEntity {
         this.image_ID = image_ID;
     }
 
+    public void favoriteCountUp() {
+        this.favoriteCount++;
+    }
+
+    public void favoriteCountDown() {
+        this.favoriteCount--;
+    }
+
+    public void feedCountUp() {
+        this.feedCount++;
+    }
+
+    public void feedCountDown() {
+        this.feedCount--;
+    }
+
+    public void VanishCountUp() {
+        this.vanishCount++;
+    }
+
+    public void setDifficultyAvg(float difficultyAvg) {
+        this.difficultyAvg = difficultyAvg;
+    }
 }
