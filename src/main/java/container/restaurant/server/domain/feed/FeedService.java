@@ -125,7 +125,7 @@ public class FeedService {
         user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
-        return feedRepository.save(dto.toEntityWith(user, restaurant))
+        return feedRepository.save(dto.toFeedWith(user, restaurant))
                 .getId();
     }
 
