@@ -1,18 +1,18 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseTimeEntity;
+import container.restaurant.server.domain.feed.container.Container;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,6 +32,9 @@ public class Feed extends BaseTimeEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed")
+    private List<Container> containerList;
 
     private String thumbnailUrl;
 
@@ -56,12 +59,13 @@ public class Feed extends BaseTimeEntity {
 
     private Boolean isDeleted;
 
+    @Getter(AccessLevel.NONE)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed")
     private List<ScrapFeed> scrapedBy;
 
     @Builder
     protected Feed(
-            User owner, Restaurant restaurant, Category category,
+            User owner, Restaurant restaurant, Category category, List<Container> menus,
             String thumbnailUrl, String content, Boolean welcome, Integer difficulty
     ) {
         this.owner = owner;
@@ -77,6 +81,11 @@ public class Feed extends BaseTimeEntity {
         this.hitCount = 0;
         this.isBlind = false;
         this.isDeleted = false;
+
+        this.containerList = new ArrayList<>();
+        if (menus != null) {
+            this.containerList.addAll(menus);
+        }
     }
 
     public void likeCountUp() {
