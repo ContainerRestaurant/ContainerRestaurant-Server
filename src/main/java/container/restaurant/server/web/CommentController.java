@@ -82,6 +82,7 @@ public class CommentController {
     }
 
     private void setLinks(CommentInfoDto dto, Long userId){
+        if(dto.getOwnerId() == null) return;
         boolean isOwner = dto.getOwnerId().equals(userId);
         dto
                 .addAllIf(isOwner, () -> List.of(

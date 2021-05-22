@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
@@ -72,6 +73,21 @@ public class CommentService {
         if(!comment.getOwner().getId().equals(userId))
             throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
 
+        // 대댓글 있다면(isHaveReply) 댓글 isDeleted 처리
+        if(comment.getIsHaveReply()){
+            comment.setIsDeleted();
+            return;
+        }
+        Comment upperReply = comment.getUpperReply();
+        // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
+        List<Comment> UpperReplies = commentRepository.findCommentsByUpperReplyId(upperReply.getId());
+        if(UpperReplies.size() == 1){
+            upperReply.unSetIsHaveReply();
+            // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
+            if(upperReply.getIsDeleted())
+                commentRepository.deleteById(upperReply.getId());
+        }
+        // delete
         commentRepository.deleteById(id);
         comment.getFeed().commentCountDown();
     }
