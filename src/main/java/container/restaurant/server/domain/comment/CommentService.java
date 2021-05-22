@@ -75,19 +75,19 @@ public class CommentService {
         // 대댓글 있다면(isHaveReply) 댓글 isDeleted 처리
         if(comment.getIsHaveReply()){
             comment.setIsDeleted();
-        }else{
-            Comment upperReply = comment.getUpperReply();
-            // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
-            List<Comment> UpperReplies = commentRepository.findCommentsByUpperReplyId(upperReply.getId());
-            if(UpperReplies.size() == 1){
-                upperReply.unSetIsHaveReply();
-                // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
-                if(upperReply.getIsDeleted())
-                    commentRepository.deleteById(upperReply.getId());
-            }
-            // delete
-            commentRepository.deleteById(id);
+            return;
         }
+        Comment upperReply = comment.getUpperReply();
+        // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
+        List<Comment> UpperReplies = commentRepository.findCommentsByUpperReplyId(upperReply.getId());
+        if(UpperReplies.size() == 1){
+            upperReply.unSetIsHaveReply();
+            // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
+            if(upperReply.getIsDeleted())
+                commentRepository.deleteById(upperReply.getId());
+        }
+        // delete
+        commentRepository.deleteById(id);
     }
 
     @Transactional
