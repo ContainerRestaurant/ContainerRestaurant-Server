@@ -10,9 +10,6 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @Entity(name = "TB_CONTRACT")
 public class Contract extends BaseTimeEntity {
-    private Integer contractCode;
     private String title;
     private String article;
-
-
 }
