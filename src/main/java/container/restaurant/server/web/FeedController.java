@@ -7,10 +7,7 @@ import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
-import container.restaurant.server.web.linker.CommentLinker;
-import container.restaurant.server.web.linker.FeedLinker;
-import container.restaurant.server.web.linker.RestaurantLinker;
-import container.restaurant.server.web.linker.UserLinker;
+import container.restaurant.server.web.linker.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
@@ -22,11 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-/**
- * TODO 필터 조건
- *  - 카테고리 필터링
- */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/feed")
@@ -38,14 +30,17 @@ public class FeedController {
     private final UserLinker userLinker;
     private final RestaurantLinker restaurantLinker;
     private final CommentLinker commentLinker;
+    private final FeedLikeLinker feedLikeLinker;
+    private final ScrapFeedLinker scrapFeedLinker;
+    private final ReportLinker reportLinker;
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
             @PathVariable Long feedId, @LoginUser SessionUser sessionUser
     ) {
-        Long loginId = sessionUser != null ? sessionUser.getId() : -1;
+        Long loginId = sessionUser != null ? sessionUser.getId() : null;
         return ResponseEntity.ok(
-                setLinks(feedService.getFeedDetail(feedId), loginId));
+                setLinks(feedService.getFeedDetail(feedId, loginId), loginId));
     }
 
     @GetMapping
@@ -123,16 +118,26 @@ public class FeedController {
     }
 
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
+        boolean isOwner = dto.getOwnerId().equals(loginId);
         return dto
                 .add(
                         feedLinker.getFeedDetail(dto.getId()).withSelfRel(),
                         userLinker.getUserById(dto.getOwnerId()).withRel("owner"),
                         restaurantLinker.findById(dto.getRestaurantId()).withRel("restaurant"),
-                        commentLinker.getCommentByFeed(dto.getId()).withRel("comments")
+                        commentLinker.getCommentByFeed(dto.getId()).withRel("comments"),
+                        dto.getIsLike() ?
+                                feedLikeLinker.userCancelLikeFeed(dto.getId()).withRel("cancel-like") :
+                                feedLikeLinker.userLikeFeed(dto.getId()).withRel("like"),
+                        dto.getIsScraped() ?
+                                scrapFeedLinker.cancelScrapFeed(dto.getId()).withRel("cancel-scrap") :
+                                scrapFeedLinker.scrapFeed(dto.getId()).withRel("scrap")
                 )
-                .addAllIf(loginId.equals(dto.getOwnerId()), () -> List.of(
+                .addAllIf(isOwner, () -> List.of(
                         feedLinker.updateFeed(dto.getId()).withRel("patch"),
                         feedLinker.deleteFeed(dto.getId()).withRel("delete")
+                ))
+                .addAllIf(!isOwner, () -> List.of(
+                        reportLinker.reportFeed(dto.getId()).withRel("report")
                 ));
     }
 

@@ -23,22 +23,24 @@ public class ScrapFeedService {
         User user = userService.findById(userId);
 
         scrapFeedRepository.findByUserIdAndFeedId(userId, feedId)
-                .ifPresentOrElse(
-                        scrap -> {/* do nothing */},
-                        () -> {
-                            scrapFeedRepository.save(ScrapFeed.of(user, feed));
-                            user.scrapCountUp();
-                        });
+                .orElseGet(() -> {
+                    scrapFeedRepository.save(ScrapFeed.of(user, feed));
+                    user.scrapCountUp();
+                    feed.scrapCountUp();
+                    return null;
+                });
     }
 
     @Transactional
     public void userCancelScrapFeed(Long userId, Long feedId) {
         User user = userService.findById(userId);
+        Feed feed = feedService.findById(feedId);
 
         scrapFeedRepository.findByUserIdAndFeedId(userId, feedId)
                 .ifPresent(scrap -> {
                     scrapFeedRepository.delete(scrap);
                     user.scrapCountDown();
+                    feed.scrapCountDown();
                 });
     }
 }

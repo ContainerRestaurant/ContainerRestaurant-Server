@@ -14,4 +14,6 @@ public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
 
     Optional<ScrapFeed> findByUserIdAndFeedId(Long userId, Long feedId);
 
+    Boolean existsByUserIdAndFeedId(Long userId, Long feedId);
+
 }

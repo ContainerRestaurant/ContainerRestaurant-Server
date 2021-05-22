@@ -45,11 +45,11 @@ public class Feed extends BaseTimeEntity {
 
     private Integer likeCount;
 
-    private Integer scrapedCount;
+    private Integer scrapCount;
 
     private Integer replyCount;
 
-    private Integer hits;
+    private Integer hitCount;
 
     private Boolean isBlind;
 
@@ -71,11 +71,39 @@ public class Feed extends BaseTimeEntity {
         this.welcome = welcome != null ? welcome : false;
         this.difficulty = difficulty;
         this.likeCount = 0;
-        this.scrapedCount = 0;
+        this.scrapCount = 0;
         this.replyCount = 0;
-        this.hits = 0;
+        this.hitCount = 0;
         this.isBlind = false;
         this.isDeleted = false;
+    }
+
+    public void likeCountUp() {
+        this.likeCount++;
+    }
+
+    public void likeCountDown() {
+        this.likeCount--;
+    }
+
+    public void scrapCountUp() {
+        this.scrapCount++;
+    }
+
+    public void scrapCountDown() {
+        this.scrapCount--;
+    }
+
+    public void commentCountUp() {
+        this.replyCount++;
+    }
+
+    public void commentCountDown() {
+        this.replyCount--;
+    }
+
+    public void hit() {
+        this.hitCount++;
     }
 
     public void setRestaurant(Restaurant restaurant) {

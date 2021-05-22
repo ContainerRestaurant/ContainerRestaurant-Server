@@ -59,13 +59,17 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                         )
                 ));
 
-        //then FeedLike 가 하나 증가하고, 관계가 잘 정의되어있다.
+        //then-1 FeedLike 가 하나 증가하고, 관계가 잘 정의되어있다.
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
         assertThat(likeList.size()).isEqualTo(size + 1);
 
         FeedLike like = likeList.get(0);
         assertThat(like.getFeed().getId()).isEqualTo(othersFeed.getId());
         assertThat(like.getUser().getId()).isEqualTo(myself.getId());
+
+        //then-2 othersFeed 의 스크랩 개수가 + 된다.
+        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+                .isEqualTo(othersFeed.getLikeCount() + 1);
     }
 
     @Test
@@ -76,6 +80,8 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         feedLikeRepository.save(FeedLike.of(myself, othersFeed));
         myself = userRepository.findById(myself.getId())
                 .orElse(myself);
+        othersFeed = feedRepository.findById(othersFeed.getId())
+                .orElse(othersFeed);
         Integer size = feedLikeRepository.findAllByFeed(othersFeed).size();
 
         //when myself 유저 세션으로 해당 피드를 다시 좋아요 하면
@@ -94,6 +100,10 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         FeedLike like = likeList.get(0);
         assertThat(like.getFeed().getId()).isEqualTo(othersFeed.getId());
         assertThat(like.getUser().getId()).isEqualTo(myself.getId());
+
+        //then-2 othersFeed 의 스크랩 개수가 그대로다.
+        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+                .isEqualTo(othersFeed.getLikeCount());
     }
 
     @Test
@@ -114,6 +124,8 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         feedLikeRepository.save(FeedLike.of(myself, othersFeed));
         myself = userRepository.findById(myself.getId())
                 .orElse(myself);
+        othersFeed = feedRepository.findById(othersFeed.getId())
+                .orElse(othersFeed);
         int size = feedLikeRepository.findAllByFeed(othersFeed).size();
 
         //when myself 유저 세션으로 주어진 피드를 좋아요 하면
@@ -135,6 +147,10 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         //then FeedLike 가 하나 감소한다
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
         assertThat(likeList.size()).isEqualTo(size - 1);
+
+        //then-2 othersFeed 의 스크랩 개수가 감소한다..
+        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+                .isEqualTo(othersFeed.getLikeCount()- 1);
     }
 
 }

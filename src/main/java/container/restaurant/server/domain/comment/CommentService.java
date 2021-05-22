@@ -34,13 +34,19 @@ public class CommentService {
         if(commentCreateDto.getUpperReplyId() == null){
             comment = new Comment(user, feed, commentCreateDto.getContent());
         }else{
-            Comment upperReply = commentRepository.findById(commentCreateDto.getUpperReplyId())
-                    .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 게시글입니다.(id:"+feedId+")"));
+            Comment upperReply = findById(commentCreateDto.getUpperReplyId());
             upperReply.setIsHaveReply();
             comment = new Comment(commentCreateDto, feed, user, upperReply);
         }
+        feed.commentCountUp();
 
         return CommentInfoDto.from(commentRepository.save(comment));
+    }
+
+    @Transactional(readOnly = true)
+    public Comment findById(Long id){
+        return commentRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+id+")"));
     }
 
     @Transactional(readOnly = true)
@@ -61,23 +67,34 @@ public class CommentService {
 
     @Transactional
     public void deleteById(Long id, Long userId){
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+id+")"));
+        Comment comment = findById(id);
 
         if(!comment.getOwner().getId().equals(userId))
             throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
 
         commentRepository.deleteById(id);
+        comment.getFeed().commentCountDown();
     }
 
     @Transactional
     public CommentInfoDto update(Long commentId, CommentUpdateDto commentUpdateDto, Long userId){
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:"+commentId+")"));
+        Comment comment = findById(commentId);
 
         if(!comment.getOwner().getId().equals(userId))
             throw new ResourceNotFoundException("수정 할 수 있는 유저가 아닙니다.");
 
         return CommentInfoDto.from(comment.setContent(commentUpdateDto.getContent()));
+    }
+
+    @Transactional
+    public void likeCountUp(Long commentId){
+        Comment comment = findById(commentId);
+        comment.likeCountUp();
+    }
+
+    @Transactional
+    public void likeCountDown(Long commentId){
+        Comment comment = findById(commentId);
+        comment.likeCountDown();
     }
 }

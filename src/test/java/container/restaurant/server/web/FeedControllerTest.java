@@ -3,6 +3,9 @@ package container.restaurant.server.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.hit.FeedHitRepository;
+import container.restaurant.server.domain.feed.like.FeedLike;
+import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
@@ -42,15 +45,23 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Autowired
     private ScrapFeedRepository scrapFeedRepository;
 
+    @Autowired
+    private FeedLikeRepository feedLikeRepository;
+
+    @Autowired
+    private FeedHitRepository feedHitRepository;
+
     @AfterEach
     public void afterEach() {
+        feedHitRepository.deleteAll();
+        feedLikeRepository.deleteAll();
         scrapFeedRepository.deleteAll();
         imageRepository.deleteAll();
         super.afterEach();
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("내가 작성한 피드 상세")
     public void testGetMyFeedDetail() throws Exception {
         //given
@@ -73,14 +84,85 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
                 .andExpect(jsonPath("likeCount").value(feed.getLikeCount()))
-                .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
+                .andExpect(jsonPath("scrapCount").value(feed.getScrapCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
+                .andExpect(jsonPath("isLike").value(false))
+                .andExpect(jsonPath("isScraped").value(false))
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.owner.href").exists())
                 .andExpect(jsonPath("_links.restaurant.href").exists())
                 .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").exists())
-                .andExpect(jsonPath("_links.delete.href").exists());
+                .andExpect(jsonPath("_links.delete.href").exists())
+                .andExpect(jsonPath("_links.like.href").exists())
+                .andExpect(jsonPath("_links.scrap.href").exists());
+
+        assertThat(feedRepository.findById(feed.getId()).orElse(feed).getHitCount())
+                .isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("내가 좋아요한 피드 상세")
+    public void testGetMyLikeFeedDetail() throws Exception {
+        //given
+        Feed feed = myFeed;
+        feedLikeRepository.save(FeedLike.of(myself, myFeed));
+
+        //expect
+        mvc.perform(
+                get("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("isLike").value(true))
+                .andExpect(jsonPath("isScraped").value(false))
+                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andExpect(jsonPath("_links.scrap.href").exists());
+
+        assertThat(feedRepository.findById(feed.getId()).orElse(feed).getHitCount())
+                .isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("내가 스크랩한 피드 상세")
+    public void testGetMyScrapFeedDetail() throws Exception {
+        //given
+        Feed feed = myFeed;
+        scrapFeedRepository.save(ScrapFeed.of(myself, myFeed));
+
+        //expect
+        mvc.perform(
+                get("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("isLike").value(false))
+                .andExpect(jsonPath("isScraped").value(true))
+                .andExpect(jsonPath("_links.like.href").exists())
+                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("내가 좋아요와 스크랩한 피드 상세")
+    public void testGetMyLikeAndScrapFeedDetail() throws Exception {
+        //given
+        Feed feed = myFeed;
+        feedLikeRepository.save(FeedLike.of(myself, myFeed));
+        scrapFeedRepository.save(ScrapFeed.of(myself, myFeed));
+
+        //expect
+        mvc.perform(
+                get("/api/feed/{feedId}", feed.getId())
+                        .session(myselfSession))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("isLike").value(true))
+                .andExpect(jsonPath("isScraped").value(true))
+                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
     }
 
     @Test
@@ -103,7 +185,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
                 .andExpect(jsonPath("likeCount").value(feed.getLikeCount()))
-                .andExpect(jsonPath("scrapCount").value(feed.getScrapedCount()))
+                .andExpect(jsonPath("scrapCount").value(feed.getScrapCount()))
                 .andExpect(jsonPath("replyCount").value(feed.getReplyCount()))
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.owner.href").exists())
@@ -241,7 +323,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 쓰기")
     public void testCreateFeed() throws Exception {
         //given
@@ -266,7 +348,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 쓰기 실패")
     public void testCreateFeedFailed() throws Exception {
         //given
@@ -286,7 +368,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 수정")
     public void testUpdateFeed() throws Exception {
         //given
@@ -320,7 +402,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 수정 실패")
     public void testFailedUpdateFeed() throws Exception {
         //given
@@ -353,7 +435,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 삭제")
     public void testDeleteFeed() throws Exception {
         //given
@@ -370,7 +452,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 삭제 실패 - 존재않는 피드")
     public void testFailedDeleteFeedById() throws Exception {
         //given
@@ -384,7 +466,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "USER")
+    @WithMockUser
     @DisplayName("피드 삭제 실패 - 다른 사용자의 피드")
     public void testFailedDeleteFeedBySession() throws Exception {
         //given

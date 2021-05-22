@@ -1,10 +1,14 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.feed.hit.FeedHit;
+import container.restaurant.server.domain.feed.hit.FeedHitRepository;
+import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
@@ -29,11 +33,21 @@ public class FeedService {
     private final UserService userService;
     private final RestaurantService restaurantService;
 
+    private final FeedLikeRepository feedLikeRepository;
+    private final ScrapFeedRepository scrapFeedRepository;
+    private final FeedHitRepository feedHitRepository;
+
     private final PagedResourcesAssembler<Feed> feedAssembler;
 
-    @Transactional(readOnly = true)
-    public FeedDetailDto getFeedDetail(Long feedId) {
-        return FeedDetailDto.from(findById(feedId));
+    @Transactional
+    public FeedDetailDto getFeedDetail(Long feedId, Long loginId) {
+        if (loginId != null && !checkHit(loginId, feedId))
+            updateHit(loginId, feedId);
+
+        return FeedDetailDto.from(
+                findById(feedId),
+                feedLikeRepository.existsByUserIdAndFeedId(loginId, feedId),
+                scrapFeedRepository.existsByUserIdAndFeedId(loginId, feedId));
     }
 
     @Transactional(readOnly = true)
@@ -116,5 +130,18 @@ public class FeedService {
     @Transactional
     public List<Feed> findByLatestFeeds() {
         return feedRepository.findByLatestFeed();
+    }
+  
+    @Transactional
+    public void updateHit(Long userId, Long feedId) {
+        Feed feed = this.findById(feedId);
+        feed.hit();
+        feedHitRepository.save(
+                FeedHit.of(userService.findById(userId), feed));
+    }
+
+    @Transactional
+    public boolean checkHit(Long loginId, Long feedId) {
+        return feedHitRepository.existsByUserIdAndFeedId(loginId, feedId);
     }
 }
