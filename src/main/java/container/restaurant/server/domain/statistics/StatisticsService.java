@@ -11,6 +11,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,8 +28,11 @@ public class StatisticsService implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         userLinkedList = new LinkedList<>();
+        // H2 에서 Mysql 함수 사용 문제로 Between 사용
+        LocalDateTime to = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime from = to.plusDays(1).minusSeconds(1);
         // 오늘 작성한 피드 오래된 순으로 저장 가장 마지막이 최신
-        userService.findByToDayFeedWriters()
+        userService.findByToDayFeedWriters(to, from)
                 .stream()
                 .map(user -> {
                     addRecentUser(user);
