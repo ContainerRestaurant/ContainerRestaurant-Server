@@ -2,7 +2,12 @@ package container.restaurant.server.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -14,8 +19,13 @@ import java.util.UUID;
 
 import static container.restaurant.server.utils.JsonUtils.JsonStringBufferParse;
 
+@Slf4j
+@Component
 public class MultipartUtility {
-    private final String URL = "http://dlwfp.synology.me:22304/api/v1/restaurant/image/upload";
+
+    @Value("${server.image.base.url}")
+    private String BASE_URL;
+    private final String DEFAULT_PATH = "/api/image/upload";
     private final String UserAgent = "ContainerRestaurant Agent";
     private final String LINE_FEED = "\r\n";
     private String boundary = "--------------------------";
@@ -24,9 +34,9 @@ public class MultipartUtility {
     private PrintWriter writer;
 
 
-    public MultipartUtility() throws IOException {
+    public void init() throws IOException {
         boundary += System.currentTimeMillis();
-        URL url = new URL(URL);
+        URL url = new URL(BASE_URL + DEFAULT_PATH);
         conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setUseCaches(false);
@@ -39,6 +49,7 @@ public class MultipartUtility {
         writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"),
                 true);
     }
+
 
     public void addFilePart(String fieldName, MultipartFile imageFile) throws IOException {
         File uploadFile = createTempImageFile(imageFile);
@@ -85,4 +96,5 @@ public class MultipartUtility {
         FileUtils.copyInputStreamToFile(imageFileStream, tempImage);
         return tempImage;
     }
+
 }
