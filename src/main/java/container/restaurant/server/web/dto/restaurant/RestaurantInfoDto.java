@@ -13,6 +13,8 @@ public class RestaurantInfoDto extends RepresentationModel<RestaurantInfoDto> {
     private final double latitude;
     private final double longitude;
     private final String image_path;
+    private final Integer feedCount;
+    private final Float difficultyAvg;
 
     public static RestaurantInfoDto from(Restaurant restaurant, Image image) {
         return new RestaurantInfoDto(restaurant, image);
@@ -23,6 +25,8 @@ public class RestaurantInfoDto extends RepresentationModel<RestaurantInfoDto> {
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();
         this.longitude = restaurant.getLongitude();
+        this.feedCount = restaurant.getFeedCount();
+        this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = image.getUrl();
     }
 
