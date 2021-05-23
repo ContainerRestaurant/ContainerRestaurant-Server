@@ -40,6 +40,15 @@ public class Restaurant extends BaseEntity {
     @ColumnDefault("0")
     private int vanishCount;
 
+    @ColumnDefault("0")
+    private int favoriteCount;
+
+    @ColumnDefault("0")
+    private int feedCount;
+
+    @ColumnDefault("0.0")
+    private float difficultySum;
+
     @SneakyThrows
     @Builder
     protected Restaurant(String name, String addr, double lon, double lat, Long image_ID) {
@@ -51,4 +60,37 @@ public class Restaurant extends BaseEntity {
         this.image_ID = image_ID;
     }
 
+    public void favoriteCountUp() {
+        this.favoriteCount++;
+    }
+
+    public void favoriteCountDown() {
+        this.favoriteCount--;
+    }
+
+    public void feedCountUp() {
+        this.feedCount++;
+    }
+
+    public void feedCountDown() {
+        this.feedCount--;
+    }
+
+    public void VanishCountUp() {
+        this.vanishCount++;
+    }
+
+    public void addDifficultySum(int difficulty) {
+        this.difficultySum += difficulty;
+    }
+
+    public void subDifficultySum(int difficulty) {
+        this.difficultySum -= difficulty;
+    }
+
+    public float getDifficultyAvg() {
+        if (this.difficultySum == 0)
+            return 0.0f;
+        return this.difficultySum / this.feedCount;
+    }
 }

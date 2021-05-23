@@ -1,10 +1,8 @@
 package container.restaurant.server.domain.restaurant;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
@@ -15,14 +13,5 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
                     "WHERE MBRCONTAINS(ST_LINESTRINGFROMTEXT( getDiagonal(?1,?2,?3)), location)")
     List<Restaurant> findNearByRestaurants(double lat, double lon, long radius);
 
-    @Query(nativeQuery = true,
-            value = "SELECT * FROM tb_restaurant\n" +
-                    "WHERE name LIKE CONCAT('%',?1,'%')")
-    List<Restaurant> searchRestaurantName(String name);
-
-    @Modifying
-    @Transactional
-    @Query(nativeQuery = true,
-            value = "UPDATE tb_restaurant set vanish_count = vanish_count +1 where id = ?1")
-    int updateVanish(Long id);
+//    식당 이름 검색 비활성화
 }
