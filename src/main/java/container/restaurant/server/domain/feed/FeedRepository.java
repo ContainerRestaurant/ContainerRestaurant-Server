@@ -8,8 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
+
+    @Override
+    @NonNull
+    @EntityGraph(attributePaths = {"owner", "restaurant", "containerList", "containerList.menu"})
+    Optional<Feed> findById(@NonNull Long id);
 
     @Override
     @NonNull
