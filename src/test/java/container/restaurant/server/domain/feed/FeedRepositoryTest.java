@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.feed;
 
+import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
@@ -15,9 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,6 +197,50 @@ public class FeedRepositoryTest {
         //then 1 개가 조회되고, 필터링한 카테고리를 갖는다.
         assertThat(res.size()).isEqualTo(1);
         assertThat(res.get(0).getCategory()).isEqualTo(CATEGORY_ARR[0]);
+    }
+
+    @Test
+    @DisplayName("추천 피드를 위한 조회 테스트")
+    void testFindRecommendFeed() throws Exception {
+        //given 10 일 동안 매일 00:00:000 에 생성된 피드들이 주어졌을 때
+        LocalDateTime from = LocalDateTime.of(LocalDate.now(), LocalTime.MIN).plusDays(1);
+        LocalDateTime to = from.plusDays(9);
+        Pageable pageable = PageRequest.of(0, 3);
+
+        List<Feed> list = testFeed(from, to);
+        assertThat(list.size()).isEqualTo(10);
+
+        //expect 3 페이지씩 가져오면 9, 6, 3, 0 번째로 생성된 피드가 차례로 포함되어 있다.
+        Page<Feed> page = feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
+        int i = 9;
+        while (page.hasContent()) {
+            assertThat(page.getContent()).contains(list.get(i));
+            i -= 3;
+            pageable = pageable.next();
+            page = feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
+        }
+    }
+
+    List<Feed> testFeed(LocalDateTime testDateFrom, LocalDateTime testDateTo) throws Exception {
+        Field createdDate_f = BaseCreatedTimeEntity.class.getDeclaredField("createdDate");
+        createdDate_f.setAccessible(true);
+        List<Feed> list = new ArrayList<>();
+
+        for (int i = 0; testDateFrom.isBefore(testDateTo) || testDateFrom.equals(testDateTo); i++) {
+            Feed feed = Feed.builder()
+                    .owner(users.get(i % 3))
+                    .restaurant(restaurants.get(i % 5))
+                    // 식당과 서로소가 되도록 1~4를 사용
+                    .difficulty(i % 4 + 1)
+                    .content("hihihi")
+                    .category(CATEGORY_ARR[i % 3])
+                    .build();
+            feed = feedRepository.save(feed);
+            createdDate_f.set(feed, testDateFrom);
+            list.add(feedRepository.save(feed));
+            testDateFrom = testDateFrom.plusDays(1);
+        }
+        return list;
     }
 
 }

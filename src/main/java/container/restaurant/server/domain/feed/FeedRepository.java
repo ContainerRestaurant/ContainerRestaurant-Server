@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDateTime;
+
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Override
@@ -34,5 +36,8 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Query("select f from TB_FEED f join f.scrapedBy s where s.user.id = ?1 and f.category = ?2")
     Page<Feed> findAllByScraperIdAndCategory(Long userId, Pageable pageable, Category category);
+
+    @EntityGraph(attributePaths = { "owner" })
+    Page<Feed> findAllByCreatedDateBetweenOrderByCreatedDateDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
 }

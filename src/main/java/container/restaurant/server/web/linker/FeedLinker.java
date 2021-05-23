@@ -75,4 +75,8 @@ public class FeedLinker {
         return linkTo(proxy.getCategoryList());
     }
 
+    public LinkBuilder selectRecommend() {
+        return linkTo(proxy.selectRecommend());
+    }
+
 }

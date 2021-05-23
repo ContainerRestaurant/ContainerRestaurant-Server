@@ -4,6 +4,7 @@ import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class FeedController {
 
     private final FeedService feedService;
+    private final RecommendFeedService recommendFeedService;
 
     private final FeedLinker feedLinker;
     private final UserLinker userLinker;
@@ -52,8 +54,8 @@ public class FeedController {
 
     @GetMapping("recommend")
     public ResponseEntity<?> selectRecommend() {
-        // TODO
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                setLinks(recommendFeedService.getRecommendFeeds()));
     }
 
     @GetMapping("user/{userId}")

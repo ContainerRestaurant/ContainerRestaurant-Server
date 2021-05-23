@@ -13,6 +13,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -129,4 +130,19 @@ public class Feed extends BaseTimeEntity {
     public void setDifficulty(Integer difficulty) {
         this.difficulty = difficulty;
     }
+
+    public Integer getRecommendScore() {
+        return (likeCount * 5) + hitCount;
+    }
+
+    public final static Comparator<Feed> RECOMMEND_COMPARATOR = (Feed f1, Feed f2) -> {
+        int dif = f1.getRecommendScore() - f2.getRecommendScore();
+        if (dif != 0) {
+            return dif;
+        } else if (f1.getCreatedDate().equals(f2.getCreatedDate())) {
+            return 0;
+        } else {
+            return f1.getCreatedDate().isBefore(f2.getCreatedDate()) ? -1 : 1;
+        }
+    };
 }

@@ -7,6 +7,7 @@ import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
@@ -50,6 +51,9 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
     @Autowired
     private FeedHitRepository feedHitRepository;
+
+    @Autowired
+    private RecommendFeedService recommendFeedService;
 
     @AfterEach
     public void afterEach() {
@@ -315,11 +319,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.create.href").exists())
                 .andExpect(jsonPath("_links.category-list.href").exists());
-    }
-
-    @Test
-    public void testSelectRecommendFeed() throws Exception {
-
     }
 
     @Test
