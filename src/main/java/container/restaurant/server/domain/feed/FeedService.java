@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static container.restaurant.server.domain.statistics.StatisticsService.*;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -125,8 +124,7 @@ public class FeedService {
         user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
-        return feedRepository.save(dto.toFeedWith(user, restaurant))
-                .getId();
+        return feedRepository.save(dto.toFeedWith(user, restaurant)).getId();
     }
 
     @Transactional
