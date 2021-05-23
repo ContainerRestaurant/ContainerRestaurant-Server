@@ -3,9 +3,11 @@ package container.restaurant.server.domain.contract;
 import container.restaurant.server.web.dto.contract.ContractInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +16,17 @@ import java.util.List;
 public class ContractService {
     private final ContractRepository contractRepository;
 
+    List<ContractInfoDto>  contractInfoDto = new ArrayList<>();
+
+    @PostConstruct
+    @Scheduled(cron = "0 0 3 * * *")
+    public void putContract(){
+        contractRepository.findAll().forEach(contract ->
+                contractInfoDto.add(ContractInfoDto.from(contract)));
+    }
+
     @Transactional(readOnly = true)
     public CollectionModel<ContractInfoDto> getContract(){
-        List<ContractInfoDto> contractInfoDtos = new ArrayList<>();
-        contractRepository.findAll().forEach(contract ->
-            contractInfoDtos.add(ContractInfoDto.from(contract)));
-        return CollectionModel.of(contractInfoDtos);
+        return CollectionModel.of(contractInfoDto);
     }
 }
