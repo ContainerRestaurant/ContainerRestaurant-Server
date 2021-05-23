@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static container.restaurant.server.domain.statistics.StatisticsService.*;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -106,6 +107,7 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 삭제할 수 없습니다.");
 
+        removeRecentUser(feed.getOwner());
         feed.getRestaurant().feedCountDown();
         feed.getRestaurant().subDifficultySum(feed.getDifficulty());
         feedRepository.delete(feed);
@@ -116,6 +118,7 @@ public class FeedService {
         User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
 
+        addRecentUser(user);
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
         return feedRepository.save(dto.toEntityWith(user, restaurant))

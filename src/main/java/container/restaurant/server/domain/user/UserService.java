@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import java.util.List;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
@@ -55,5 +56,10 @@ public class UserService {
     @Transactional(readOnly = true)
     public Boolean existsUserByNickname(String nickname) {
         return userRepository.existsUserByNickname(nickname);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findByToDayFeedWriters() {
+        return userRepository.findByToDayFeedWriter();
     }
 }
