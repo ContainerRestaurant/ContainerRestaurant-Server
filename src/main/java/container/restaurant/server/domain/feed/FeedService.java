@@ -105,6 +105,9 @@ public class FeedService {
         Feed feed = findById(feedId);
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 삭제할 수 없습니다.");
+
+        feed.getRestaurant().feedCountDown();
+        feed.getRestaurant().subDifficultySum(feed.getDifficulty());
         feedRepository.delete(feed);
     }
 
@@ -112,6 +115,9 @@ public class FeedService {
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
+
+        restaurant.feedCountUp();
+        restaurant.addDifficultySum(dto.getDifficulty());
         return feedRepository.save(dto.toEntityWith(user, restaurant))
                 .getId();
     }

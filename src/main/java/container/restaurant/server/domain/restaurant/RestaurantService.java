@@ -4,7 +4,6 @@ import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
-import container.restaurant.server.web.dto.restaurant.RestaurantNameInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,13 +20,14 @@ public class RestaurantService {
 
     private final ImageService imageService;
 
+    @Transactional(readOnly = true)
     public RestaurantInfoDto getRestaurantInfoById(Long id) {
         Restaurant restaurant = findById(id);
         Image image = imageService.findById(restaurant.getImage_ID());
-
         return RestaurantInfoDto.from(restaurant, image);
     }
 
+    @Transactional(readOnly = true)
     public List<RestaurantNearInfoDto> findNearByRestaurants(double lat, double lon, long radius) {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
@@ -38,15 +38,12 @@ public class RestaurantService {
                 .collect(Collectors.toList());
     }
 
-    public List<RestaurantNameInfoDto> searchRestaurantName(String name) {
-        return restaurantRepository.searchRestaurantName(name)
-                .stream()
-                .map(RestaurantNameInfoDto::from)
-                .collect(Collectors.toList());
-    }
+    // 식당 이름 검색 비활성화
 
-    public void updateVanish(Long id) {
-        restaurantRepository.updateVanish(id);
+    @Transactional
+    public void restaurantVanish(Long id) {
+        Restaurant restaurant = findById(id);
+        restaurant.VanishCountUp();
     }
 
     @Transactional(readOnly = true)
