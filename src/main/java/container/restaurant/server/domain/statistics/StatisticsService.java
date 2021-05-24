@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StatisticsService implements ApplicationRunner {
     private final UserService userService;
-    public static LinkedList<User> userLinkedList;
-    public static int todayFeedCount = 0;
+    public LinkedList<User> userLinkedList;
+    public int todayFeedCount = 0;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -52,7 +52,7 @@ public class StatisticsService implements ApplicationRunner {
         return StatisticsInfoDto.from(statisticsUserDtoList, todayFeedCount);
     }
 
-    public static void addRecentUser(User user) {
+    public void addRecentUser(User user) {
         // 중복되는 사용자가 있으면, 해당 위치를 지우고 최신으로 추가
         if (userLinkedList.contains(user))
             userLinkedList.remove(user);
@@ -70,7 +70,7 @@ public class StatisticsService implements ApplicationRunner {
      * 최근 사용자 리스트에서 삭제
      * @param user
      */
-    public static void removeRecentUser(User user) {
+    public void removeRecentUser(User user) {
         userLinkedList.remove(user);
         todayFeedCount--;
     }

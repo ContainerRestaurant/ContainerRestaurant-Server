@@ -6,6 +6,7 @@ import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
+import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
@@ -34,6 +35,7 @@ public class FeedService {
 
     private final UserService userService;
     private final RestaurantService restaurantService;
+    private final StatisticsService statisticsService;
 
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
@@ -107,7 +109,7 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 삭제할 수 없습니다.");
 
-        removeRecentUser(feed.getOwner());
+        statisticsService.removeRecentUser(feed.getOwner());
         feed.getRestaurant().feedCountDown();
         feed.getRestaurant().subDifficultySum(feed.getDifficulty());
         feedRepository.delete(feed);
@@ -118,7 +120,7 @@ public class FeedService {
         User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
 
-        addRecentUser(user);
+        statisticsService.addRecentUser(user);
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
         return feedRepository.save(dto.toEntityWith(user, restaurant))
