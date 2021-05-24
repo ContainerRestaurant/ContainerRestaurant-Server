@@ -110,6 +110,7 @@ public class FeedService {
             throw new FailedAuthorizationException("해당 피드를 삭제할 수 없습니다.");
 
         statisticsService.removeRecentUser(feed.getOwner());
+        feed.getOwner().feedCountDown();
         feed.getRestaurant().feedCountDown();
         feed.getRestaurant().subDifficultySum(feed.getDifficulty());
         feedRepository.delete(feed);
@@ -121,6 +122,7 @@ public class FeedService {
         Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
 
         statisticsService.addRecentUser(user);
+        user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
         return feedRepository.save(dto.toEntityWith(user, restaurant))

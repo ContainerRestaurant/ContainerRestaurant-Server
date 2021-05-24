@@ -79,4 +79,12 @@ public class User extends BaseCreatedTimeEntity {
         this.scrapCount--;
         return this;
     }
+
+    public void feedCountUp() {
+        this.feedCount++;
+    }
+
+    public void feedCountDown() {
+        this.feedCount--;
+    }
 }
