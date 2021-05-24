@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -61,6 +62,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<User> findByToDayFeedWriters(LocalDateTime to, LocalDateTime from) {
-        return userRepository.findByToDayFeedWriter(to,from);
+        return userRepository.findByToDayFeedWriter(to, from);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findByFeedCountTopUsers(LocalDateTime to, LocalDateTime from) {
+        return userRepository.findByFeedCountTopUsers(to, from);
     }
 }

@@ -15,4 +15,6 @@ public class StatisticsLinker {
     public LinkBuilder getRecentFeedUsers() {
         return linkTo(proxy.getRecentFeedUsers());
     }
+
+    public LinkBuilder getFeedCountTopUsers() {return linkTo(proxy.getFeedCountTopUsers());}
 }

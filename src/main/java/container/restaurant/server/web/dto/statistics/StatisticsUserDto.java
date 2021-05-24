@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class StatisticsUserDto extends RepresentationModel<StatisticsUserDto> implements Serializable {
 
     private final Long id;
-    private final String email;
+    private final Integer level;
     private final String nickname;
     private final String profile;
 
@@ -20,7 +20,7 @@ public class StatisticsUserDto extends RepresentationModel<StatisticsUserDto> im
 
     protected StatisticsUserDto(User user) {
         this.id = user.getId();
-        this.email = user.getEmail();
+        this.level = user.getLevel();
         this.nickname = user.getNickname();
         this.profile = user.getProfile();
     }
