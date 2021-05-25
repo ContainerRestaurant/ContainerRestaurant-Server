@@ -8,6 +8,7 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.container.ContainerRepository;
+import container.restaurant.server.domain.feed.container.ContainerService;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeService;
@@ -21,6 +22,7 @@ import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteService;
 import container.restaurant.server.domain.restaurant.menu.MenuRepository;
+import container.restaurant.server.domain.restaurant.menu.MenuService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.UserService;
@@ -53,6 +55,8 @@ public class BaseServiceTest {
     @Mock
     protected ContainerRepository containerRepository;
     @Mock
+    protected ContainerService containerService;
+    @Mock
     protected FeedHitRepository feedHitRepository;
     @Mock
     protected FeedLikeRepository feedLikeRepository;
@@ -82,6 +86,8 @@ public class BaseServiceTest {
     protected RestaurantFavoriteService restaurantFavoriteService;
     @Mock
     protected MenuRepository menuRepository;
+    @Mock
+    protected MenuService menuService;
     @Mock
     protected RestaurantRepository restaurantRepository;
     @Mock

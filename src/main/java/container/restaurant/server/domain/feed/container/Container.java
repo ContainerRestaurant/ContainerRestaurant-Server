@@ -33,4 +33,9 @@ public class Container extends BaseEntity {
         return new Container(feed, menu, description);
     }
 
+    public Container setMenu(Menu menu) {
+        this.menu = menu;
+        return this;
+    }
+
 }

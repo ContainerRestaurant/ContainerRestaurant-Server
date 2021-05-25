@@ -6,17 +6,19 @@ import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
+import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedMenuDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Optional.of;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class FeedServiceTest extends BaseServiceTest {
@@ -37,6 +39,11 @@ class FeedServiceTest extends BaseServiceTest {
 
     @InjectMocks
     private FeedService feedService;
+
+    @Captor
+    ArgumentCaptor<Feed> feedCaptor;
+    @Captor
+    ArgumentCaptor<Collection<Container>> containersCaptor;
 
     @Test
     @DisplayName("Container 를 포함해 단일 Feed 찾기 테스트")
@@ -67,6 +74,56 @@ class FeedServiceTest extends BaseServiceTest {
 
         assertEqualsMenuAndDto(mainMenus, actualDto.getMainMenu());
         assertEqualsMenuAndDto(subMenus, actualDto.getSubMenu());
+    }
+
+    @Test
+    @DisplayName("피드 생성 테스트")
+    void createFeed() {
+        // given
+        when(feedRepository.save(any())).thenReturn(feed);
+        when(userService.findById(user.getId())).thenReturn(user);
+        when(restaurantService.findById(restaurant.getId())).thenReturn(restaurant);
+
+        FeedMenuDto mainMenuDto = FeedMenuDto.builder()
+                .menuName("mainMenu")
+                .container("mainMenuContainer")
+                .build();
+
+        FeedMenuDto subMenuDto = FeedMenuDto.builder()
+                .menuName("subMenu")
+                .container("subMenuContainer")
+                .build();
+
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(restaurant.getId())
+                .category(Category.FAST_FOOD)
+                .mainMenu(List.of(mainMenuDto))
+                .subMenu(List.of(subMenuDto))
+                .difficulty(3)
+                .welcome(true)
+                .thumbnailUrl("test url")
+                .content("this is new Feed")
+                .build();
+
+        //when 함수를 콜하면
+        feedService.createFeed(dto, user.getId());
+
+        //then FeedInfoDto 정보와 동등한 Feed, FeedMenuDto 정보와 동등한 Containers 가 save 된다.
+        verify(feedRepository).save(feedCaptor.capture());
+        Feed saved = feedCaptor.getValue();
+        assertThat(saved.getOwner()).isEqualTo(user);
+        assertThat(saved.getRestaurant()).isEqualTo(restaurant);
+        assertThat(saved.getCategory()).isEqualTo(dto.getCategory());
+        assertThat(saved.getDifficulty()).isEqualTo(dto.getDifficulty());
+        assertThat(saved.getWelcome()).isEqualTo(dto.getWelcome());
+        assertThat(saved.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(saved.getContent()).isEqualTo(dto.getContent());
+
+        verify(containerService).save(containersCaptor.capture());
+        assertThat(containersCaptor.getValue())
+                .hasSize(2)
+                .anyMatch(container -> equalsMenuAndDto(container, mainMenuDto))
+                .anyMatch(container -> equalsMenuAndDto(container, subMenuDto));
     }
 
     void mockFindFeedByIdWithContainers() {

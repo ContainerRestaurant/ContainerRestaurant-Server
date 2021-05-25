@@ -45,4 +45,9 @@ public class Menu extends BaseEntity {
         this.count = 0;
         this.isMain = isMain;
     }
+
+    public int countUp() {
+        return ++this.count;
+    }
+
 }
