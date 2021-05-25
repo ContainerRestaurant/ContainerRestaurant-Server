@@ -126,6 +126,22 @@ class FeedServiceTest extends BaseServiceTest {
                 .anyMatch(container -> equalsMenuAndDto(container, subMenuDto));
     }
 
+    @Test
+    @DisplayName("피드 삭제 테스트")
+    void deleteTest() {
+        //given findByIdWithContainers() 목 데이터
+        mockFindFeedByIdWithContainers();
+
+        //when 함수를 콜하면
+        feedService.delete(feed.getId(), user.getId());
+
+        //then
+        InOrder order = inOrder(containerService, feedHitRepository, feedRepository);
+        order.verify(containerService).deleteAll(feed.getContainerList());
+        order.verify(feedHitRepository).deleteAllByFeed(feed);
+        order.verify(feedRepository).delete(feed);
+    }
+
     void mockFindFeedByIdWithContainers() {
         mainMenus = new ArrayList<>();
         for (int i = 1; i <= MENU_NUM; i++) {
@@ -139,6 +155,7 @@ class FeedServiceTest extends BaseServiceTest {
         }
         feed.getContainerList().addAll(mainMenus);
         feed.getContainerList().addAll(subMenus);
+        feed.setDifficulty(3);
 
         when(user.getId()).thenReturn(1L);
         when(feed.getId()).thenReturn(2L);

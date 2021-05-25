@@ -18,4 +18,11 @@ public class MenuService {
         return saved;
     }
 
+    public void delete(Menu menu) {
+        menuRepository.findByRestaurantAndName(menu.getRestaurant(), menu.getName())
+                .ifPresent(m -> {
+                    if (m.countDown() == 0)
+                        menuRepository.delete(m);
+                });
+    }
 }

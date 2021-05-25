@@ -50,4 +50,8 @@ public class Menu extends BaseEntity {
         return ++this.count;
     }
 
+    public int countDown() {
+        return --this.count;
+    }
+
 }

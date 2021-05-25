@@ -114,6 +114,9 @@ public class FeedService {
         feed.getOwner().feedCountDown();
         feed.getRestaurant().feedCountDown();
         feed.getRestaurant().subDifficultySum(feed.getDifficulty());
+
+        containerService.deleteAll(feed.getContainerList());
+        feedHitRepository.deleteAllByFeed(feed);
         feedRepository.delete(feed);
     }
 
