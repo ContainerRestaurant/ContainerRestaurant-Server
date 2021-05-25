@@ -1,33 +1,57 @@
 package container.restaurant.server.domain.restaurant.menu;
 
 import container.restaurant.server.domain.base.BaseEntity;
-import container.restaurant.server.domain.feed.container.Container;
 import container.restaurant.server.domain.restaurant.Restaurant;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "TB_MENU")
 public class Menu extends BaseEntity {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Restaurant restaurant;
 
     @NotNull
-    @OneToOne
-    private Container container;
+    private String name;
 
-    public static Menu of(Restaurant restaurant, Container container) {
-        return new Menu(restaurant, container);
+    @NotNull
+    private Boolean isMain;
+
+    private Integer count;
+
+    public static Menu mainOf(Restaurant restaurant, String menuName) {
+        return of(restaurant, menuName, true);
     }
+
+    public static Menu subOf(Restaurant restaurant, String menuName) {
+        return of(restaurant, menuName, false);
+    }
+
+    public static Menu of(Restaurant restaurant, String menuName, Boolean isMain) {
+        return new Menu(restaurant, menuName, isMain);
+    }
+
+    protected Menu(Restaurant restaurant, String menuName, Boolean isMain) {
+        this.restaurant = restaurant;
+        this.name = menuName;
+        this.count = 0;
+        this.isMain = isMain;
+    }
+
+    public int countUp() {
+        return ++this.count;
+    }
+
+    public int countDown() {
+        return --this.count;
+    }
+
 }

@@ -5,6 +5,9 @@ import container.restaurant.server.domain.feed.Feed;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 단일 피드에 대한 상세 정보를 응답하기 위한 DTO
  */
@@ -25,6 +28,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final Integer likeCount;
     private final Integer scrapCount;
     private final Integer replyCount;
+
+    private final List<FeedMenuDto> mainMenu;
+    private final List<FeedMenuDto> subMenu;
 
     private final Boolean isLike;
     private final Boolean isScraped;
@@ -48,6 +54,15 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.likeCount = feed.getLikeCount();
         this.scrapCount = feed.getScrapCount();
         this.replyCount = feed.getReplyCount();
+
+        this.mainMenu = new ArrayList<>();
+        this.subMenu = new ArrayList<>();
+        feed.getContainerList().forEach(container -> {
+            if (container.getMenu().getIsMain())
+                mainMenu.add(FeedMenuDto.from(container));
+            else
+                subMenu.add(FeedMenuDto.from(container));
+        });
 
         this.isLike = isLike;
         this.isScraped = isScraped;

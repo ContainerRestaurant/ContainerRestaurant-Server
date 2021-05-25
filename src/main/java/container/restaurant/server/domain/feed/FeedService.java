@@ -1,6 +1,8 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.feed.container.Container;
+import container.restaurant.server.domain.feed.container.ContainerService;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
@@ -23,8 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static container.restaurant.server.domain.statistics.StatisticsService.*;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -36,6 +40,7 @@ public class FeedService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final StatisticsService statisticsService;
+    private final ContainerService containerService;
 
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
@@ -113,6 +118,9 @@ public class FeedService {
         feed.getOwner().feedCountDown();
         feed.getRestaurant().feedCountDown();
         feed.getRestaurant().subDifficultySum(feed.getDifficulty());
+
+        containerService.deleteAll(feed.getContainerList());
+        feedHitRepository.deleteAllByFeed(feed);
         feedRepository.delete(feed);
     }
 
@@ -125,8 +133,11 @@ public class FeedService {
         user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
-        return feedRepository.save(dto.toEntityWith(user, restaurant))
-                .getId();
+
+        Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant));
+        containerService.save(dto.toContainerListWith(feed, restaurant));
+
+        return feed.getId();
     }
 
     @Transactional
@@ -135,10 +146,30 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
 
-        Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
-        if (restaurant != null)
-            feed.setRestaurant(restaurant);
         dto.update(feed);
+        feedContainerUpdate(feed, dto);
+    }
+
+    private void feedContainerUpdate(Feed feed, FeedInfoDto dto) {
+        // 업데이트할 리스트와 삭제할 리스트
+        List<Container> newMenus = dto.toContainerListWith(feed, feed.getRestaurant());
+        List<Container> toDelete = feed.getContainerList();
+
+        Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
+        if (!feed.getRestaurant().getId().equals(restaurant.getId())) {
+            // 식당이 바뀐 경우 식당을 업데이트하고, 기존 모든 메뉴 삭제
+            feed.setRestaurant(restaurant);
+        } else {
+            // 식당이 그대로인 경우 동일한 이름의 메뉴를 삭제하지 않음
+            Set<String> menuNames = newMenus.stream()
+                    .map(c -> c.getMenu().getName())
+                    .collect(Collectors.toSet());
+            toDelete.removeIf(c -> menuNames.contains(c.getMenu().getName()));
+        }
+        containerService.deleteAll(toDelete);
+
+        feed.setContainerList(newMenus);
+        containerService.save(feed.getContainerList());
     }
 
     @Transactional

@@ -9,8 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -20,17 +20,22 @@ import javax.validation.constraints.NotNull;
 public class Container extends BaseEntity {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Feed feed;
 
     @NotNull
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Menu menu;
 
     private String description;
 
     public static Container of(Feed feed, Menu menu, String description) {
         return new Container(feed, menu, description);
+    }
+
+    public Container setMenu(Menu menu) {
+        this.menu = menu;
+        return this;
     }
 
 }
