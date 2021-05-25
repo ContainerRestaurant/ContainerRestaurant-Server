@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.feed.container.ContainerService;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
@@ -35,6 +36,7 @@ public class FeedService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final StatisticsService statisticsService;
+    private final ContainerService containerService;
 
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
@@ -124,7 +126,11 @@ public class FeedService {
         user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
-        return feedRepository.save(dto.toFeedWith(user, restaurant)).getId();
+
+        Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant));
+        containerService.save(dto.toContainerListWith(feed, restaurant));
+
+        return feed.getId();
     }
 
     @Transactional
