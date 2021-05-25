@@ -23,9 +23,8 @@ public class FirebaseCloudMessageUtils {
     @Value("${google.push.api.url}")
     private String API_URL;
 
-    @Value("${server.real.base.url}")
-    private String IMAGE_DEFAULT;
-    private final String TEMP_IMAGE = "/api/image/ebadca0e-30ac-58e3-914c-5303fc4c6061.jpeg";
+    @Value("${google.firebase.key.path}")
+    private String KEY_PATH;
 
     private final ObjectMapper objectMapper;
 
@@ -53,15 +52,15 @@ public class FirebaseCloudMessageUtils {
     private String makeMessage(String target, String title, String body) throws JsonProcessingException {
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
-                        .token(target)
-                        .notification(FcmMessage.Notification.builder()
-                                .title(title)
-                                .body(body)
-                                .image(null)
+                                .token(target)
+                                .notification(FcmMessage.Notification.builder()
+                                                .title(title)
+                                                .body(body)
+                                                .image(null)
 //                                .image(IMAGE_DEFAULT + TEMP_IMAGE)
+                                                .build()
+                                )
                                 .build()
-                        )
-                        .build()
                 )
                 .validate_only(false)
                 .build();
@@ -69,7 +68,7 @@ public class FirebaseCloudMessageUtils {
     }
 
     private String createAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase_service_key.json";
+        String firebaseConfigPath = KEY_PATH;
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
