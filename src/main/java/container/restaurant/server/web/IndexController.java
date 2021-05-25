@@ -2,6 +2,8 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.IndexDto;
@@ -29,8 +31,9 @@ public class IndexController {
     private final StatisticsLinker statisticsLinker;
 
     private final UserService userService;
+    private final StatisticsService statisticsService;
 
-    // TODO 배너, 메인 문구 랜덤 생성, 전체 피드 개수
+    // TODO 배너, 메인 문구 랜덤 생성
 
     @GetMapping
     public ResponseEntity<?> index(@LoginUser SessionUser sessionUser) {
@@ -39,6 +42,7 @@ public class IndexController {
         return ResponseEntity.ok(
                 setLinks(IndexDto.builder()
                         .user(loginUser)
+                        .totalContainer(statisticsService.getTotalFeed())
                         .build()));
     }
 
