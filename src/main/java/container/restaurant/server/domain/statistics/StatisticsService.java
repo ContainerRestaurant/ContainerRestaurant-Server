@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @Log4j2
 public class StatisticsService implements ApplicationRunner {
-    private final int MAX_COUNT = 100;
+    private static final int MAX_COUNT = 100;
     private final UserService userService;
     private final FeedRepository feedRepository;
     private LinkedList<User> userLinkedList;
@@ -42,7 +41,7 @@ public class StatisticsService implements ApplicationRunner {
     private Long totalFeed;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         initToDayFeedWriter();
         refreshTotalFeed();
     }
@@ -53,11 +52,7 @@ public class StatisticsService implements ApplicationRunner {
         LocalDateTime from = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         // 오늘 작성한 피드 오래된 순으로 저장 가장 마지막이 최신
         userService.findByToDayFeedWriters(to, from)
-                .stream()
-                .map(user -> {
-                    addRecentUser(user);
-                    return null;
-                }).collect(Collectors.toList());
+                .forEach(this::addRecentUser);
     }
 
     private void refreshTotalFeed() {
@@ -66,21 +61,17 @@ public class StatisticsService implements ApplicationRunner {
 
     @Transactional
     public StatisticsInfoDto getRecentFeedUsers() {
-        List<EntityModel> entityModelList = new ArrayList<>();
-        for (int i = 0; i < userLinkedList.size(); i++) {
-            User user = userLinkedList.get(i);
-            entityModelList
-                    .add(EntityModel.of(StatisticsUserDto.from(user))
-                            .add(userLinker.getUserById(user.getId()).withSelfRel(),
-                                    feedLinker.selectUserFeed(user.getId()).withRel("feeds")));
-        }
-        return StatisticsInfoDto.from(entityModelList, todayFeedCount);
+        List<StatisticsUserDto> statisticUserDtoList = userLinkedList.stream()
+                .map(user -> StatisticsUserDto.from(user).add(
+                        userLinker.getUserById(user.getId()).withSelfRel(),
+                        feedLinker.selectUserFeed(user.getId()).withRel("feeds")))
+                .collect(Collectors.toList());
+        return StatisticsInfoDto.from(statisticUserDtoList, todayFeedCount);
     }
 
     public void addRecentUser(User user) {
         // 중복되는 사용자가 있으면, 해당 위치를 지우고 최신으로 추가
-        if (userLinkedList.contains(user))
-            userLinkedList.remove(user);
+        userLinkedList.remove(user);
 
         // 리스트 사용자가 n 명이 넘으면 마지막 삭제 LRU 형식
         if (userLinkedList.size() >= MAX_COUNT)
