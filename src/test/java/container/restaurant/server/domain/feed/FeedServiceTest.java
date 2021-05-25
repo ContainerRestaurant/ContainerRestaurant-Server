@@ -142,6 +142,134 @@ class FeedServiceTest extends BaseServiceTest {
         order.verify(feedRepository).delete(feed);
     }
 
+    @Test
+    @DisplayName("피드 수정 테스트")
+    void updateFeed() {
+        //given findByIdWithContainers() 목 데이터
+        mockFindFeedByIdWithContainers();
+        when(userService.findById(user.getId())).thenReturn(user);
+
+        Container updateMenu = Container.of(feed, Menu.mainOf(restaurant, "updateMenu"), "test update");
+        Container deleteMenu = Container.of(feed, Menu.mainOf(restaurant, "deleteMenu"), "test delete");
+        feed.getContainerList().clear();
+        feed.getContainerList().addAll(List.of(updateMenu, deleteMenu));
+
+//        Restaurant newRestaurant = mock(Restaurant.class);
+        when(restaurantService.findById(restaurant.getId())).thenReturn(restaurant);
+        FeedMenuDto updateMenuDto = FeedMenuDto.builder()
+                .menuName("updateMenu")
+                .container("test update2")
+                .build();
+
+        FeedMenuDto createMenuDto = FeedMenuDto.builder()
+                .menuName("createMenu")
+                .container("test create")
+                .build();
+
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(restaurant.getId())
+                .category(Category.FAST_FOOD)
+                .mainMenu(List.of(updateMenuDto, createMenuDto))
+                .subMenu(List.of())
+                .difficulty(3)
+                .welcome(true)
+                .thumbnailUrl("test url")
+                .content("this is new Feed")
+                .build();
+
+        //when 함수를 콜하면
+        feedService.updateFeed(feed.getId(), dto, user.getId());
+
+        //then
+        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantId());
+        assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
+        assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
+        assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
+        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getContent()).isEqualTo(dto.getContent());
+
+        assertThat(feed.getContainerList())
+                .hasSize(2)
+                .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
+                .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
+
+        verify(containerService).save(containersCaptor.capture());
+        assertThat(containersCaptor.getValue())
+                .hasSize(2)
+                .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
+                .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
+
+        verify(containerService).deleteAll(containersCaptor.capture());
+        assertThat(containersCaptor.getValue())
+                .hasSize(1)
+                .anyMatch(container -> container.equals(deleteMenu));
+    }
+
+
+    @Test
+    @DisplayName("피드 수정 테스트 - 식당 변경")
+    void updateFeedRestaurantChange() {
+        //given findByIdWithContainers() 목 데이터
+        mockFindFeedByIdWithContainers();
+        when(userService.findById(user.getId())).thenReturn(user);
+
+        Container updateMenu = Container.of(feed, Menu.mainOf(restaurant, "updateMenu"), "test update");
+        Container deleteMenu = Container.of(feed, Menu.mainOf(restaurant, "deleteMenu"), "test delete");
+        feed.getContainerList().clear();
+        feed.getContainerList().addAll(List.of(updateMenu, deleteMenu));
+
+        Restaurant newRestaurant = mock(Restaurant.class);
+        when(restaurantService.findById(newRestaurant.getId())).thenReturn(newRestaurant);
+        FeedMenuDto updateMenuDto = FeedMenuDto.builder()
+                .menuName("updateMenu")
+                .container("test update2")
+                .build();
+
+        FeedMenuDto createMenuDto = FeedMenuDto.builder()
+                .menuName("createMenu")
+                .container("test create")
+                .build();
+
+        FeedInfoDto dto = FeedInfoDto.builder()
+                .restaurantId(newRestaurant.getId())
+                .category(Category.FAST_FOOD)
+                .mainMenu(List.of(updateMenuDto, createMenuDto))
+                .subMenu(List.of())
+                .difficulty(3)
+                .welcome(true)
+                .thumbnailUrl("test url")
+                .content("this is new Feed")
+                .build();
+
+        //when 함수를 콜하면
+        feedService.updateFeed(feed.getId(), dto, user.getId());
+
+        //then
+        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantId());
+        assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
+        assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
+        assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
+        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getContent()).isEqualTo(dto.getContent());
+
+        assertThat(feed.getContainerList())
+                .hasSize(2)
+                .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
+                .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
+
+        verify(containerService).save(containersCaptor.capture());
+        assertThat(containersCaptor.getValue())
+                .hasSize(2)
+                .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
+                .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
+
+        verify(containerService).deleteAll(containersCaptor.capture());
+        assertThat(containersCaptor.getValue())
+                .hasSize(2)
+                .anyMatch(container -> container.equals(deleteMenu))
+                .anyMatch(container -> container.equals(updateMenu));
+    }
+
     void mockFindFeedByIdWithContainers() {
         mainMenus = new ArrayList<>();
         for (int i = 1; i <= MENU_NUM; i++) {
