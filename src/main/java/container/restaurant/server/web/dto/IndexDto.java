@@ -16,14 +16,14 @@ public class IndexDto extends RepresentationModel<IndexDto> {
 
     private final Long loginId;
     private final Integer myContainer;
-    private final Integer totalContainer;
+    private final Long totalContainer;
     private final Integer myLevel;
     private final String phrase;
 
     // TODO 배너
 
     @Builder
-    protected IndexDto(User user, Integer totalContainer, String phrase) {
+    protected IndexDto(User user, Long totalContainer, String phrase) {
         this(
                 from(user, User::getId, null),
                 from(user, User::getFeedCount, 0),
