@@ -4,6 +4,7 @@ import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
+import container.restaurant.server.domain.push.event.FeedHitEvent;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.statistics.StatisticsService;
@@ -15,6 +16,7 @@ import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -24,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static container.restaurant.server.domain.statistics.StatisticsService.*;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -42,6 +43,8 @@ public class FeedService {
     private final FeedHitRepository feedHitRepository;
 
     private final PagedResourcesAssembler<Feed> feedAssembler;
+
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public FeedDetailDto getFeedDetail(Long feedId, Long loginId) {
@@ -147,6 +150,7 @@ public class FeedService {
         feed.hit();
         feedHitRepository.save(
                 FeedHit.of(userService.findById(userId), feed));
+        publisher.publishEvent(new FeedHitEvent(feed));
     }
 
     @Transactional
