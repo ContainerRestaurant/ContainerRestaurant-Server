@@ -3,16 +3,18 @@ package container.restaurant.server.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.container.ContainerRepository;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
-import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.restaurant.Restaurant;
+import container.restaurant.server.domain.restaurant.menu.MenuRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
+import container.restaurant.server.web.dto.feed.FeedMenuDto;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,10 +55,15 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     private FeedHitRepository feedHitRepository;
 
     @Autowired
-    private RecommendFeedService recommendFeedService;
+    private ContainerRepository containerRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     @AfterEach
     public void afterEach() {
+        containerRepository.deleteAll();
+        menuRepository.deleteAll();
         feedHitRepository.deleteAll();
         feedLikeRepository.deleteAll();
         scrapFeedRepository.deleteAll();
@@ -333,6 +340,14 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .welcome(true)
                 .thumbnailUrl("https://test.feed.thumbnail")
                 .content("this is feed's content")
+                .mainMenu(List.of(FeedMenuDto.builder()
+                        .menuName("rice cake")
+                        .container("fry pan")
+                        .build()))
+                .subMenu(List.of(FeedMenuDto.builder()
+                        .menuName("source")
+                        .container("mini cup")
+                        .build()))
                 .build();
 
         //when
@@ -379,6 +394,14 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .welcome(!myFeed.getWelcome())
                 .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
                 .content("update feed!")
+                .mainMenu(List.of(FeedMenuDto.builder()
+                        .menuName("rice cake")
+                        .container("fry pan")
+                        .build()))
+                .subMenu(List.of(FeedMenuDto.builder()
+                        .menuName("source")
+                        .container("mini cup")
+                        .build()))
                 .build();
 
         //when
@@ -398,6 +421,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
         assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
+        assertThat(feed.getContainerList()).hasSize(2);
     }
 
     @Test
