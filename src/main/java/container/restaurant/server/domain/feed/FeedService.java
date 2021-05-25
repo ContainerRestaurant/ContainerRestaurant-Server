@@ -122,7 +122,7 @@ public class FeedService {
     @Transactional
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
-        Restaurant restaurant = restaurantService.save(dto.getRestaurant());
+        Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
 
         user.feedCountUp();
         restaurant.feedCountUp();
@@ -138,7 +138,7 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
 
-        Restaurant restaurant = restaurantService.findById(dto.getRestaurant().getId());
+        Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
         if (restaurant != null)
             feed.setRestaurant(restaurant);
         dto.update(feed);

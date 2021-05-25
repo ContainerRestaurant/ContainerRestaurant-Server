@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class FeedInfoDto {
 
     @NotNull
-    private final Restaurant restaurant;
+    private final Long restaurantId;
 
     @NotNull
     private final Category category;
