@@ -25,4 +25,11 @@ public class ContainerService {
                 })
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteAll(Collection<Container> containerList) {
+        containerRepository.deleteAll(containerList);
+        containerList.forEach(container ->
+                menuService.delete(container.getMenu()));
+    }
 }

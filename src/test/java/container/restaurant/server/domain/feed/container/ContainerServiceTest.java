@@ -51,4 +51,22 @@ class ContainerServiceTest extends BaseServiceTest {
         verify(menuService).save(orgMenu1);
         verify(menuService).save(orgMenu2);
     }
+
+    @Test
+    @DisplayName("용기 삭제 테스트")
+    void deleteAllTest() {
+        //given 삭제할 ContainerList 가 주어졌을 때
+        List<Container> containerList = List.of(
+                Container.of(feed, mock(Menu.class), "contain1"),
+                Container.of(feed, mock(Menu.class), "contain2")
+        );
+
+        //when 해당 리스트를 삭제하면
+        containerService.deleteAll(containerList);
+
+        //then 각 container 와 menu 가 삭제된다.
+        verify(containerRepository).deleteAll(containerList);
+        containerList.forEach(container ->
+                verify(menuService).delete(container.getMenu()));
+    }
 }
