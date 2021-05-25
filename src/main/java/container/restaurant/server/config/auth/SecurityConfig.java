@@ -20,7 +20,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/feed/**",
             "/api/image/**",
             "/api/restaurant/**",
-            "/api/statistics/**"
+            "/api/statistics/**",
+            "/api/push/**"
     };
 
     @Override
