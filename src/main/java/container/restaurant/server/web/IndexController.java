@@ -2,11 +2,13 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.banner.BannerService;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.IndexDto;
+import container.restaurant.server.web.linker.BannerLinker;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.StatisticsLinker;
 import container.restaurant.server.web.linker.UserLinker;
@@ -29,9 +31,11 @@ public class IndexController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
     private final StatisticsLinker statisticsLinker;
+    private final BannerLinker bannerLinker;
 
     private final UserService userService;
     private final StatisticsService statisticsService;
+    private final BannerService bannerService;
 
     // TODO 배너, 메인 문구 랜덤 생성
 
@@ -55,7 +59,8 @@ public class IndexController {
                         feedLinker.selectRecommend().withRel("feed-recommend"),
                         feedLinker.createFeed().withRel("feed-create"),
                         statisticsLinker.getFeedCountTopUsers().withRel("top-users"),
-                        statisticsLinker.getRecentFeedUsers().withRel("recent-users")
+                        statisticsLinker.getRecentFeedUsers().withRel("recent-users"),
+                        bannerLinker.getBanners().withRel("get-banners")
                 ))
                 .addAllIf(loginId == null, () -> List.of(
                         Link.of("/login").withRel("login"),
@@ -65,6 +70,13 @@ public class IndexController {
                         Link.of("/logout").withRel("logout"),
                         userLinker.getUserById(loginId).withRel("my-info")
                 ));
+    }
+
+    @GetMapping("/banners")
+    public ResponseEntity<?> getBanners(){
+        return ResponseEntity.ok(
+                bannerService.getBanners()
+        );
     }
 
 }
