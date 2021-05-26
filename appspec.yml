@@ -22,5 +22,5 @@ hooks:
       runas: ec2-user
   ValidateServer:
     - location: health.sh
-      timeout:60
+      timeout: 60
       runas: ec2-user
