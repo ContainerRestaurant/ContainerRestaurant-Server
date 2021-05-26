@@ -12,5 +12,15 @@ permissions:
     group: ec2-user
 
 hooks:
+  ApplicationInstall:
+    - location: stop.sh
+      timeout: 60
+      runas: ec2-user
   ApplicationStart:
     - location: deploy.sh
+      timeout: 60
+      runas: ec2-user
+  ValidateServer:
+    - location: health.sh
+      timeout:60
+      runas: ec2-user
