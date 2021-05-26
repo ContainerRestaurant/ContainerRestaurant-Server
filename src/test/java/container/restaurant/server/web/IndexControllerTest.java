@@ -1,13 +1,11 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.domain.user.User;
-import container.restaurant.server.web.base.BaseMvcControllerTest;
+import container.restaurant.server.web.base.BaseUserControllerTest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -17,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class IndexControllerTest extends BaseMvcControllerTest {
+class IndexControllerTest extends BaseUserControllerTest {
 
     @Test
     @DisplayName("비로그인 index 링크 테스트")
@@ -27,28 +25,30 @@ class IndexControllerTest extends BaseMvcControllerTest {
         mvc.perform(get(testPath))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").value(Matchers.containsString(testPath)))
-                .andExpect(jsonPath("_links.auth-list.href").exists())
+                .andExpect(jsonPath("_links.login.href").exists())
                 .andDo(document("index-guest",
                 links(
                         linkWithRel("self").description("본 응답의 링크"),
-                        linkWithRel("auth-list").description("인증을 위한 링크 리스트")
+                        linkWithRel("feed-list").description("전체 피드 리스트 링크 (페이징)"),
+                        linkWithRel("feed-recommend").description("추천 피드 리스트 링크"),
+                        linkWithRel("feed-create").description("피드를 생성하기 위한 링크"),
+                        linkWithRel("top-users").description("누적 피드가 최근 30일간 제일 많은 10명에 대한 리스트 링크"),
+                        linkWithRel("recent-users").description("최근에 피드를 작성한 사용자 리스트 링크"),
+                        linkWithRel("my-info").description("사용자 상세 정보 링크 (비로그인인 경우 로그인 링크)"),
+                        linkWithRel("login").description("인증을 위한 링크 리스트")
                 )
         ));
     }
 
     @Test
+    @WithMockUser
     @DisplayName("로그인 index 링크 테스트")
     void testAuthIndexLinks() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", SessionUser.from(User.builder()
-                .email("index@test.com")
-                .profile("https://my.profile.path")
-                .build()));
         String testPath = "/";
 
         mvc.perform(
                 get(testPath)
-                        .session(session))
+                        .session(myselfSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").value(Matchers.containsString(testPath)))
                 .andExpect(jsonPath("_links.my-info").exists())
@@ -56,7 +56,12 @@ class IndexControllerTest extends BaseMvcControllerTest {
                 .andDo(document("index-user",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
-                                linkWithRel("my-info").description("현 사용자의 상세 정보 링크"),
+                                linkWithRel("feed-list").description("전체 피드 리스트 링크 (페이징)"),
+                                linkWithRel("feed-recommend").description("추천 피드 리스트 링크"),
+                                linkWithRel("feed-create").description("피드를 생성하기 위한 링크"),
+                                linkWithRel("top-users").description("누적 피드가 최근 30일간 제일 많은 10명에 대한 리스트 링크"),
+                                linkWithRel("recent-users").description("최근에 피드를 작성한 사용자 리스트 링크"),
+                                linkWithRel("my-info").description("사용자 상세 정보 링크"),
                                 linkWithRel("logout").description("현재 로그인을 로그아웃 하기 위한 링크")
                         )
                 ));

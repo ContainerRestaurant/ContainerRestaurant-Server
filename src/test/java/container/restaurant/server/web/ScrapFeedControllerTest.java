@@ -20,8 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -95,7 +93,6 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.cancel-scrap.href").exists())
                 .andDo(document("user-scrap",
-                        preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("cancel-scrap").description("본 스크랩을 취소하는 링크")
@@ -147,7 +144,6 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.scrap.href").exists())
                 .andDo(document("cancel-user-scrap",
-                        preprocessResponse(prettyPrint()),
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("scrap").description("다시 스크랩하는 링크")

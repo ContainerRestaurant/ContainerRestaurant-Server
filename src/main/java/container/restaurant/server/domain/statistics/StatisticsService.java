@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.statistics;
 
+import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.statistics.StatisticsInfoDto;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +19,18 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 @Log4j2
 public class StatisticsService implements ApplicationRunner {
-    private final int MAX_COUNT = 100;
+    private static final int MAX_COUNT = 100;
     private final UserService userService;
+    private final FeedRepository feedRepository;
     private LinkedList<User> userLinkedList;
     private int todayFeedCount = 0;
 
@@ -35,9 +38,12 @@ public class StatisticsService implements ApplicationRunner {
     private final FeedLinker feedLinker;
     private List<StatisticsUserDto> statisticsUserDtoList;
 
+    private Long totalFeed;
+
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         initToDayFeedWriter();
+        refreshTotalFeed();
     }
 
     public void initToDayFeedWriter() {
@@ -46,30 +52,26 @@ public class StatisticsService implements ApplicationRunner {
         LocalDateTime from = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         // 오늘 작성한 피드 오래된 순으로 저장 가장 마지막이 최신
         userService.findByToDayFeedWriters(to, from)
-                .stream()
-                .map(user -> {
-                    addRecentUser(user);
-                    return null;
-                }).collect(Collectors.toList());
+                .forEach(this::addRecentUser);
+    }
+
+    private void refreshTotalFeed() {
+        this.totalFeed = feedRepository.count();
     }
 
     @Transactional
     public StatisticsInfoDto getRecentFeedUsers() {
-        List<EntityModel> entityModelList = new ArrayList<>();
-        for (int i = 0; i < userLinkedList.size(); i++) {
-            User user = userLinkedList.get(i);
-            entityModelList
-                    .add(EntityModel.of(StatisticsUserDto.from(user))
-                            .add(userLinker.getUserById(user.getId()).withSelfRel(),
-                                    feedLinker.selectUserFeed(user.getId()).withRel("feeds")));
-        }
-        return StatisticsInfoDto.from(entityModelList, todayFeedCount);
+        List<StatisticsUserDto> statisticUserDtoList = userLinkedList.stream()
+                .map(user -> StatisticsUserDto.from(user).add(
+                        userLinker.getUserById(user.getId()).withSelfRel(),
+                        feedLinker.selectUserFeed(user.getId()).withRel("feeds")))
+                .collect(Collectors.toList());
+        return StatisticsInfoDto.from(statisticUserDtoList, todayFeedCount);
     }
 
     public void addRecentUser(User user) {
         // 중복되는 사용자가 있으면, 해당 위치를 지우고 최신으로 추가
-        if (userLinkedList.contains(user))
-            userLinkedList.remove(user);
+        userLinkedList.remove(user);
 
         // 리스트 사용자가 n 명이 넘으면 마지막 삭제 LRU 형식
         if (userLinkedList.size() >= MAX_COUNT)
@@ -90,8 +92,9 @@ public class StatisticsService implements ApplicationRunner {
     }
 
     /*
-     * 최근 30 일간 제일 많은 피드를 작성한 10 명을
-     * 매일 9 시 0분에 업데이트 한다.
+     * 최근 30 일간 제일 많은 피드를 작성한 10 명 세팅
+     * 누적 피드 개수 새로고침
+     * 매일 0 시 0분에 업데이트 한다.
      */
     @PostConstruct
     @Scheduled(cron = "0 0 0 * * *")
@@ -107,10 +110,16 @@ public class StatisticsService implements ApplicationRunner {
                         .map(StatisticsUserDto::from)
                         .collect(Collectors.toList())
                 );
-    }
 
+        refreshTotalFeed();
+    }
 
     public List<StatisticsUserDto> getFeedCountTopUsers() {
         return statisticsUserDtoList;
     }
+
+    public Long getTotalFeed() {
+        return this.totalFeed;
+    }
+
 }
