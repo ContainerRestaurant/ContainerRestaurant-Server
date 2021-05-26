@@ -22,7 +22,6 @@ public class IndexDto extends RepresentationModel<IndexDto> {
     private final Long totalContainer;
     private final Integer myLevel;
     private final String phrase;
-    // TODO 배너
 
     @Builder
     protected IndexDto(User user, Long totalContainer, String phrase) {
