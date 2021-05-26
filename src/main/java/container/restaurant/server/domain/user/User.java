@@ -43,6 +43,7 @@ public class User extends BaseCreatedTimeEntity {
 
     private Boolean banned;
 
+    private String pushToken;
     @Builder
     protected User(String email, String profile, String nickname) {
         this.email = email;
@@ -55,7 +56,8 @@ public class User extends BaseCreatedTimeEntity {
         this.scrapCount = 0;
         this.bookmarkedCount = 0;
         this.role = Role.USER;
-        this.banned = false;
+        this.pushToken = "";
+
     }
 
     public void setNickname(String nickname) {
