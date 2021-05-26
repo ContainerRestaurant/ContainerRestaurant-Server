@@ -2,6 +2,7 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.banner.BannerService;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
@@ -27,6 +28,7 @@ public class FeedController {
 
     private final FeedService feedService;
     private final RecommendFeedService recommendFeedService;
+    private final BannerService bannerService;
 
     private final FeedLinker feedLinker;
     private final UserLinker userLinker;
@@ -50,6 +52,13 @@ public class FeedController {
 
         return ResponseEntity.ok(
                 setLinks(feedService.findAll(pageable, category)));
+    }
+
+    @GetMapping("/banner")
+    public ResponseEntity<?> getBanner(){
+        return ResponseEntity.ok(
+                bannerService.getBanners()
+        );
     }
 
     @GetMapping("recommend")
