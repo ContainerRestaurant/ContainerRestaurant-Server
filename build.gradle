@@ -36,6 +36,9 @@ dependencies {
 	implementation 'org.locationtech.jts:jts-core'
 	implementation 'org.hibernate:hibernate-spatial:5.4.30.Final'
 
+	implementation 'com.google.firebase:firebase-admin:7.3.0'
+	implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
