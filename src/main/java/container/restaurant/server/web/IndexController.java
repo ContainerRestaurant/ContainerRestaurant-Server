@@ -60,7 +60,7 @@ public class IndexController {
                         feedLinker.createFeed().withRel("feed-create"),
                         statisticsLinker.getFeedCountTopUsers().withRel("top-users"),
                         statisticsLinker.getRecentFeedUsers().withRel("recent-users"),
-                        bannerLinker.getBanners().withRel("get-banners")
+                        bannerLinker.getBanners().withRel("banner-list")
                 ))
                 .addAllIf(loginId == null, () -> List.of(
                         Link.of("/login").withRel("login"),
