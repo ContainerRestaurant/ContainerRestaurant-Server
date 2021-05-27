@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/container-restaurant/zip/
+    destination: /home/ec2-user/container-restaurant-test/zip/
     overwrite: yes
 
 permissions:
@@ -12,5 +12,15 @@ permissions:
     group: ec2-user
 
 hooks:
+  ApplicationInstall:
+    - location: stop.sh
+      timeout: 60
+      runas: ec2-user
   ApplicationStart:
-    - location: deploy.sh
+    - location: start.sh
+      timeout: 60
+      runas: ec2-user
+  ValidateService:
+    - location: health.sh
+      timeout: 60
+      runas: ec2-user
