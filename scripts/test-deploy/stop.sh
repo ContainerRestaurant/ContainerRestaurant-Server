@@ -2,7 +2,7 @@
 
 ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
-source ${ABSDIR}/pofile.sh
+source ${ABSDIR}/profile.sh
 
 IDLE_PORT=$(find_idle_port)
 
