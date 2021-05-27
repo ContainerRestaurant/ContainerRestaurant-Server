@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.net.URI;
@@ -38,10 +39,9 @@ public class ImageController {
     }
 
     @GetMapping(value = "{path}")
-    public ResponseEntity<?> getImageFile(@PathVariable String path) throws URISyntaxException {
-        URI redirectUri = new URI(BASE_URL + DEFAULT_PATH + path);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(redirectUri);
-        return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+    public RedirectView getImageFile(@PathVariable String path) {
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl(BASE_URL + DEFAULT_PATH + path);
+        return redirectView;
     }
 }
