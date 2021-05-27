@@ -10,16 +10,16 @@ public class BannerInfoDto {
     private final String contentURL;
     private final String additionalURL;
 
-    public static BannerInfoDto from(Banner banner){
-        return new BannerInfoDto(banner);
+    public static BannerInfoDto from(Banner banner, String baseURL) {
+        return new BannerInfoDto(banner, baseURL);
     }
 
-    protected BannerInfoDto(Banner banner){
+    protected BannerInfoDto(Banner banner, String baseURL) {
         this.title = banner.getTitle();
-        this.bannerURL = "http://localhost:8080/api/image/"+banner.getBannerURL();
+        this.bannerURL = baseURL + banner.getBannerURL();
         this.contentURL = banner.getContentURL() != null ?
-                "http://localhost:8080/api/image/"+banner.getContentURL() : null;
+                baseURL + banner.getContentURL() : null;
         this.additionalURL = banner.getAdditionalURL() != null ?
-                "http://localhost:8080/api/image/"+banner.getAdditionalURL() : null;
+                baseURL + banner.getAdditionalURL() : null;
     }
 }
