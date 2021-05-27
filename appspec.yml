@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/container-restaurant/zip/
+    destination: /home/ec2-user/container-restaurant-test/zip/
     overwrite: yes
 
 permissions:
