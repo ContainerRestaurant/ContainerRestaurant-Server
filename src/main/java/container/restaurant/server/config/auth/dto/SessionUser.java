@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
+import java.io.Serializable;
 
 @Getter
 @NoArgsConstructor
-public class SessionUser {
+public class SessionUser implements Serializable {
 
     private Long id;
     private String email;

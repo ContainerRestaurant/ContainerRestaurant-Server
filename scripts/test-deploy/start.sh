@@ -2,9 +2,9 @@
 
 ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
-source ${ABSDIR}/pofile.sh
+source ${ABSDIR}/profile.sh
 
-REPOSITORY=/home/ec2-user/container-restaurant
+REPOSITORY=/home/ec2-user/container-restaurant-test
 PROJECT_NAME=server
 
 echo "> Build 파일 복사"
