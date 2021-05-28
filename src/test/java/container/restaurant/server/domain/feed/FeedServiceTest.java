@@ -109,6 +109,7 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.createFeed(dto, user.getId());
 
         //then FeedInfoDto 정보와 동등한 Feed, FeedMenuDto 정보와 동등한 Containers 가 save 된다.
+        verify(userLevelFeedCountService).levelFeedUp(feed);
         verify(feedRepository).save(feedCaptor.capture());
         Feed saved = feedCaptor.getValue();
         assertThat(saved.getOwner()).isEqualTo(user);
@@ -137,6 +138,7 @@ class FeedServiceTest extends BaseServiceTest {
 
         //then
         InOrder order = inOrder(containerService, feedHitRepository, feedRepository);
+        verify(userLevelFeedCountService).levelFeedDown(feed);
         order.verify(containerService).deleteAll(feed.getContainerList());
         order.verify(feedHitRepository).deleteAllByFeed(feed);
         order.verify(feedRepository).delete(feed);
