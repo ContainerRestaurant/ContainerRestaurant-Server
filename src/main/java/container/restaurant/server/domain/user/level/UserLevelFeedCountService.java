@@ -3,8 +3,12 @@ package container.restaurant.server.domain.user.level;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -42,6 +46,15 @@ public class UserLevelFeedCountService {
                 userLevelRepository.findByUserAndDate(user, feed.getCreatedDate().toLocalDate())
                         .orElseGet(() -> userLevelRepository.save(UserLevelFeedCount.from(feed)));
         return levelFeed.countAggregate(count);
+    }
+
+    @Scheduled(cron = "0 5 0 * * *")
+    @Transactional
+    public void deleteExpired() {
+        List<UserLevelFeedCount> list = userLevelRepository.findAllByDateBefore(LocalDate.now().minusDays(89));
+        list.forEach(levelFeedCount ->
+                levelFeedCount.getUser().levelFeedDown(Math.min(DAY_LIMIT, levelFeedCount.getCount())));
+        userLevelRepository.deleteAll(list);
     }
     
 }

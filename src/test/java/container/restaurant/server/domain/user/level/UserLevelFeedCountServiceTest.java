@@ -3,7 +3,6 @@ package container.restaurant.server.domain.user.level;
 import container.restaurant.server.domain.BaseServiceTest;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.user.User;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -13,9 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -80,6 +82,39 @@ class UserLevelFeedCountServiceTest extends BaseServiceTest {
         } else {
             verify(user, never()).levelFeedDown(count);
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void deleteExpired_dayPerMax3(List<Integer> counts, int totalExpected) {
+        //given
+        when(feed.getCreatedDate()).thenReturn(LocalDateTime.now());
+        user = User.builder().build();
+        when(feed.getOwner()).thenReturn(user);
+
+        List<UserLevelFeedCount> list = counts.stream()
+                .map(count -> {
+                    UserLevelFeedCount to = UserLevelFeedCount.from(feed);
+                    to.countAggregate(count);
+                    return to;
+                })
+                .collect(Collectors.toList());
+        when(userLevelFeedCountRepository.findAllByDateBefore(any()))
+                .thenReturn(list);
+
+        //when
+        userLevelFeedCountService.deleteExpired();
+
+        //then
+        verify(userLevelFeedCountRepository).deleteAll(list);
+        assertThat(user.getLevelFeedCount()).isEqualTo(totalExpected);
+    }
+
+    static Stream<Arguments> deleteExpired_dayPerMax3() {
+        return Stream.of(
+                arguments(List.of(1,2,2,2,3,3), -1-2-2-2-3-3),
+                arguments(List.of(3,4,5,7,5,1), -3-3-3-3-3-1)
+        );
     }
 
 }
