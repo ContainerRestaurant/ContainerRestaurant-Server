@@ -1,5 +1,6 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
@@ -26,6 +27,9 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
 
     @Autowired
     private FeedLikeRepository feedLikeRepository;
+
+    @Autowired
+    private FeedService feedService;
 
     @Override
     @AfterEach
@@ -65,7 +69,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(like.getUser().getId()).isEqualTo(myself.getId());
 
         //then-2 othersFeed 의 스크랩 개수가 + 된다.
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+        assertThat(feedService.findById(othersFeed.getId()).getLikeCount())
                 .isEqualTo(othersFeed.getLikeCount() + 1);
     }
 
@@ -99,7 +103,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(like.getUser().getId()).isEqualTo(myself.getId());
 
         //then-2 othersFeed 의 스크랩 개수가 그대로다.
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+        assertThat(feedService.findById(othersFeed.getId()).getLikeCount())
                 .isEqualTo(othersFeed.getLikeCount());
     }
 
@@ -145,7 +149,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(likeList.size()).isEqualTo(size - 1);
 
         //then-2 othersFeed 의 스크랩 개수가 감소한다..
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+        assertThat(feedService.findById(othersFeed.getId()).getLikeCount())
                 .isEqualTo(othersFeed.getLikeCount()- 1);
     }
 
