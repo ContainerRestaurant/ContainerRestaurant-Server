@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -17,7 +18,7 @@ public class ContainerService {
     private final MenuService menuService;
 
     @Transactional
-    public Collection<Container> save(Collection<Container> containerList) {
+    public List<Container> save(Collection<Container> containerList) {
         return containerList.stream()
                 .map(container -> {
                     container.setMenu(menuService.save(container.getMenu()));

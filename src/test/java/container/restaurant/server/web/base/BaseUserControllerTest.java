@@ -21,17 +21,17 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        myself = User.builder()
+        myself = userRepository.save(User.builder()
                 .email("me@test.com")
                 .profile("https://my.profile.path")
-                .build();
-        myself.setNickname("테스트닉네임");
-        myself = userRepository.save(myself);
+                .nickname("나의닉네임")
+                .build());
 
         myselfSession.setAttribute("user", SessionUser.from(myself));
         other = userRepository.save(User.builder()
                 .email("you@test.com")
                 .profile("https://your.profile.path")
+                .nickname("남의닉네임")
                 .build());
     }
 

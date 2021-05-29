@@ -3,13 +3,11 @@ package container.restaurant.server.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.container.ContainerRepository;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.domain.restaurant.menu.MenuRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
@@ -54,16 +52,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Autowired
     private FeedHitRepository feedHitRepository;
 
-    @Autowired
-    private ContainerRepository containerRepository;
-
-    @Autowired
-    private MenuRepository menuRepository;
-
     @AfterEach
     public void afterEach() {
-        containerRepository.deleteAll();
-        menuRepository.deleteAll();
         feedHitRepository.deleteAll();
         feedLikeRepository.deleteAll();
         scrapFeedRepository.deleteAll();
