@@ -12,6 +12,7 @@ import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import container.restaurant.server.domain.restaurant.menu.MenuRepository;
+import container.restaurant.server.domain.user.level.UserLevelFeedCountRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
 
     @Autowired
     private ContainerService containerService;
+  
+    @
+    protected UserLevelFeedCountRepository userLevelFeedCountRepository;
 
     protected Restaurant restaurant;
     protected Feed myFeed;
@@ -98,6 +102,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
         feedRepository.deleteAll();
         restaurantRepository.deleteAll();
         imageRepository.deleteAll();
+        userLevelFeedCountRepository.deleteAll();
         super.afterEach();
     }
 
