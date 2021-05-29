@@ -26,7 +26,6 @@ import container.restaurant.server.domain.restaurant.menu.MenuService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.UserService;
-import container.restaurant.server.domain.user.bookmark.FavoriteRestaurantRepository;
 import container.restaurant.server.domain.user.level.UserLevelFeedCountRepository;
 import container.restaurant.server.domain.user.level.UserLevelFeedCountService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;

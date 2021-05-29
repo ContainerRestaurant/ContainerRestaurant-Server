@@ -38,8 +38,8 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
 
     @Autowired
     private ContainerService containerService;
-  
-    @
+
+    @Autowired
     protected UserLevelFeedCountRepository userLevelFeedCountRepository;
 
     protected Restaurant restaurant;
