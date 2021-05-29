@@ -12,6 +12,7 @@ import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.domain.user.level.UserLevelFeedCountService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.exceptioin.FailedAuthorizationException;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
@@ -43,6 +44,7 @@ public class FeedService {
     private final RestaurantService restaurantService;
     private final StatisticsService statisticsService;
     private final ContainerService containerService;
+    private final UserLevelFeedCountService userLevelFeedCountService;
 
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
@@ -125,6 +127,7 @@ public class FeedService {
 
         containerService.deleteAll(feed.getContainerList());
         feedHitRepository.deleteAllByFeed(feed);
+        userLevelFeedCountService.levelFeedDown(feed);
         feedRepository.delete(feed);
     }
 
@@ -140,7 +143,7 @@ public class FeedService {
 
         Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant));
         containerService.save(dto.toContainerListWith(feed, restaurant));
-
+        userLevelFeedCountService.levelFeedUp(feed);
         return feed.getId();
     }
 

@@ -30,7 +30,7 @@ public class User extends BaseCreatedTimeEntity {
 
     private Integer level;
 
-    private Integer experience;
+    private Integer levelFeedCount;
 
     private Integer feedCount;
 
@@ -51,7 +51,7 @@ public class User extends BaseCreatedTimeEntity {
         this.profile = profile;
         this.greeting = null;
         this.level = 1;
-        this.experience = 0;
+        this.levelFeedCount = 0;
         this.feedCount = 0;
         this.scrapCount = 0;
         this.bookmarkedCount = 0;
@@ -73,14 +73,12 @@ public class User extends BaseCreatedTimeEntity {
         return this.role.getKey();
     }
 
-    public User scrapCountUp() {
+    public void scrapCountUp() {
         this.scrapCount++;
-        return this;
     }
 
-    public User scrapCountDown() {
+    public void scrapCountDown() {
         this.scrapCount--;
-        return this;
     }
 
     public void feedCountUp() {
@@ -89,5 +87,32 @@ public class User extends BaseCreatedTimeEntity {
 
     public void feedCountDown() {
         this.feedCount--;
+    }
+
+    public void levelFeedUp(int count) {
+        updateLevelFeed(count);
+    }
+
+    public void levelFeedDown(int count) {
+        updateLevelFeed(-count);
+    }
+
+    private void updateLevelFeed(int count) {
+        this.levelFeedCount += count;
+        updateLevel();
+    }
+
+    private void updateLevel() {
+        if (this.levelFeedCount <= 0) {
+            this.level = 0;
+        } else if (this.levelFeedCount < 5) {
+            this.level = 1;
+        } else if (this.levelFeedCount < 10) {
+            this.level = 2;
+        } else if (this.levelFeedCount < 20) {
+            this.level = 3;
+        } else {
+            this.level = 4;
+        }
     }
 }
