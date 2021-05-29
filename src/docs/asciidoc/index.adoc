@@ -159,6 +159,72 @@ operation::check-nickname-exists[snippets='curl-request,request-parameters,http-
 [[feed]]
 == 피드
 
+[[feed-create]]
+=== 피드 쓰기
+`POST /api/feed`
+
+operation::feed-create[snippets='curl-request,request-fields,http-response']
+
+[[feed-detail]]
+=== 피드 상세
+`GET /api/feed/[피드_ID]`
+
+단일 피드에 대한 상세 데이터를 조회합니다.
+
+operation::feed-detail[snippets='curl-request,http-response,response-fields,links']
+
+[[feed-list]]
+=== 피드 리스트
+
+조건에 따라 피드 목록을 조회합니다.
+
+==== 일반 피드 목록 (최신순)
+`GET /api/feed`
+
+operation::feed-list[snippets='curl-request,http-response,response-fields,links']
+operation::feed-options[snippets='request-parameters']
+
+카테고리는 <<feed-category>> 참조
+
+[[feed-list-advanced]]
+=== 피드 리스트 - 조건부
+
+[[feed-by-user]]
+==== 작성자로 피드 리스트 조회
+`GET /api/feed/user/[사용자_ID]`
+
+include::{snippets}/feed-by-user/curl-request.adoc[]
+
+[[feed-by-restaurant]]
+==== 식당으로 피드 리스트 조회
+`GET /api/feed/restaurant/[식당_ID]`
+
+include::{snippets}/feed-by-restaurant/curl-request.adoc[]
+
+[[feed-by-scrap]]
+==== 특정 사용자가 스크랩한 피드 리스트 조회
+`GET /api/feed/user/[사용자_ID]/scrap`
+
+include::{snippets}/feed-by-scrap/curl-request.adoc[]
+
+[[feed-category]]
+=== 피드 카테고리
+`GET /api/feed/category`
+
+operation::feed-category-list[snippets='curl-request,http-response']
+
+[[feed-update]]
+=== 피드 수정
+`PATCH /api/feed/[피드_ID]`
+
+operation::feed-update[snippets='curl-request,request-fields,http-response']
+
+[[feed-delete]]
+=== 피드 삭제
+`DELETE /api/feed/[피드_ID]`
+
+operation::feed-delete[snippets='curl-request,http-response']
+
 [[feed-scrap]]
 === 피드 스크랩
 `POST /api/scrap/[피드_ID]`
