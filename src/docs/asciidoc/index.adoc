@@ -4,14 +4,14 @@
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
-:toclevels: 4
+:toclevels: 2
 :sectlinks:
 :operation-curl-request-title: 요청 예시
 :operation-request-fields-title: 요청 필드
 :operation-request-parameters-title: 요청 파라미터
 :operation-http-response-title: 응답 예시
 :operation-response-fields-title: 응답 필드
-:operation-links-title: 링크
+:operation-links-title: 응답 링크
 
 [[overview]]
 = 개요
@@ -19,7 +19,7 @@
 [[overview-http-verbs]]
 == HTTP 동사
 
-본 REST API에서 사용하는 HTTP 동사(verbs)는 가능한한 표준 HTTP와 REST 규약을 따릅니다.
+본 REST API 에서 사용하는 HTTP 동사(verbs)는 가능한한 표준 HTTP 와 REST 규약을 따릅니다.
 
 |===
 | 동사 | 용례
@@ -43,7 +43,7 @@
 [[overview-http-status-codes]]
 == HTTP 상태 코드
 
-본 REST API에서 사용하는 HTTP 상태 코드는 가능한한 표준 HTTP와 REST 규약을 따릅니다.
+본 REST API 에서 사용하는 HTTP 상태 코드는 가능한한 표준 HTTP 와 REST 규약을 따릅니다.
 
 |===
 | 상태 코드 | 용례
@@ -52,13 +52,13 @@
 | 요청을 성공적으로 처리함
 
 | `201 Created`
-| 새 리소스를 성공적으로 생성함. 응답의 `Location` 헤더에 해당 리소스의 URI가 담겨있다.
+| 새 리소스를 성공적으로 생성함. 응답의 `Location` 헤더에 해당 리소스의 URI 가 담겨있다.
 
 | `204 No Content`
-| 기존 리소스를 성공적으로 수정함.
+| 해당 리소스를 성공적으로 수정함.
 
 | `400 Bad Request`
-| 잘못된 요청을 보낸 경우. 응답 본문에 더 오류에 대한 정보가 담겨있다.
+| 잘못된 요청을 보낸 경우. 응답 본문에 오류에 대한 정보가 담겨있다.
 
 | `403 Forbidden`
 | 해당 요청에 대한 요청 권한이 없음.
@@ -74,53 +74,57 @@
 
 include::{snippets}/error-example/response-fields.adoc[]
 
-예를 들어, 잘못된 요청으로 이벤트를 만들려고 했을 때 다음과 같은 `400 Bad Request` 응답을 받는다.
+예를 들어, 잘못된 요청으로 사용자를 만들려고 했을 때 다음과 같은 `400 Bad Request` 응답을 받는다.
 
 include::{snippets}/error-example/http-response.adoc[]
 
 [[overview-hypermedia]]
 == 하이퍼미디어
 
-본 REST API는 하이퍼미디어와 사용하며 응답에 담겨있는 리소스는 다른 리소스에 대한 링크를 가지고 있다.
+본 REST API 는 하이퍼미디어와 사용하며 응답에 담겨있는 리소스는 다른 리소스에 대한 링크를 가지고 있다.
 응답은 http://stateless.co/hal_specification.html[Hypertext Application from resource to resource. Language (HAL)] 형식을 따른다.
-링크는 `_links`라는 키로 제공한다. 본 API의 사용자(클라이언트)는 URI를 직접 생성하지 않아야 하며, 리소스에서 제공하는 링크를 사용해야 한다.
+링크는 `_links`라는 키로 제공한다. 본 API 의 사용자(클라이언트)는 URI 를 직접 생성하지 않아야 하며, 리소스에서 제공하는 링크를 사용해야 한다.
 
 [[resources]]
 = 리소스
 
 [[resources-index]]
 == 인덱스
+`GET /`
 
-인덱스는 서비스 진입점을 제공한다.
+인덱스는 서비스 진입점을 제공한다. 홈 화면 관련 컨텐츠들이 해당 리소스에 포함되어 있다.
 
-[[resources-index]]
-=== 인덱스
+=== 게스트의 인덱스 조회
 
-`GET` 요청을 사용하여 인덱스에 접근할 수 있다. 홈 화면 관련 컨텐츠들이 해당 리소스에 포함된다.
-
-==== 게스트의 인덱스 조회
 operation::index-guest[snippets='curl-request,http-response,links']
 
-==== 인증된 사용자의 인덱스 조회
+=== 인증된 사용자의 인덱스 조회
 
 operation::index-user[snippets='curl-request,http-response,links']
 
 [[login]]
 == 로그인
 
+[[login-web]]
+=== 웹에서의 로그인
+`GET /login`
+
 OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및 회원가입을 할 수 있습니다.
+(웹에서 로그인/회원 가입시 사용하는 API 로, 모바일 앱에서는 다른 방식을 이용합니다.)
+
+[[login-mobile]]
+=== 모바일 앱에서의 로그인
+모바일 SDK 에서 OAuth 2.0 제공자에게 인증 받은 뒤,
+용기낸 식당 서버의 아래 URI 로 리다이렉트하여 간편 로그인/회원가입을 할 수 있습니다.
 
 * 카카오
-** http://localhost:8080/login/oauth2/code/kakao
+** `POST /login/oauth2/code/kakao`
 * 구글
-** http://localhost:8080/login/oauth2/code/kakao
+** `POST /login/oauth2/code/google`
 
 [[logout]]
 == 로그아웃
-
-로그인이 되어있는 경우 아래 경로를 통해 로그아웃할 수 있습니다.
-
-* http://localhost:8080/logout
+`GET /logout`
 
 [[resources-user]]
 == 사용자
@@ -128,11 +132,13 @@ OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및
 
 [[resources-get-user]]
 === 사용자 정보 조회
+`GET /api/user/[유저_ID]`
 
 operation::get-user[snippets='curl-request,http-response,response-fields,links']
 
 [[resources-path-user]]
 === 사용자 정보 변경
+`PATCH /api/user/[유저_ID]`
 
 operation::patch-user[snippets='curl-request,request-fields,http-response']
 
@@ -140,11 +146,13 @@ operation::patch-user[snippets='curl-request,request-fields,http-response']
 
 [[resources-delete-user]]
 === 사용자 계정 탈퇴
+`DELETE /api/user/[유저_ID]`
 
 operation::delete-user[snippets='curl-request,http-response']
 
 [[resources-check-nickname]]
 === 닉네임 중복 확인
+`GET /api/user/nickname/exists?nickname=[확인할_닉네임]`
 
 operation::check-nickname-exists[snippets='curl-request,request-parameters,http-response,response-fields']
 
@@ -153,6 +161,7 @@ operation::check-nickname-exists[snippets='curl-request,request-parameters,http-
 
 [[resources-feed-scrap]]
 === 피드 스크랩
+`POST /api/scrap/[피드_ID]`
 
 피드를 스크랩합니다. 스크랩하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
@@ -160,6 +169,7 @@ operation::user-scrap[snippets='curl-request,http-response,links']
 
 [[resources-cancel-feed-scrap]]
 === 피드 스크랩 취소
+`DELETE /api/scrap/[피드_ID]`
 
 피드를 스크랩을 취소합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
@@ -167,6 +177,7 @@ operation::cancel-user-scrap[snippets='curl-request,http-response,links']
 
 [[resources-feed-like]]
 === 피드 좋아요
+`POST /api/like/feed/[피드_ID]`
 
 피드를 좋아요 합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
@@ -174,6 +185,7 @@ operation::feed-like[snippets='curl-request,http-response,links']
 
 [[resources-cancel-feed-like]]
 === 피드 좋아요 취소
+`DELETE /api/like/feed/[피드_ID]`
 
 피드를 좋아요를 취소합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
