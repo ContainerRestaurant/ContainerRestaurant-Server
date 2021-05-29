@@ -48,11 +48,11 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-like 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andExpect(jsonPath("_links.like-cancel.href").exists())
                 .andDo(document("feed-like",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
-                                linkWithRel("cancel-like").description("본 좋아요를 취소하는 링크")
+                                linkWithRel("like-cancel").description("본 좋아요를 취소하는 링크")
                         )
                 ));
 
@@ -88,7 +88,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-like 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-like.href").exists());
+                .andExpect(jsonPath("_links.like-cancel.href").exists());
 
         //then FeedLike 사이즈가 변함없고, 관계가 잘 정의되어있다.
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
@@ -133,7 +133,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.like.href").exists())
-                .andDo(document("cancel-feed-like",
+                .andDo(document("feed-like-cancel",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("like").description("다시 좋아요 하는 링크")

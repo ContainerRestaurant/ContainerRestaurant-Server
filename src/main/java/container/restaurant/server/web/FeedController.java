@@ -128,10 +128,10 @@ public class FeedController {
                         restaurantLinker.findById(dto.getRestaurantId()).withRel("restaurant"),
                         commentLinker.getCommentByFeed(dto.getId()).withRel("comments"),
                         dto.getIsLike() ?
-                                feedLikeLinker.userCancelLikeFeed(dto.getId()).withRel("cancel-like") :
+                                feedLikeLinker.userCancelLikeFeed(dto.getId()).withRel("like-cancel") :
                                 feedLikeLinker.userLikeFeed(dto.getId()).withRel("like"),
                         dto.getIsScraped() ?
-                                scrapFeedLinker.cancelScrapFeed(dto.getId()).withRel("cancel-scrap") :
+                                scrapFeedLinker.cancelScrapFeed(dto.getId()).withRel("scrap-cancel") :
                                 scrapFeedLinker.scrapFeed(dto.getId()).withRel("scrap")
                 )
                 .addAllIf(isOwner, () -> List.of(

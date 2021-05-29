@@ -118,7 +118,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("isLike").value(true))
                 .andExpect(jsonPath("isScraped").value(false))
-                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andExpect(jsonPath("_links.like-cancel.href").exists())
                 .andExpect(jsonPath("_links.scrap.href").exists());
 
         assertThat(feedRepository.findById(feed.getId()).orElse(feed).getHitCount())
@@ -142,7 +142,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("isLike").value(false))
                 .andExpect(jsonPath("isScraped").value(true))
                 .andExpect(jsonPath("_links.like.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+                .andExpect(jsonPath("_links.scrap-cancel.href").exists());
     }
 
     @Test
@@ -162,8 +162,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("isLike").value(true))
                 .andExpect(jsonPath("isScraped").value(true))
-                .andExpect(jsonPath("_links.cancel-like.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+                .andExpect(jsonPath("_links.like-cancel.href").exists())
+                .andExpect(jsonPath("_links.scrap-cancel.href").exists());
     }
 
     @Test

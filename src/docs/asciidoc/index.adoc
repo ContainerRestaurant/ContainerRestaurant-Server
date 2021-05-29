@@ -88,7 +88,7 @@ include::{snippets}/error-example/http-response.adoc[]
 [[resources]]
 = 리소스
 
-[[resources-index]]
+[[index]]
 == 인덱스
 `GET /`
 
@@ -126,56 +126,56 @@ OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및
 == 로그아웃
 `GET /logout`
 
-[[resources-user]]
+[[user]]
 == 사용자
 외부 OAuth 2.0 제공자를 통해 최초 로그인 한 경우, 로그인한 계정의 이메일로 "용기낸 식당" 계정이 생성된다.
 
-[[resources-get-user]]
+[[user-get]]
 === 사용자 정보 조회
 `GET /api/user/[유저_ID]`
 
 operation::get-user[snippets='curl-request,http-response,response-fields,links']
 
-[[resources-path-user]]
+[[user-update]]
 === 사용자 정보 변경
 `PATCH /api/user/[유저_ID]`
 
 operation::patch-user[snippets='curl-request,request-fields,http-response']
 
-사용자 정보 변경시 응답 형식은 <<resources-get-user>>를 참조합니다.
+사용자 정보 변경시 응답 형식은 <<user-get>>를 참조합니다.
 
-[[resources-delete-user]]
+[[user-delete]]
 === 사용자 계정 탈퇴
 `DELETE /api/user/[유저_ID]`
 
 operation::delete-user[snippets='curl-request,http-response']
 
-[[resources-check-nickname]]
+[[check-nickname]]
 === 닉네임 중복 확인
 `GET /api/user/nickname/exists?nickname=[확인할_닉네임]`
 
 operation::check-nickname-exists[snippets='curl-request,request-parameters,http-response,response-fields']
 
-[[resources-feed]]
+[[feed]]
 == 피드
 
-[[resources-feed-scrap]]
+[[feed-scrap]]
 === 피드 스크랩
 `POST /api/scrap/[피드_ID]`
 
 피드를 스크랩합니다. 스크랩하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
-operation::user-scrap[snippets='curl-request,http-response,links']
+operation::feed-scrap[snippets='curl-request,http-response,links']
 
-[[resources-cancel-feed-scrap]]
+[[feed-scrap-cancel]]
 === 피드 스크랩 취소
 `DELETE /api/scrap/[피드_ID]`
 
 피드를 스크랩을 취소합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
-operation::cancel-user-scrap[snippets='curl-request,http-response,links']
+operation::feed-scrap-cancel[snippets='curl-request,http-response,links']
 
-[[resources-feed-like]]
+[[feed-like]]
 === 피드 좋아요
 `POST /api/like/feed/[피드_ID]`
 
@@ -183,13 +183,13 @@ operation::cancel-user-scrap[snippets='curl-request,http-response,links']
 
 operation::feed-like[snippets='curl-request,http-response,links']
 
-[[resources-cancel-feed-like]]
+[[feed-like-cancel]]
 === 피드 좋아요 취소
 `DELETE /api/like/feed/[피드_ID]`
 
 피드를 좋아요를 취소합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
 
-operation::cancel-feed-like[snippets='curl-request,http-response,links']
+operation::feed-like-cancel[snippets='curl-request,http-response,links']
 
 
 
