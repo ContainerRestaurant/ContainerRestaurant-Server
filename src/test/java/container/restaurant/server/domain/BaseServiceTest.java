@@ -26,7 +26,6 @@ import container.restaurant.server.domain.restaurant.menu.MenuService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.UserService;
-import container.restaurant.server.domain.user.bookmark.FavoriteRestaurantRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeedService;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,8 +93,6 @@ public class BaseServiceTest {
     protected RestaurantService restaurantService;
 
     // --------------------USER--------------------
-    @Mock
-    protected FavoriteRestaurantRepository favoriteRestaurantRepository;
     @Mock
     protected ScrapFeedRepository scrapFeedRepository;
     @Mock
