@@ -257,5 +257,17 @@ operation::feed-like[snippets='curl-request,http-response,links']
 
 operation::feed-like-cancel[snippets='curl-request,http-response,links']
 
+[[report]]
+== 신고
 
+[[feed-report]]
+=== 피드 신고
+`POST /api/report/feed/[신고할_피드_ID]`
 
+operation::feed-report[snippets='curl-request,http-response']
+
+[[comment-report]]
+=== 댓글 신고
+`POST /api/report/feed/[신고할_댓글_ID]`
+
+operation::comment-report[snippets='curl-request,http-response']

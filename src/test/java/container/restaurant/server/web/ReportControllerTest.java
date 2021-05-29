@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,7 +47,8 @@ class ReportControllerTest extends BaseUserAndFeedControllerTest {
             mvc.perform(
                     post("/api/report/feed/{feedId}", othersFeed.getId())
                             .session(myselfSession))
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isNoContent())
+                    .andDo(document("feed-report"));
 
             //then
             assertThat(
@@ -74,7 +76,8 @@ class ReportControllerTest extends BaseUserAndFeedControllerTest {
             mvc.perform(
                     post("/api/report/comment/{commentId}", comment.getId())
                             .session(myselfSession))
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isNoContent())
+                    .andDo(document("comment-report"));
 
             //then
             assertThat(
