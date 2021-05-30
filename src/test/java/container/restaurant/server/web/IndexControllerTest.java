@@ -34,6 +34,7 @@ class IndexControllerTest extends BaseUserControllerTest {
                         linkWithRel("feed-create").description("피드를 생성하기 위한 링크"),
                         linkWithRel("top-users").description("누적 피드가 최근 30일간 제일 많은 10명에 대한 리스트 링크"),
                         linkWithRel("recent-users").description("최근에 피드를 작성한 사용자 리스트 링크"),
+                        linkWithRel("banner-list").description("배너 리스트 링크"),
                         linkWithRel("my-info").description("사용자 상세 정보 링크 (비로그인인 경우 로그인 링크)"),
                         linkWithRel("login").description("인증을 위한 링크 리스트")
                 )
@@ -61,6 +62,7 @@ class IndexControllerTest extends BaseUserControllerTest {
                                 linkWithRel("feed-create").description("피드를 생성하기 위한 링크"),
                                 linkWithRel("top-users").description("누적 피드가 최근 30일간 제일 많은 10명에 대한 리스트 링크"),
                                 linkWithRel("recent-users").description("최근에 피드를 작성한 사용자 리스트 링크"),
+                                linkWithRel("banner-list").description("배너 리스트 링크"),
                                 linkWithRel("my-info").description("사용자 상세 정보 링크"),
                                 linkWithRel("logout").description("현재 로그인을 로그아웃 하기 위한 링크")
                         )

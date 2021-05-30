@@ -21,7 +21,7 @@ public class ImageLinker {
         return linkTo(proxy.uploadImageFile(image));
     }
 
-    public LinkBuilder getImage(String path) throws URISyntaxException {
+    public LinkBuilder getImage(String path) {
         return linkTo(proxy.getImageFile(path));
     }
 

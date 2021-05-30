@@ -14,10 +14,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final static String[] PERMITTED_ALL_PATH = {
             "/",
+            "/banners",
             "/docs/index.html",
+            "/api/contract",
             "/auth/list",
             "/api/user/nickname/**/exists",
             "/api/feed/**",
+            "/api/comment/**",
             "/api/image/**",
             "/api/restaurant/**",
             "/api/statistics/**",
