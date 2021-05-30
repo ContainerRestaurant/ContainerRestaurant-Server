@@ -2,7 +2,8 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.domain.banner.BannerService;
+import container.restaurant.server.domain.home.banner.BannerService;
+import container.restaurant.server.domain.home.phrase.PhraseService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
@@ -35,8 +36,7 @@ public class IndexController {
     private final UserService userService;
     private final StatisticsService statisticsService;
     private final BannerService bannerService;
-
-    // TODO 메인 문구 랜덤 생성
+    private final PhraseService phraseService;
 
     @GetMapping
     public ResponseEntity<?> index(@LoginUser SessionUser sessionUser) {
@@ -46,6 +46,7 @@ public class IndexController {
                 setLinks(IndexDto.builder()
                         .user(loginUser)
                         .totalContainer(statisticsService.getTotalFeed())
+                        .phrase(phraseService.getPhrase())
                         .build()));
     }
 
