@@ -1,14 +1,11 @@
 package container.restaurant.server.web.dto;
 
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.web.dto.banner.BannerInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
