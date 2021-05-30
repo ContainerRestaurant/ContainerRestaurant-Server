@@ -1,5 +1,7 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeedService;
@@ -33,6 +35,10 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
 
     @Autowired
     private ScrapFeedService scrapFeedService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private FeedService feedService;
 
     @AfterEach
     public void afterEach() {
@@ -53,13 +59,13 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-scrap 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+                .andExpect(jsonPath("_links.scrap-cancel.href").exists());
 
         //then-2 myself , otherFeed 의 스크랩 개수가 + 1 되고,
         //       myself 와 주어진 피드가 관계된 하나의 FeedScrap 이 존재한다.
-        assertThat(userRepository.findById(myself.getId()).get().getScrapCount())
+        assertThat(userService.findById(myself.getId()).getScrapCount())
                 .isEqualTo(myself.getScrapCount() + 1);
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getScrapCount())
+        assertThat(feedService.findById(othersFeed.getId()).getScrapCount())
                 .isEqualTo(othersFeed.getScrapCount() + 1);
 
         Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(myself.getId(), Pageable.unpaged());
@@ -91,19 +97,19 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-scrap 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists())
-                .andDo(document("user-scrap",
+                .andExpect(jsonPath("_links.scrap-cancel.href").exists())
+                .andDo(document("feed-scrap",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
-                                linkWithRel("cancel-scrap").description("본 스크랩을 취소하는 링크")
+                                linkWithRel("scrap-cancel").description("본 스크랩을 취소하는 링크")
                         )
                 ));
 
         //then-2 myself, otherFeed 의 스크랩 개수가 그대로이고,
         //       이미 만들어져있던 FeedScrap 이 존재한다.
-        assertThat(userRepository.findById(myself.getId()).get().getScrapCount())
+        assertThat(userService.findById(myself.getId()).getScrapCount())
                 .isEqualTo(myself.getScrapCount());
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getScrapCount())
+        assertThat(feedService.findById(othersFeed.getId()).getScrapCount())
                 .isEqualTo(othersFeed.getScrapCount());
 
         Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(myself.getId(), Pageable.unpaged());
@@ -143,7 +149,7 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.scrap.href").exists())
-                .andDo(document("cancel-user-scrap",
+                .andDo(document("feed-scrap-cancel",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("scrap").description("다시 스크랩하는 링크")
@@ -151,9 +157,9 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
                 ));
 
         //then myself, otherFeed 의 스크랩 개수가 1개 줄어들고, 남은 FeedScrap 없어진다.
-        assertThat(userRepository.findById(myself.getId()).get().getScrapCount())
+        assertThat(userService.findById(myself.getId()).getScrapCount())
                 .isEqualTo(myself.getScrapCount() - 1);
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getScrapCount())
+        assertThat(feedService.findById(othersFeed.getId()).getScrapCount())
                 .isEqualTo(othersFeed.getScrapCount()- 1);
 
         Page<ScrapFeed> scraps = scrapFeedRepository.findAllByUserId(myself.getId(), Pageable.unpaged());

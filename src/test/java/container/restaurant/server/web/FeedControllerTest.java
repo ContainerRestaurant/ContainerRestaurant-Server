@@ -3,13 +3,11 @@ package container.restaurant.server.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.container.ContainerRepository;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.domain.restaurant.menu.MenuRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
@@ -27,13 +25,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -54,16 +55,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     @Autowired
     private FeedHitRepository feedHitRepository;
 
-    @Autowired
-    private ContainerRepository containerRepository;
-
-    @Autowired
-    private MenuRepository menuRepository;
-
     @AfterEach
     public void afterEach() {
-        containerRepository.deleteAll();
-        menuRepository.deleteAll();
         feedHitRepository.deleteAll();
         feedLikeRepository.deleteAll();
         scrapFeedRepository.deleteAll();
@@ -128,7 +121,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("isLike").value(true))
                 .andExpect(jsonPath("isScraped").value(false))
-                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andExpect(jsonPath("_links.like-cancel.href").exists())
                 .andExpect(jsonPath("_links.scrap.href").exists());
 
         assertThat(feedRepository.findById(feed.getId()).orElse(feed).getHitCount())
@@ -152,7 +145,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("isLike").value(false))
                 .andExpect(jsonPath("isScraped").value(true))
                 .andExpect(jsonPath("_links.like.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+                .andExpect(jsonPath("_links.scrap-cancel.href").exists());
     }
 
     @Test
@@ -172,8 +165,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("isLike").value(true))
                 .andExpect(jsonPath("isScraped").value(true))
-                .andExpect(jsonPath("_links.cancel-like.href").exists())
-                .andExpect(jsonPath("_links.cancel-scrap.href").exists());
+                .andExpect(jsonPath("_links.like-cancel.href").exists())
+                .andExpect(jsonPath("_links.scrap-cancel.href").exists());
     }
 
     @Test
@@ -203,7 +196,47 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("_links.restaurant.href").exists())
                 .andExpect(jsonPath("_links.comments.href").exists())
                 .andExpect(jsonPath("_links.patch.href").doesNotExist())
-                .andExpect(jsonPath("_links.delete.href").doesNotExist());
+                .andExpect(jsonPath("_links.delete.href").doesNotExist())
+                .andDo(document("feed-detail",
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("owner").description("본 피드를 작성한 사용자 링크"),
+                                linkWithRel("restaurant").description("본 피드에 등록된 식당 링크"),
+                                linkWithRel("comments").description("본 피드에 달린 댓글 리스트 링크"),
+                                linkWithRel("like").description("본 피드를 좋아요하는 링크"),
+                                linkWithRel("scrap").description("본 피드를 스크랩하는 링크"),
+                                linkWithRel("patch").optional()
+                                        .description("본 피드를 수정하는 링크 (본 피드 작성자인 경우)"),
+                                linkWithRel("delete").optional()
+                                        .description("본 피드를 삭제하는 링크 (본 피드 작성자인 경우)"),
+                                linkWithRel("report").optional()
+                                        .description("본 피드를 신고하는 링크 (본 피드 작성자가 아닌 경우)")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("본 피드의 식별값"),
+                                fieldWithPath("ownerId").description("본 피드를 작성한 사용자의 식별값"),
+                                fieldWithPath("restaurantId").description("본 피드에 등록된 식당의 식별값"),
+                                fieldWithPath("ownerNickname").description("본 피드를 작성한 사용자의 닉네임"),
+                                fieldWithPath("restaurantName").description("본 피드에 등록된 삭당의 이름"),
+                                fieldWithPath("category").description("본 피드에 등록된 식당의 카테고리"),
+                                fieldWithPath("thumbnailUrl").description("본 피드에 썸네일 및 업로드 사진"),
+                                fieldWithPath("content").description("본 피드의 콘텐트"),
+                                fieldWithPath("welcome").description("본 피드에 등록된 식당에서 사장님이 환영했는지 여부"),
+                                fieldWithPath("difficulty").description("본 피드에 등록된 음식의 난이도"),
+                                fieldWithPath("likeCount").description("본 피드의 좋아요 개수"),
+                                fieldWithPath("scrapCount").description("본 피드의 스크랩 횟수"),
+                                fieldWithPath("replyCount").description("본 피드의 댓글 개수"),
+                                fieldWithPath("isLike").description("현재 사용자가 본 피드를 좋아요 했는지 여부"),
+                                fieldWithPath("isScraped").description("현재 사용자가 본 피드를 스크랩 했는지 여부"),
+                                subsectionWithPath("mainMenu").description("본 피드에 등록된 메인 메뉴 리스트"),
+                                subsectionWithPath("subMenu").description("본 피드에 등록된 서브 메뉴 리스트"),
+                                subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세")
+                        )))
+                .andDo(document("feed-menu",
+                        responseFields(beneathPath("mainMenu[]"),
+                                fieldWithPath("menuName").description("음식 메뉴 이름"),
+                                fieldWithPath("container").description("음식에 사용한 용기 설명")
+                        )));
     }
 
     @Test
@@ -211,25 +244,50 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     public void testSelectFeedPage() throws Exception {
         //given
         List<Feed> list = saveFeeds();
-        Feed lastFeed = list.get(list.size() - 1);
+        Feed testFeed = list.get(list.size() - 3);
 
         //expect
         mvc.perform(
                 get("/api/feed")
-                        .queryParam("page", "0")
+                        .queryParam("page", "1")
                         .queryParam("size", "2"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(LIST_PATH, hasSize(2)))
-                .andExpect(jsonPath(LIST_PATH + "[0].id").value(lastFeed.getId()))
-                .andExpect(jsonPath(LIST_PATH + "[0].ownerNickname").value(lastFeed.getOwner().getNickname()))
-                .andExpect(jsonPath(LIST_PATH + "[0].content").value(lastFeed.getContent()))
-                .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(lastFeed.getLikeCount()))
-                .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(lastFeed.getReplyCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(testFeed.getId()))
+                .andExpect(jsonPath(LIST_PATH + "[0].ownerNickname").value(testFeed.getOwner().getNickname()))
+                .andExpect(jsonPath(LIST_PATH + "[0].content").value(testFeed.getContent()))
+                .andExpect(jsonPath(LIST_PATH + "[0].likeCount").value(testFeed.getLikeCount()))
+                .andExpect(jsonPath(LIST_PATH + "[0].replyCount").value(testFeed.getReplyCount()))
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.create.href").exists())
-                .andExpect(jsonPath("_links.category-list.href").exists());
+                .andExpect(jsonPath("_links.category-list.href").exists())
+                .andDo(document("feed-list",
+                        links(
+                                linkWithRel("self").description("본 응답의 링크"),
+                                linkWithRel("create").description("새 피드를 생성하는 링크"),
+                                linkWithRel("category-list").description("피드의 카테고리 분류"),
+                                linkWithRel("next").description("다음 피드 리스트"),
+                                linkWithRel("last").description("마지막 피드 리스트"),
+                                linkWithRel("prev").description("이전 피드 리스트"),
+                                linkWithRel("first").description("첫 피드 리스트")
+                        ),
+                        responseFields(
+                                fieldWithPath(LIST_PATH + "[].id").description("해당 피드 식별값"),
+                                fieldWithPath(LIST_PATH + "[].thumbnailUrl").description("해당 피드 썸네일 URL"),
+                                fieldWithPath(LIST_PATH + "[].ownerNickname").description("해당 피드 작성자 닉네임"),
+                                fieldWithPath(LIST_PATH + "[].content").description("해당 피드 콘텐트"),
+                                fieldWithPath(LIST_PATH + "[].likeCount").description("해당 피드 좋아요 개수"),
+                                fieldWithPath(LIST_PATH + "[].replyCount").description("해당 피드 답글 개수"),
+                                fieldWithPath(LIST_PATH + "[]._links.self.href").description("해당 피드의 상세 정보 링크"),
+                                subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세"),
+                                fieldWithPath("page.size").description("본 피드 리스트의 페이지 당 피드 개수"),
+                                fieldWithPath("page.totalElements").description("본 피드 리스트의 전체 피드 개수"),
+                                fieldWithPath("page.totalPages").description("본 피드 리스트의 전체 페이지 수"),
+                                fieldWithPath("page.number").description("본 피드 리스트에서 현재 페이지")
+
+                        )));
     }
 
     @Test
@@ -255,7 +313,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.create.href").exists())
-                .andExpect(jsonPath("_links.category-list.href").exists());
+                .andExpect(jsonPath("_links.category-list.href").exists())
+                .andDo(document("feed-by-user"));
     }
 
     @Test
@@ -281,7 +340,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.create.href").exists())
-                .andExpect(jsonPath("_links.category-list.href").exists());
+                .andExpect(jsonPath("_links.category-list.href").exists())
+                .andDo(document("feed-by-restaurant"));
     }
 
     @Test
@@ -313,19 +373,42 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath(LIST_PATH + "[0]._links.self.href").exists())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.create.href").exists())
-                .andExpect(jsonPath("_links.category-list.href").exists());
+                .andExpect(jsonPath("_links.category-list.href").exists())
+                .andDo(document("feed-by-scrap"));
     }
 
     @Test
-    @DisplayName("카테고리 필터링 테스트")
+    @DisplayName("카테고리 필터링과 정렬 테스트")
     public void testCategoryFilter() throws Exception{
-        mvc.perform(get("/api/feed?category=korean"))
+        //given
+        List<Feed> list = saveFeeds();
+        Feed testFeed = list.get(list.size() - 1);
+
+        mvc.perform(
+
+                get("/api/feed")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("category", "japanese")
+                        .queryParam("sort", "createdDate,DESC"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(LIST_PATH, hasSize(1)))
-                .andExpect(jsonPath(LIST_PATH + "[0].id").value(othersFeed.getId()))
+                .andExpect(jsonPath(LIST_PATH, hasSize(2)))
+                .andExpect(jsonPath(LIST_PATH + "[0].id").value(testFeed.getId()))
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.create.href").exists())
-                .andExpect(jsonPath("_links.category-list.href").exists());
+                .andExpect(jsonPath("_links.category-list.href").exists())
+                .andDo(document("feed-options",
+                        requestParameters(
+                                parameterWithName("category").description(
+                                        "필터링할 카테고리 (대소문자 구분 X)"),
+                                parameterWithName("sort").description(
+                                        "정렬 방식 [createdDate|likeCount|difficulty],[ASC,DESC] +\n" +
+                                        "기본값: createdDate,DESC"),
+                                parameterWithName("size").description(
+                                        "페이지당 피드 개수 +\n기본값: 20"),
+                                parameterWithName("page").description(
+                                        "가져올 페이지 +\n기본값: 0")
+                        )));
     }
 
     @Test
@@ -357,8 +440,18 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                         .content(mapper.writeValueAsString(dto))
                         .session(myselfSession))
                 .andExpect(status().isCreated())
-                .andExpect(header()
-                        .string("Location", Matchers.containsString("/api/feed/")));
+                .andExpect(header().string("Location", Matchers.containsString("/api/feed/")))
+                .andDo(document("feed-create",
+                        requestFields(
+                                fieldWithPath("restaurantId").description("등록할 식당의 식별값"),
+                                fieldWithPath("category").description("음식의 카테고리"),
+                                subsectionWithPath("mainMenu").description("메인 음식 리스트"),
+                                subsectionWithPath("subMenu").description("반찬 리스트"),
+                                fieldWithPath("difficulty").description("포장 난이도"),
+                                fieldWithPath("welcome").description("사장님 환영 여부"),
+                                fieldWithPath("thumbnailUrl").description("썸네일 URL"),
+                                fieldWithPath("content").description("피드 콘텐트")
+                        )));
     }
 
     @Test
@@ -410,7 +503,18 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto))
                         .session(myselfSession))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("feed-update",
+                        requestFields(
+                                fieldWithPath("restaurantId").description("등록할 식당의 식별값"),
+                                fieldWithPath("category").description("음식의 카테고리"),
+                                subsectionWithPath("mainMenu").description("메인 음식 리스트"),
+                                subsectionWithPath("subMenu").description("반찬 리스트"),
+                                fieldWithPath("difficulty").description("포장 난이도"),
+                                fieldWithPath("welcome").description("사장님 환영 여부"),
+                                fieldWithPath("thumbnailUrl").description("썸네일 URL"),
+                                fieldWithPath("content").description("피드 콘텐트")
+                        )));
 
         //then
         feed = feedRepository.findById(feed.getId())
@@ -468,7 +572,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         mvc.perform(
                 delete("/api/feed/{feedId}", feed.getId())
                         .session(myselfSession))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("feed-delete"));
 
         //expect
         assertThat(feedRepository.existsById(feed.getId())).isFalse();
@@ -512,6 +617,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         MvcResult res = mvc.perform(get("/api/feed/category"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
+                .andDo(document("feed-category-list"))
                 .andReturn();
 
         Map<String, String> map =

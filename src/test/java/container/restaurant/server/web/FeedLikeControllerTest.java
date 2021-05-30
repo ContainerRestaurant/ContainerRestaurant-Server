@@ -1,5 +1,6 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
@@ -27,6 +28,9 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
     @Autowired
     private FeedLikeRepository feedLikeRepository;
 
+    @Autowired
+    private FeedService feedService;
+
     @Override
     @AfterEach
     public void afterEach() {
@@ -48,11 +52,11 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-like 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-like.href").exists())
+                .andExpect(jsonPath("_links.like-cancel.href").exists())
                 .andDo(document("feed-like",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
-                                linkWithRel("cancel-like").description("본 좋아요를 취소하는 링크")
+                                linkWithRel("like-cancel").description("본 좋아요를 취소하는 링크")
                         )
                 ));
 
@@ -65,7 +69,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(like.getUser().getId()).isEqualTo(myself.getId());
 
         //then-2 othersFeed 의 스크랩 개수가 + 된다.
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+        assertThat(feedService.findById(othersFeed.getId()).getLikeCount())
                 .isEqualTo(othersFeed.getLikeCount() + 1);
     }
 
@@ -88,7 +92,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 //then-1 status 200 에 self, cancel-like 링크가 반환된다.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.cancel-like.href").exists());
+                .andExpect(jsonPath("_links.like-cancel.href").exists());
 
         //then FeedLike 사이즈가 변함없고, 관계가 잘 정의되어있다.
         List<FeedLike> likeList = feedLikeRepository.findAllByFeed(othersFeed);
@@ -99,7 +103,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(like.getUser().getId()).isEqualTo(myself.getId());
 
         //then-2 othersFeed 의 스크랩 개수가 그대로다.
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+        assertThat(feedService.findById(othersFeed.getId()).getLikeCount())
                 .isEqualTo(othersFeed.getLikeCount());
     }
 
@@ -133,7 +137,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.like.href").exists())
-                .andDo(document("cancel-feed-like",
+                .andDo(document("feed-like-cancel",
                         links(
                                 linkWithRel("self").description("본 응답의 링크"),
                                 linkWithRel("like").description("다시 좋아요 하는 링크")
@@ -145,7 +149,7 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(likeList.size()).isEqualTo(size - 1);
 
         //then-2 othersFeed 의 스크랩 개수가 감소한다..
-        assertThat(feedRepository.findById(othersFeed.getId()).get().getLikeCount())
+        assertThat(feedService.findById(othersFeed.getId()).getLikeCount())
                 .isEqualTo(othersFeed.getLikeCount()- 1);
     }
 

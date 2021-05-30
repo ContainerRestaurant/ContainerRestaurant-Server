@@ -28,7 +28,7 @@ public class ScrapFeedController {
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(scrapFeedLinker.scrapFeed(feedId).withSelfRel())
-                        .add(scrapFeedLinker.cancelScrapFeed(feedId).withRel("cancel-scrap"))
+                        .add(scrapFeedLinker.cancelScrapFeed(feedId).withRel("scrap-cancel"))
         );
     }
 

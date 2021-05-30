@@ -26,7 +26,7 @@ public class FeedLikeController {
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(feedLikeLinker.userLikeFeed(feedId).withSelfRel())
-                        .add(feedLikeLinker.userCancelLikeFeed(feedId).withRel("cancel-like"))
+                        .add(feedLikeLinker.userCancelLikeFeed(feedId).withRel("like-cancel"))
         );
     }
 
