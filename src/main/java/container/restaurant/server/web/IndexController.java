@@ -7,7 +7,7 @@ import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.IndexDto;
-import container.restaurant.server.web.linker.BannerLinker;
+import container.restaurant.server.web.linker.IndexLinker;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.StatisticsLinker;
 import container.restaurant.server.web.linker.UserLinker;
@@ -30,7 +30,7 @@ public class IndexController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
     private final StatisticsLinker statisticsLinker;
-    private final BannerLinker bannerLinker;
+    private final IndexLinker indexLinker;
 
     private final UserService userService;
     private final StatisticsService statisticsService;
@@ -59,7 +59,7 @@ public class IndexController {
                         feedLinker.createFeed().withRel("feed-create"),
                         statisticsLinker.getFeedCountTopUsers().withRel("top-users"),
                         statisticsLinker.getRecentFeedUsers().withRel("recent-users"),
-                        bannerLinker.getBanners().withRel("banner-list")
+                        indexLinker.getBanners().withRel("banner-list")
                 ))
                 .addAllIf(loginId == null, () -> List.of(
                         Link.of("/login").withRel("login"),

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
-public class BannerLinker {
+public class IndexLinker {
     IndexController proxy
             = DummyInvocationUtils.methodOn(IndexController.class);
 
