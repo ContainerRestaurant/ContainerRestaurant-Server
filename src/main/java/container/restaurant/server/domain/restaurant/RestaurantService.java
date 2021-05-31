@@ -60,9 +60,6 @@ public class RestaurantService {
     }
 
     public Restaurant save(Restaurant restaurant) {
-        if (restaurant.getId() != null) {
-            return findById(restaurant.getId());
-        }
         return findByName(restaurant.getName())
                 .orElseGet(() ->
                         restaurantRepository.save(
