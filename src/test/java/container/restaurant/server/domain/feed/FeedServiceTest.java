@@ -82,7 +82,7 @@ class FeedServiceTest extends BaseServiceTest {
         // given
         when(feedRepository.save(any())).thenReturn(feed);
         when(userService.findById(user.getId())).thenReturn(user);
-        when(restaurantService.findById(restaurant.getId())).thenReturn(restaurant);
+        when(restaurantService.save(restaurant)).thenReturn(restaurant);
 
         FeedMenuDto mainMenuDto = FeedMenuDto.builder()
                 .menuName("mainMenu")
