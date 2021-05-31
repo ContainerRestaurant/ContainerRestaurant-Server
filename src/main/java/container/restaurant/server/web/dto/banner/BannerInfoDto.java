@@ -1,6 +1,6 @@
 package container.restaurant.server.web.dto.banner;
 
-import container.restaurant.server.domain.banner.Banner;
+import container.restaurant.server.domain.home.banner.Banner;
 import lombok.Getter;
 
 @Getter
