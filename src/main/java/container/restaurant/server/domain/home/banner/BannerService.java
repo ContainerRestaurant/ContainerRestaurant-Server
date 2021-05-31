@@ -1,4 +1,4 @@
-package container.restaurant.server.domain.banner;
+package container.restaurant.server.domain.home.banner;
 
 import container.restaurant.server.web.dto.banner.BannerInfoDto;
 import container.restaurant.server.web.linker.ImageLinker;

@@ -1,4 +1,4 @@
-package container.restaurant.server.domain.banner;
+package container.restaurant.server.domain.home.banner;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

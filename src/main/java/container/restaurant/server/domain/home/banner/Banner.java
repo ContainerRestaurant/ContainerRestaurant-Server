@@ -1,4 +1,4 @@
-package container.restaurant.server.domain.banner;
+package container.restaurant.server.domain.home.banner;
 
 import container.restaurant.server.domain.base.BaseEntity;
 import lombok.Getter;
