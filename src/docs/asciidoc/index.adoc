@@ -94,13 +94,13 @@ include::{snippets}/error-example/http-response.adoc[]
 
 인덱스는 서비스 진입점을 제공한다. 홈 화면 관련 컨텐츠들이 해당 리소스에 포함되어 있다.
 
+=== 인증된 사용자의 인덱스 조회
+
+operation::index-user[snippets='curl-request,http-response,response-fields,links']
+
 === 게스트의 인덱스 조회
 
 operation::index-guest[snippets='curl-request,http-response,links']
-
-=== 인증된 사용자의 인덱스 조회
-
-operation::index-user[snippets='curl-request,http-response,links']
 
 [[login]]
 == 로그인
