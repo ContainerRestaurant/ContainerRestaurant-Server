@@ -197,5 +197,4 @@ public class FeedService {
     public Page<Feed> findForUpdatingRecommend(LocalDateTime from, LocalDateTime to, Pageable pageable) {
         return feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
     }
-
 }

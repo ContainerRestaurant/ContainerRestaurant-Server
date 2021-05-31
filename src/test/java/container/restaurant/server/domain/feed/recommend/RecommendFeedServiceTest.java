@@ -1,12 +1,13 @@
 package container.restaurant.server.domain.feed.recommend;
 
+import container.restaurant.server.domain.BaseServiceTest;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.FeedService;
-import org.junit.jupiter.api.BeforeEach;
+import container.restaurant.server.domain.user.User;
+import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.quartz.JobExecutionContext;
+import org.mockito.InjectMocks;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,34 +15,28 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-class RecommendFeedUpdateJobTest {
+class RecommendFeedServiceTest extends BaseServiceTest {
 
-    FeedService feedService = mock(FeedService.class);
-    RecommendFeedService recommendFeedService = mock(RecommendFeedService.class);
-
-    RecommendFeedUpdateJob job;
-
-    @BeforeEach
-    void beforeEach() {
-        job = new RecommendFeedUpdateJob(feedService, recommendFeedService);
-    }
+    @InjectMocks
+    RecommendFeedService recommendFeedService;
 
     @ParameterizedTest(name = "[{index}] - {0}")
     @MethodSource
-    void testExecute(String TEST, List<Feed> input, List<Long> res) {
+    void updateRecommendFeed(String TEST, List<Feed> input, List<Long> res) {
         //given-1 기본날짜 / Pageable 이 주어지고 job 의 배치 페이지 사이즈를 세팅
         int pageSize = 10;
-        job.setPageSize(pageSize);
+        recommendFeedService.setPageSize(pageSize);
 
         //given-2 주어진 날짜 사이에 모든 피드를 가져오는 로직을 목
         when(feedService.findForUpdatingRecommend(any(), any(), any()))
@@ -52,22 +47,18 @@ class RecommendFeedUpdateJobTest {
                     return new PageImpl<>(input.subList(from, to), p, input.size());
                 }));
 
-        //given-3 결과 비교는 ID 로 하기위해 mockRes 에 결과 Feed 리스트 아이디를 만든다.
-        List<Long> mockRes = new ArrayList<>();
-        doAnswer(invocation -> {
-            List<Feed> list = invocation.getArgument(0);
-            list.forEach(feed -> mockRes.add(feed.getId()));
-            return null;
-        }).when(recommendFeedService).updateRecommendFeed(any());
-
-        //when 추천 업데이트 작업을 실행하면
-        job.execute(mock(JobExecutionContext.class));
+        //when 추천 업데이트 작업을 실행하고 결과 리스트를 ID 로 리스트로 변환
+        recommendFeedService.updateRecommendFeed();
+        List<Long> actualRes = recommendFeedService.getRecommendFeeds()
+                .getContent().stream()
+                .map(FeedPreviewDto::getId)
+                .collect(Collectors.toList());
 
         //then 생성된 추천 피드 ID 리스트(mockRes) 와 예상한 res 가 동일하다.
-        assertThat(mockRes).isEqualTo(res);
+        assertThat(actualRes).isEqualTo(res);
     }
 
-    static Stream<Arguments> testExecute() {
+    static Stream<Arguments> updateRecommendFeed() {
         LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
         return Stream.of(
                 arguments("스코어가 다른 경우 테스트", List.of(
@@ -90,9 +81,9 @@ class RecommendFeedUpdateJobTest {
                         testFeed(16L, 17, today),
                         testFeed(17L, 18, today)
                 ), List.of(
-                    17L, 16L, 15L, 14L,
-                    13L, 12L, 11L, 10L,
-                    9L, 8L, 7L, 6L
+                        17L, 16L, 15L, 14L,
+                        13L, 12L, 11L, 10L,
+                        9L, 8L, 7L, 6L
                 )),
                 arguments("날짜가 다른 경우 테스트", List.of(
                         testFeed(9L, 3, today.minusDays(1)),
@@ -123,10 +114,11 @@ class RecommendFeedUpdateJobTest {
 
     static Feed testFeed(Long id, Integer score, LocalDateTime createDate) {
         Feed feed = mock(Feed.class);
+        User user = mock(User.class);
         when(feed.getId()).thenReturn(id);
         when(feed.getRecommendScore()).thenReturn(score);
         when(feed.getCreatedDate()).thenReturn(createDate);
+        when(feed.getOwner()).thenReturn(user);
         return feed;
     }
-
 }
