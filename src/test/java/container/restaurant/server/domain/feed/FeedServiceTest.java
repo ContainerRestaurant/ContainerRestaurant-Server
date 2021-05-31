@@ -95,13 +95,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(restaurant.getId())
+                .restaurant(restaurant)
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(mainMenuDto))
                 .subMenu(List.of(subMenuDto))
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("test url")
+                .thumbnailImageId(1L)
                 .content("this is new Feed")
                 .build();
 
@@ -117,7 +117,7 @@ class FeedServiceTest extends BaseServiceTest {
         assertThat(saved.getCategory()).isEqualTo(dto.getCategory());
         assertThat(saved.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(saved.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(saved.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(saved.getThumbnailImageId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(saved.getContent()).isEqualTo(dto.getContent());
 
         verify(containerService).save(containersCaptor.capture());
@@ -169,13 +169,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(restaurant.getId())
+                .restaurant(restaurant)
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("test url")
+                .thumbnailImageId(1L)
                 .content("this is new Feed")
                 .build();
 
@@ -183,11 +183,11 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.updateFeed(feed.getId(), dto, user.getId());
 
         //then
-        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantId());
+        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurant().getId());
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getThumbnailImageId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
 
         assertThat(feed.getContainerList())
@@ -233,13 +233,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(newRestaurant.getId())
+                .restaurant(newRestaurant)
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("test url")
+                .thumbnailImageId(1L)
                 .content("this is new Feed")
                 .build();
 
@@ -247,11 +247,11 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.updateFeed(feed.getId(), dto, user.getId());
 
         //then
-        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantId());
+        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurant().getId());
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getThumbnailImageId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
 
         assertThat(feed.getContainerList())

@@ -21,7 +21,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final String ownerNickname;
     private final String restaurantName;
     private final Category category;
-    private final String thumbnailUrl;
+    private final Long thumbnailImageId;
     private final String content;
     private final Boolean welcome;
     private final Integer difficulty;
@@ -47,7 +47,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.ownerNickname = feed.getOwner().getNickname();
         this.restaurantName = feed.getRestaurant().getName();
         this.category = feed.getCategory();
-        this.thumbnailUrl = feed.getThumbnailUrl();
+        this.thumbnailImageId = feed.getThumbnailImageId();
         this.content = feed.getContent();
         this.welcome = feed.getWelcome();
         this.difficulty = feed.getDifficulty();

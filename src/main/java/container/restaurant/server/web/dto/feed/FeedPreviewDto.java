@@ -14,7 +14,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
 
     private final Long id;
 
-    private final String thumbnailUrl;
+    private final Long thumbnailImageId;
     private final String ownerNickname;
     private final String content;
     private final Integer likeCount;
@@ -35,7 +35,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
     protected FeedPreviewDto(Feed feed) {
         this.id = feed.getId();
 
-        this.thumbnailUrl = feed.getThumbnailUrl();
+        this.thumbnailImageId = feed.getThumbnailImageId();
         this.ownerNickname = feed.getOwner().getNickname();
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();

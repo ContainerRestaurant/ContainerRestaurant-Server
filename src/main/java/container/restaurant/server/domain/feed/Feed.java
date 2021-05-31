@@ -39,7 +39,7 @@ public class Feed extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed")
     private List<Container> containerList;
 
-    private String thumbnailUrl;
+    private Long thumbnailImageId;
 
     @Size(max = 500)
     private String content;
@@ -69,11 +69,11 @@ public class Feed extends BaseTimeEntity {
     @Builder
     protected Feed(
             User owner, Restaurant restaurant, Category category, List<Container> menus,
-            String thumbnailUrl, String content, Boolean welcome, Integer difficulty
+            Long thumbnailImageId, String content, Boolean welcome, Integer difficulty
     ) {
         this.owner = owner;
         this.restaurant = restaurant;
-        this.thumbnailUrl = thumbnailUrl;
+        this.thumbnailImageId = thumbnailImageId;
         this.category = category;
         this.content = content;
         this.welcome = welcome != null ? welcome : false;
@@ -127,8 +127,8 @@ public class Feed extends BaseTimeEntity {
         this.category = category;
     }
 
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
+    public void setThumbnailImageId(Long thumbnailImageId) {
+        this.thumbnailImageId = thumbnailImageId;
     }
 
     public void setContent(String content) {

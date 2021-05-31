@@ -29,10 +29,10 @@ class FeedInfoDtoTest {
         when(restaurant.getId()).thenReturn(restaurantId = 5L);
 
         FeedInfoDto feedInfoDto = FeedInfoDto.builder()
-                .restaurantId(restaurantId)
+                .restaurant(restaurant)
                 .category(Category.NIGHT_MEAL)
                 .difficulty(4)
-                .thumbnailUrl("test/url")
+                .thumbnailImageId(1L)
                 .content("test content")
                 .welcome(true)
                 .build();
@@ -45,7 +45,7 @@ class FeedInfoDtoTest {
         assertThat(feed.getRestaurant().getId()).isEqualTo(restaurantId);
         assertThat(feed.getCategory()).isEqualTo(feedInfoDto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(feedInfoDto.getDifficulty());
-        assertThat(feed.getThumbnailUrl()).isEqualTo(feedInfoDto.getThumbnailUrl());
+        assertThat(feed.getThumbnailImageId()).isEqualTo(feedInfoDto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(feedInfoDto.getContent());
         assertThat(feed.getWelcome()).isEqualTo(feedInfoDto.getWelcome());
 

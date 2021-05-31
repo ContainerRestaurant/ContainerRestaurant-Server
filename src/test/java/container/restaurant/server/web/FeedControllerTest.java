@@ -83,7 +83,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailUrl()))
+                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailImageId()))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -184,7 +184,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailUrl()))
+                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailImageId()))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -417,11 +417,11 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     public void testCreateFeed() throws Exception {
         //given
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(restaurant.getId())
+                .restaurant(restaurant)
                 .category(Category.KOREAN)
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("https://test.feed.thumbnail")
+                .thumbnailImageId(1L)
                 .content("this is feed's content")
                 .mainMenu(List.of(FeedMenuDto.builder()
                         .menuName("rice cake")
@@ -461,7 +461,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         //given
         FeedInfoDto dto = FeedInfoDto.builder()
                 .welcome(true)
-                .thumbnailUrl("https://test.feed.thumbnail")
+                .thumbnailImageId(1L)
                 .content("this is feed's content")
                 .build();
 
@@ -481,11 +481,11 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         //given
         Feed feed = myFeed;
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(restaurant.getId())
+                .restaurant(restaurant)
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())
-                .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
+                .thumbnailImageId(myFeed.getThumbnailImageId()+1)
                 .content("update feed!")
                 .mainMenu(List.of(FeedMenuDto.builder()
                         .menuName("rice cake")
@@ -523,7 +523,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getThumbnailImageId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
         assertThat(feed.getContainerList()).hasSize(2);
     }
@@ -538,7 +538,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())
-                .thumbnailUrl(myFeed.getThumbnailUrl() + ".update")
+                .thumbnailImageId(myFeed.getThumbnailImageId()+1)
                 .content("update feed!")
                 .build();
 
@@ -557,7 +557,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(feed.getCategory()).isNotEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isNotEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isNotEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailUrl()).isNotEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getThumbnailImageId()).isNotEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isNotEqualTo(dto.getContent());
     }
 
@@ -650,7 +650,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                     .difficulty(4)
                     .category(Category.JAPANESE)
                     .welcome(true)
-                    .thumbnailUrl("https://my.thumbnail" + 1)
+                    .thumbnailImageId(myFeed.getThumbnailImageId()+1)
                     .content("Feed Content")
                     .build()));
             // 각 피드간에 생성시간차를 두기위해 잠시 대기
