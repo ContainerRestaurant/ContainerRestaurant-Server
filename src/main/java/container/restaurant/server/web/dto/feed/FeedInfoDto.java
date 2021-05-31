@@ -19,7 +19,7 @@ import java.util.List;
 public class FeedInfoDto {
 
     @NotNull
-    private final Long restaurantId;
+    private final Restaurant restaurant;
 
     @NotNull
     private final Category category;
@@ -31,7 +31,7 @@ public class FeedInfoDto {
     private final Integer difficulty;
 
     private final Boolean welcome;
-    private final String thumbnailUrl;
+    private final Long thumbnailImageId;
     private final String content;
 
     public Feed toFeedWith(User owner, Restaurant restaurant) {
@@ -39,7 +39,7 @@ public class FeedInfoDto {
                 .owner(owner)
                 .restaurant(restaurant)
                 .category(category)
-                .thumbnailUrl(thumbnailUrl)
+                .thumbnailImageId(thumbnailImageId)
                 .content(content)
                 .welcome(welcome)
                 .difficulty(difficulty)
@@ -67,8 +67,8 @@ public class FeedInfoDto {
             feed.setDifficulty(difficulty);
         if (!welcome.equals(feed.getWelcome()))
             feed.setWelcome(welcome);
-        if (!thumbnailUrl.equals(feed.getThumbnailUrl()))
-            feed.setThumbnailUrl(thumbnailUrl);
+        if (!thumbnailImageId.equals(feed.getThumbnailImageId()))
+            feed.setThumbnailImageId(thumbnailImageId);
         if (!content.equals(feed.getContent()))
             feed.setContent(content);
         return feed;

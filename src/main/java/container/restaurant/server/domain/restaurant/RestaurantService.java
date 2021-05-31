@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,5 +52,26 @@ public class RestaurantService {
         return restaurantRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "존재하지 않는 식당입니다.(id:" + id + ")"));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Restaurant> findByName(String name) {
+        return restaurantRepository.findByName(name);
+    }
+
+    public Restaurant save(Restaurant restaurant) {
+        if (restaurant.getId() != null) {
+            return findById(restaurant.getId());
+        }
+        return findByName(restaurant.getName())
+                .orElseGet(() ->
+                        restaurantRepository.save(
+                                Restaurant.builder()
+                                        .addr(restaurant.getAddress())
+                                        .name(restaurant.getName())
+                                        .lat(restaurant.getLatitude())
+                                        .lon(restaurant.getLongitude())
+                                        .build()));
+
     }
 }

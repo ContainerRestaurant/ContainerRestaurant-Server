@@ -41,7 +41,6 @@ public class Restaurant extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     private List<Menu> menu;
 
-    @NotNull
     private Long image_ID;
 
     @ColumnDefault("0")
