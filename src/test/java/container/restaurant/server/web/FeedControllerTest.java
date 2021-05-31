@@ -83,7 +83,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailImageId()))
+                .andExpect(jsonPath("thumbnailImageId").value(feed.getThumbnailImageId()))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -184,7 +184,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("thumbnailUrl").value(feed.getThumbnailImageId()))
+                .andExpect(jsonPath("thumbnailImageId").value(feed.getThumbnailImageId()))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -219,7 +219,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("ownerNickname").description("본 피드를 작성한 사용자의 닉네임"),
                                 fieldWithPath("restaurantName").description("본 피드에 등록된 삭당의 이름"),
                                 fieldWithPath("category").description("본 피드에 등록된 식당의 카테고리"),
-                                fieldWithPath("thumbnailUrl").description("본 피드에 썸네일 및 업로드 사진"),
+                                fieldWithPath("thumbnailImageId").description("본 피드에 썸네일 및 업로드 사진"),
                                 fieldWithPath("content").description("본 피드의 콘텐트"),
                                 fieldWithPath("welcome").description("본 피드에 등록된 식당에서 사장님이 환영했는지 여부"),
                                 fieldWithPath("difficulty").description("본 피드에 등록된 음식의 난이도"),
@@ -275,7 +275,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath(LIST_PATH + "[].id").description("해당 피드 식별값"),
-                                fieldWithPath(LIST_PATH + "[].thumbnailUrl").description("해당 피드 썸네일 URL"),
+                                fieldWithPath(LIST_PATH + "[].thumbnailImageId").description("해당 피드 썸네일 이미지 식별값"),
                                 fieldWithPath(LIST_PATH + "[].ownerNickname").description("해당 피드 작성자 닉네임"),
                                 fieldWithPath(LIST_PATH + "[].content").description("해당 피드 콘텐트"),
                                 fieldWithPath(LIST_PATH + "[].likeCount").description("해당 피드 좋아요 개수"),
@@ -443,13 +443,13 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(header().string("Location", Matchers.containsString("/api/feed/")))
                 .andDo(document("feed-create",
                         requestFields(
-                                fieldWithPath("restaurantId").description("등록할 식당의 식별값"),
+                                subsectionWithPath("restaurant").description("등록할 식당의 식별값"),
                                 fieldWithPath("category").description("음식의 카테고리"),
                                 subsectionWithPath("mainMenu").description("메인 음식 리스트"),
                                 subsectionWithPath("subMenu").description("반찬 리스트"),
                                 fieldWithPath("difficulty").description("포장 난이도"),
                                 fieldWithPath("welcome").description("사장님 환영 여부"),
-                                fieldWithPath("thumbnailUrl").description("썸네일 URL"),
+                                fieldWithPath("thumbnailImageId").description("썸네일 이미지 식별값"),
                                 fieldWithPath("content").description("피드 콘텐트")
                         )));
     }
@@ -506,13 +506,13 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andDo(document("feed-update",
                         requestFields(
-                                fieldWithPath("restaurantId").description("등록할 식당의 식별값"),
+                                subsectionWithPath("restaurant").description("등록할 식당의 식별값"),
                                 fieldWithPath("category").description("음식의 카테고리"),
                                 subsectionWithPath("mainMenu").description("메인 음식 리스트"),
                                 subsectionWithPath("subMenu").description("반찬 리스트"),
                                 fieldWithPath("difficulty").description("포장 난이도"),
                                 fieldWithPath("welcome").description("사장님 환영 여부"),
-                                fieldWithPath("thumbnailUrl").description("썸네일 URL"),
+                                fieldWithPath("thumbnailImageId").description("썸네일 이미지 식별값"),
                                 fieldWithPath("content").description("피드 콘텐트")
                         )));
 
