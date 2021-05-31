@@ -35,9 +35,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers(h -> h
                         .frameOptions().disable()
                 )
+                // FIXME 임시 로그인 방편
                 .authorizeRequests(a -> a
-                        .antMatchers(HttpMethod.GET, PERMITTED_ALL_PATH).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
+//                        .antMatchers(HttpMethod.GET, PERMITTED_ALL_PATH).permitAll()
+//                        .anyRequest().authenticated()
                 )
                 .logout(l -> l
                         .logoutSuccessUrl("/")
