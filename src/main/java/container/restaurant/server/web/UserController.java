@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -90,6 +91,14 @@ public class UserController {
                         feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps")
                         // TODO favorite link
                 ));
+    }
+
+    // FIXME 임시 로그인 방편
+    private final HttpSession httpSession;
+    @GetMapping("temp-login")
+    public ResponseEntity<?> tempLogin() {
+        httpSession.setAttribute("user", SessionUser.from(userService.findById(1L)));
+        return ResponseEntity.noContent().build();
     }
 
 }
