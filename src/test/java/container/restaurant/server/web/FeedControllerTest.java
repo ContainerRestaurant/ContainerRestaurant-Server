@@ -6,7 +6,7 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
-import container.restaurant.server.domain.feed.picture.ImageRepository;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -45,9 +46,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     private static final String LIST_PATH = "_embedded.feedPreviewDtoList";
 
     @Autowired
-    private ImageRepository imageRepository;
-
-    @Autowired
     private ScrapFeedRepository scrapFeedRepository;
 
     @Autowired
@@ -61,7 +59,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         feedHitRepository.deleteAll();
         feedLikeRepository.deleteAll();
         scrapFeedRepository.deleteAll();
-        imageRepository.deleteAll();
         super.afterEach();
     }
 
@@ -84,7 +81,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("thumbnailImageId").value(feed.getThumbnailImageId()))
+                .andExpect(jsonPath("thumbnailUrl").value(containsString(feed.getThumbnail().getUrl())))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -185,7 +182,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(jsonPath("ownerNickname").value(feed.getOwner().getNickname()))
                 .andExpect(jsonPath("restaurantName").value(feed.getRestaurant().getName()))
                 .andExpect(jsonPath("category").value(feed.getCategory().toString()))
-                .andExpect(jsonPath("thumbnailImageId").value(feed.getThumbnailImageId()))
+                .andExpect(jsonPath("thumbnailUrl").value(containsString(feed.getThumbnail().getUrl())))
                 .andExpect(jsonPath("content").value(feed.getContent()))
                 .andExpect(jsonPath("welcome").value(feed.getWelcome()))
                 .andExpect(jsonPath("difficulty").value(feed.getDifficulty()))
@@ -220,7 +217,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("ownerNickname").description("본 피드를 작성한 사용자의 닉네임"),
                                 fieldWithPath("restaurantName").description("본 피드에 등록된 삭당의 이름"),
                                 fieldWithPath("category").description("본 피드에 등록된 식당의 카테고리"),
-                                fieldWithPath("thumbnailImageId").description("본 피드에 썸네일 및 업로드 사진"),
+                                fieldWithPath("thumbnailUrl").description("본 피드에 썸네일 및 업로드 사진"),
                                 fieldWithPath("content").description("본 피드의 콘텐트"),
                                 fieldWithPath("welcome").description("본 피드에 등록된 식당에서 사장님이 환영했는지 여부"),
                                 fieldWithPath("difficulty").description("본 피드에 등록된 음식의 난이도"),
@@ -276,7 +273,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath(LIST_PATH + "[].id").description("해당 피드 식별값"),
-                                fieldWithPath(LIST_PATH + "[].thumbnailImageId").description("해당 피드 썸네일 이미지 식별값"),
+                                fieldWithPath(LIST_PATH + "[].thumbnailUrl").description("해당 피드 썸네일 이미지 링크"),
                                 fieldWithPath(LIST_PATH + "[].ownerNickname").description("해당 피드 작성자 닉네임"),
                                 fieldWithPath(LIST_PATH + "[].content").description("해당 피드 콘텐트"),
                                 fieldWithPath(LIST_PATH + "[].likeCount").description("해당 피드 좋아요 개수"),
@@ -422,7 +419,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .category(Category.KOREAN)
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailImageId(1L)
+                .thumbnailImageId(image.getId())
                 .content("this is feed's content")
                 .mainMenu(List.of(FeedMenuDto.builder()
                         .menuName("rice cake")
@@ -486,7 +483,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())
-                .thumbnailImageId(myFeed.getThumbnailImageId() + 1)
+                .thumbnailImageId(image.getId())
                 .content("update feed!")
                 .mainMenu(List.of(FeedMenuDto.builder()
                         .menuName("rice cake")
@@ -524,7 +521,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailImageId()).isEqualTo(dto.getThumbnailImageId());
+        assertThat(feed.getThumbnail().getId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
         assertThat(feed.getContainerList()).hasSize(2);
     }
@@ -535,11 +532,14 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     public void testFailedUpdateFeed() throws Exception {
         //given
         Feed feed = myFeed;
+        Image newImage = imageRepository.save(Image.builder()
+                .url("https://new.thumbnail")
+                .build());
         FeedInfoDto dto = FeedInfoDto.builder()
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())
-                .thumbnailImageId(myFeed.getThumbnailImageId() + 1)
+                .thumbnailImageId(newImage.getId())
                 .content("update feed!")
                 .build();
 
@@ -558,7 +558,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(feed.getCategory()).isNotEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isNotEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isNotEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailImageId()).isNotEqualTo(dto.getThumbnailImageId());
+        assertThat(feed.getThumbnail().getId()).isNotEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isNotEqualTo(dto.getContent());
     }
 
@@ -652,7 +652,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                     .difficulty(4)
                     .category(Category.JAPANESE)
                     .welcome(true)
-                    .thumbnailImageId(myFeed.getThumbnailImageId() + 1)
+                    .thumbnail(image)
                     .content("Feed Content")
                     .build()));
             // 각 피드간에 생성시간차를 두기위해 잠시 대기

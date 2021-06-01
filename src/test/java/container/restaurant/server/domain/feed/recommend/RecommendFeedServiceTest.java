@@ -2,6 +2,7 @@ package container.restaurant.server.domain.feed.recommend;
 
 import container.restaurant.server.domain.BaseServiceTest;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -115,10 +116,13 @@ class RecommendFeedServiceTest extends BaseServiceTest {
     static Feed testFeed(Long id, Integer score, LocalDateTime createDate) {
         Feed feed = mock(Feed.class);
         User user = mock(User.class);
+        Image image = mock(Image.class);
         when(feed.getId()).thenReturn(id);
         when(feed.getRecommendScore()).thenReturn(score);
         when(feed.getCreatedDate()).thenReturn(createDate);
         when(feed.getOwner()).thenReturn(user);
+        when(feed.getThumbnail()).thenReturn(image);
+        when(image.getUrl()).thenReturn("test.path");
         return feed;
     }
 }

@@ -1,7 +1,7 @@
 package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.user.scrap.ScrapFeed;
+import container.restaurant.server.domain.feed.picture.ImageService;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.NonNull;
@@ -14,7 +14,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
 
     private final Long id;
 
-    private final Long thumbnailImageId;
+    private final String thumbnailUrl;
     private final String ownerNickname;
     private final String content;
     private final Integer likeCount;
@@ -26,16 +26,10 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
         return new FeedPreviewDto(feed);
     }
 
-    @NonNull
-    public static FeedPreviewDto from(ScrapFeed scrapFeed)
-    {
-        return new FeedPreviewDto(scrapFeed.getFeed());
-    }
-
     protected FeedPreviewDto(Feed feed) {
         this.id = feed.getId();
 
-        this.thumbnailImageId = feed.getThumbnailImageId();
+        this.thumbnailUrl = ImageService.getUrlFromImage(feed.getThumbnail());
         this.ownerNickname = feed.getOwner().getNickname();
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();

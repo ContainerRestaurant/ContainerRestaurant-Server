@@ -3,6 +3,7 @@ package container.restaurant.server.web.dto.feed;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.container.Container;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
@@ -21,7 +22,7 @@ class FeedInfoDtoTest {
     @DisplayName("Feed 변환 테스트")
     void toFeedWith() {
         //given User, Restaurant, FeedInfoDto 가 주어졌을 때
-        long userId, restaurantId;
+        long userId, restaurantId, imageId;
 
         User user = mock(User.class);
         when(user.getId()).thenReturn(userId = 3L);
@@ -29,24 +30,27 @@ class FeedInfoDtoTest {
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.getId()).thenReturn(restaurantId = 5L);
 
+        Image thumbnail = mock(Image.class);
+        when(thumbnail.getId()).thenReturn(imageId = 6L);
+
         FeedInfoDto feedInfoDto = FeedInfoDto.builder()
                 .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
                 .category(Category.NIGHT_MEAL)
                 .difficulty(4)
-                .thumbnailImageId(1L)
+                .thumbnailImageId(imageId)
                 .content("test content")
                 .welcome(true)
                 .build();
 
         //when User, Restaurant 를 이용해 dto 를 Feed 로 변환하면
-        Feed feed = feedInfoDto.toFeedWith(user, restaurant);
+        Feed feed = feedInfoDto.toFeedWith(user, restaurant, thumbnail);
 
         //then User, Restaurant 와 dto 속성들이 잘 세팅되어있다.
         assertThat(feed.getOwner().getId()).isEqualTo(userId);
         assertThat(feed.getRestaurant().getId()).isEqualTo(restaurantId);
         assertThat(feed.getCategory()).isEqualTo(feedInfoDto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(feedInfoDto.getDifficulty());
-        assertThat(feed.getThumbnailImageId()).isEqualTo(feedInfoDto.getThumbnailImageId());
+        assertThat(feed.getThumbnail().getId()).isEqualTo(feedInfoDto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(feedInfoDto.getContent());
         assertThat(feed.getWelcome()).isEqualTo(feedInfoDto.getWelcome());
 

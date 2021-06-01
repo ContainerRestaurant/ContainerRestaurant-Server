@@ -34,7 +34,7 @@ public class ImageController {
     @GetMapping(value = "{path}")
     public RedirectView getImageFile(@PathVariable String path) {
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(imageService.getUrlFromPath(path));
+        redirectView.setUrl(ImageService.getUrlFromPath(path));
         return redirectView;
     }
 }

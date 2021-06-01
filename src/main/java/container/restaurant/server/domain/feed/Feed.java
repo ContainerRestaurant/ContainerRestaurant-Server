@@ -2,6 +2,7 @@ package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseTimeEntity;
 import container.restaurant.server.domain.feed.container.Container;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
@@ -39,7 +40,8 @@ public class Feed extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed")
     private List<Container> containerList;
 
-    private Long thumbnailImageId;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Image thumbnail;
 
     @Size(max = 500)
     private String content;
@@ -69,11 +71,11 @@ public class Feed extends BaseTimeEntity {
     @Builder
     protected Feed(
             User owner, Restaurant restaurant, Category category, List<Container> menus,
-            Long thumbnailImageId, String content, Boolean welcome, Integer difficulty
+            Image thumbnail, String content, Boolean welcome, Integer difficulty
     ) {
         this.owner = owner;
         this.restaurant = restaurant;
-        this.thumbnailImageId = thumbnailImageId;
+        this.thumbnail = thumbnail;
         this.category = category;
         this.content = content;
         this.welcome = welcome != null ? welcome : false;
@@ -127,8 +129,8 @@ public class Feed extends BaseTimeEntity {
         this.category = category;
     }
 
-    public void setThumbnailImageId(Long thumbnailImageId) {
-        this.thumbnailImageId = thumbnailImageId;
+    public void setThumbnail(Image thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public void setContent(String content) {
