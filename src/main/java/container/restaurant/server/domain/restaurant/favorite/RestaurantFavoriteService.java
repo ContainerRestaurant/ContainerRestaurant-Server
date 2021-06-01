@@ -58,7 +58,7 @@ public class RestaurantFavoriteService {
         return restaurantFavoriteRepository.findAllByUser(user)
                 .stream()
                 .map(restaurantFavorite -> {
-                    Image image = imageService.findById(restaurantFavorite.getRestaurant().getImage_ID());
+                    Image image = imageService.findById(restaurantFavorite.getRestaurant().getThumbnail().getId());
                     return RestaurantFavoriteDto.from(restaurantFavorite, image);
                 })
                 .collect(Collectors.toList());

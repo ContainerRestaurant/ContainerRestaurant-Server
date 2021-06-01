@@ -3,6 +3,8 @@ package container.restaurant.server.domain.comment;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.user.User;
@@ -34,14 +36,21 @@ class CommentRepositoryTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ImageRepository imageRepository;
 
     protected User user;
     protected Restaurant restaurant;
+    protected Image image;
     List<Feed> feeds = new ArrayList<>();
     List<Comment> comments = new ArrayList<>();
 
     @BeforeEach
     void beforeEach() {
+        image = imageRepository.save(Image.builder()
+                .url("test.url")
+                .build());
+
         user = userRepository.save(User.builder()
                 .email("test@test.com")
                 .profile("https://test")
@@ -52,7 +61,7 @@ class CommentRepositoryTest {
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(1L)
+                .thumbnail(image)
                 .build());
 
         for (int i = 0; i < 3; i++) {

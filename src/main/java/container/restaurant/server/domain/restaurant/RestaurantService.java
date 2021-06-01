@@ -24,7 +24,7 @@ public class RestaurantService {
     @Transactional(readOnly = true)
     public RestaurantInfoDto getRestaurantInfoById(Long id) {
         Restaurant restaurant = findById(id);
-        Image image = imageService.findById(restaurant.getImage_ID());
+        Image image = imageService.findById(restaurant.getThumbnail().getId());
         return RestaurantInfoDto.from(restaurant, image);
     }
 
@@ -33,7 +33,7 @@ public class RestaurantService {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
                 .map(restaurant -> {
-                    Image image = imageService.findById(restaurant.getImage_ID());
+                    Image image = imageService.findById(restaurant.getThumbnail().getId());
                     return RestaurantNearInfoDto.from(restaurant, image);
                 })
                 .collect(Collectors.toList());

@@ -641,7 +641,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(image.getId())
+                .thumbnail(image)
                 .build());
 
         List<Feed> list = new ArrayList<>();

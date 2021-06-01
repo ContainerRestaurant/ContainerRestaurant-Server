@@ -61,7 +61,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(image.getId())
+                .thumbnail(image)
                 .build());
         myFeed = feedRepository.save(Feed.builder()
                 .owner(myself)
