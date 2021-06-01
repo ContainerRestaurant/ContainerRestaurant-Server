@@ -1,5 +1,6 @@
 package container.restaurant.server.web.linker;
 
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.web.ImageController;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
@@ -25,5 +26,9 @@ public class ImageLinker {
         return linkTo(proxy.getImageFile(path));
     }
 
+    public String getImageURL(Image image) {
+
+        return image != null ? getImage(image.getUrl()).toString() : null;
+    }
 
 }

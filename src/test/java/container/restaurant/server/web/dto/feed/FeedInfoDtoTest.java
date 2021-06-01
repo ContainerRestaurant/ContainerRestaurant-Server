@@ -5,6 +5,7 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.container.Container;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class FeedInfoDtoTest {
         when(restaurant.getId()).thenReturn(restaurantId = 5L);
 
         FeedInfoDto feedInfoDto = FeedInfoDto.builder()
-                .restaurant(restaurant)
+                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
                 .category(Category.NIGHT_MEAL)
                 .difficulty(4)
                 .thumbnailImageId(1L)

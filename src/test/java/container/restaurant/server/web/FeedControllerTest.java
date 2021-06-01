@@ -13,6 +13,7 @@ import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedMenuDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -350,7 +351,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         //given
         List<Feed> list = saveFeeds();
         Feed lastFeed = null;
-        for (int i = 0; i < 10; i+=3) {
+        for (int i = 0; i < 10; i += 3) {
             scrapFeedRepository.save(ScrapFeed.of(myself, list.get(i)));
             lastFeed = list.get(i);
             // 각 스크랩간에 생성 시간차를 두기위해 잠시 대기
@@ -379,7 +380,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
 
     @Test
     @DisplayName("카테고리 필터링과 정렬 테스트")
-    public void testCategoryFilter() throws Exception{
+    public void testCategoryFilter() throws Exception {
         //given
         List<Feed> list = saveFeeds();
         Feed testFeed = list.get(list.size() - 1);
@@ -403,7 +404,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                         "필터링할 카테고리 (대소문자 구분 X)"),
                                 parameterWithName("sort").description(
                                         "정렬 방식 [createdDate|likeCount|difficulty],[ASC,DESC] +\n" +
-                                        "기본값: createdDate,DESC"),
+                                                "기본값: createdDate,DESC"),
                                 parameterWithName("size").description(
                                         "페이지당 피드 개수 +\n기본값: 20"),
                                 parameterWithName("page").description(
@@ -417,7 +418,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     public void testCreateFeed() throws Exception {
         //given
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurant(restaurant)
+                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
                 .category(Category.KOREAN)
                 .difficulty(3)
                 .welcome(true)
@@ -443,7 +444,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(header().string("Location", Matchers.containsString("/api/feed/")))
                 .andDo(document("feed-create",
                         requestFields(
-                                subsectionWithPath("restaurant").description("등록할 식당의 식별값"),
+                                subsectionWithPath("restaurantCreateDto").description("등록할 식당의 식별값"),
                                 fieldWithPath("category").description("음식의 카테고리"),
                                 subsectionWithPath("mainMenu").description("메인 음식 리스트"),
                                 subsectionWithPath("subMenu").description("반찬 리스트"),
@@ -481,11 +482,11 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         //given
         Feed feed = myFeed;
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurant(restaurant)
+                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())
-                .thumbnailImageId(myFeed.getThumbnailImageId()+1)
+                .thumbnailImageId(myFeed.getThumbnailImageId() + 1)
                 .content("update feed!")
                 .mainMenu(List.of(FeedMenuDto.builder()
                         .menuName("rice cake")
@@ -506,7 +507,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andDo(document("feed-update",
                         requestFields(
-                                subsectionWithPath("restaurant").description("등록할 식당의 식별값"),
+                                subsectionWithPath("restaurantCreateDto").description("등록할 식당의 식별값"),
                                 fieldWithPath("category").description("음식의 카테고리"),
                                 subsectionWithPath("mainMenu").description("메인 음식 리스트"),
                                 subsectionWithPath("subMenu").description("반찬 리스트"),
@@ -538,7 +539,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())
-                .thumbnailImageId(myFeed.getThumbnailImageId()+1)
+                .thumbnailImageId(myFeed.getThumbnailImageId() + 1)
                 .content("update feed!")
                 .build();
 
@@ -623,7 +624,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         Map<String, String> map =
                 mapper.readValue(
                         res.getResponse().getContentAsString(StandardCharsets.UTF_8),
-                        new TypeReference<HashMap<String, String>>(){});
+                        new TypeReference<HashMap<String, String>>() {
+                        });
 
         //expect
         for (Category category : Category.values()) {
@@ -646,11 +648,11 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         for (int i = 0; i < 10; i++) {
             list.add(feedRepository.save(Feed.builder()
                     .owner(i % 2 == 0 ? myself : other)
-                    .restaurant(i % 2 == 0? tempRestaurant : restaurant)
+                    .restaurant(i % 2 == 0 ? tempRestaurant : restaurant)
                     .difficulty(4)
                     .category(Category.JAPANESE)
                     .welcome(true)
-                    .thumbnailImageId(myFeed.getThumbnailImageId()+1)
+                    .thumbnailImageId(myFeed.getThumbnailImageId() + 1)
                     .content("Feed Content")
                     .build()));
             // 각 피드간에 생성시간차를 두기위해 잠시 대기
