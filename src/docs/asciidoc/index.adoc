@@ -279,6 +279,7 @@ operation::feed-comments[snippets='curl-request,http-response,response-fields']
 
 [[comment-update]]
 === 댓글 수정
+`PATCH /api/comment/[수정할_댓글_ID]`
 
 operation::comment-update[snippets='curl-request,http-response']
 
