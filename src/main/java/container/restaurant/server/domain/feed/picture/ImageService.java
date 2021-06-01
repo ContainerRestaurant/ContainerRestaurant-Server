@@ -2,7 +2,7 @@ package container.restaurant.server.domain.feed.picture;
 
 
 import com.google.gson.JsonObject;
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.utils.MultipartUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

@@ -1,7 +1,7 @@
 package container.restaurant.server.web.util;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.web.dto.ErrorDto;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
