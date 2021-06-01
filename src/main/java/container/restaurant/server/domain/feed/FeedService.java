@@ -134,7 +134,7 @@ public class FeedService {
     @Transactional
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
-        Restaurant restaurant = restaurantService.findByRestaurantCreateDto(dto.getRestaurantCreateDto());
+        Restaurant restaurant = restaurantService.findByDto(dto.getRestaurantCreateDto());
 
         statisticsService.addRecentUser(user);
         user.feedCountUp();

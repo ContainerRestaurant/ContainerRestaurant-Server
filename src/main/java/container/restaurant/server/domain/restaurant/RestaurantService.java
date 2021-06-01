@@ -55,16 +55,8 @@ public class RestaurantService {
     }
 
     @Transactional
-    public Restaurant findByRestaurantCreateDto(RestaurantCreateDto restaurantCreateDto) {
-        return restaurantRepository.findByName(restaurantCreateDto.getName())
-                .orElseGet(() ->
-                        restaurantRepository.save(
-                                Restaurant.builder()
-                                        .addr(restaurantCreateDto.getAddress())
-                                        .name(restaurantCreateDto.getName())
-                                        .lat(restaurantCreateDto.getLatitude())
-                                        .lon(restaurantCreateDto.getLongitude())
-                                        .build()));
-
+    public Restaurant findByDto(RestaurantCreateDto dto) {
+        return restaurantRepository.findByName(dto.getName())
+                .orElseGet(() -> restaurantRepository.save(dto.toEntity()));
     }
 }

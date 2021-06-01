@@ -26,4 +26,13 @@ public class RestaurantCreateDto  {
         this.longitude = restaurant.getLongitude();
     }
 
+    public Restaurant toEntity() {
+        return Restaurant.builder()
+                .name(name)
+                .addr(address)
+                .lat(latitude)
+                .lon(longitude)
+                .build();
+    }
+
 }
