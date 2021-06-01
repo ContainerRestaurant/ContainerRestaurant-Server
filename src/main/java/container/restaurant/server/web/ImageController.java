@@ -4,10 +4,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.web.linker.ImageLinker;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 @RequiredArgsConstructor
@@ -23,9 +19,6 @@ import java.net.URISyntaxException;
 @RequestMapping("/api/image")
 public class ImageController {
 
-    @Value("${server.image.base.url}")
-    private String BASE_URL;
-    private final String DEFAULT_PATH = "/api/image/";
     final private ImageService imageService;
 
     final private ImageLinker imageLinker;
@@ -41,7 +34,7 @@ public class ImageController {
     @GetMapping(value = "{path}")
     public RedirectView getImageFile(@PathVariable String path) {
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(BASE_URL + DEFAULT_PATH + path);
+        redirectView.setUrl(imageService.getUrlFromPath(path));
         return redirectView;
     }
 }
