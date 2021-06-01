@@ -119,6 +119,7 @@ public class FeedController {
                                 Category::getKorean)));
     }
 
+    // TODO Linker 모듈에 setLinks 자체의 책임을 주는 방법을 고민해보자
     private FeedDetailDto setLinks(FeedDetailDto dto, Long loginId) {
         boolean isOwner = dto.getOwnerId().equals(loginId);
         return dto
