@@ -27,7 +27,7 @@ public class CommentController {
     private final CommentLinker commentLinker;
     private final ReportLinker reportLinker;
 
-    @PostMapping("{feedId}")
+    @PostMapping("feed/{feedId}")
     public ResponseEntity<?> createComment(
             @RequestBody CommentCreateDto commentCreateDto,
             @PathVariable Long feedId,

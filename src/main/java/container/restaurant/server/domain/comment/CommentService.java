@@ -35,14 +35,10 @@ public class CommentService {
         Feed feed = feedService.findById(feedId);
         User user = userService.findById(userId);
 
-        Comment comment;
-        if (commentCreateDto.getUpperReplyId() == null) {
-            comment = new Comment(user, feed, commentCreateDto.getContent());
-        } else {
-            Comment upperReply = findById(commentCreateDto.getUpperReplyId());
-            upperReply.setIsHaveReply();
-            comment = new Comment(commentCreateDto, feed, user, upperReply);
-        }
+        Comment upperReply = ofNullable(commentCreateDto.getUpperReplyId())
+                .map(id -> this.findById(id).setIsHaveReply())
+                .orElse(null);
+        Comment comment = commentCreateDto.toEntityWith(user, feed, upperReply);
         feed.commentCountUp();
 
         publisher.publishEvent(new FeedCommentedEvent(comment));
