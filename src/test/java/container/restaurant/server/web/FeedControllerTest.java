@@ -6,7 +6,6 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLike;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
-import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
@@ -25,7 +24,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -44,9 +46,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     private static final String LIST_PATH = "_embedded.feedPreviewDtoList";
 
     @Autowired
-    private ImageRepository imageRepository;
-
-    @Autowired
     private ScrapFeedRepository scrapFeedRepository;
 
     @Autowired
@@ -60,7 +59,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         feedHitRepository.deleteAll();
         feedLikeRepository.deleteAll();
         scrapFeedRepository.deleteAll();
-        imageRepository.deleteAll();
         super.afterEach();
     }
 
