@@ -5,6 +5,7 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.container.Container;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.util.List;
 public class FeedInfoDto {
 
     @NotNull
-    private final Restaurant restaurant;
+    private final RestaurantCreateDto restaurantCreateDto;
 
     @NotNull
     private final Category category;

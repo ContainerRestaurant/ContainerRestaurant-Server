@@ -3,6 +3,7 @@ package container.restaurant.server.domain.restaurant;
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,20 +54,16 @@ public class RestaurantService {
                         "존재하지 않는 식당입니다.(id:" + id + ")"));
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Restaurant> findByName(String name) {
-        return restaurantRepository.findByName(name);
-    }
-
-    public Restaurant save(Restaurant restaurant) {
-        return findByName(restaurant.getName())
+    @Transactional
+    public Restaurant findByRestaurantCreateDto(RestaurantCreateDto restaurantCreateDto) {
+        return restaurantRepository.findByName(restaurantCreateDto.getName())
                 .orElseGet(() ->
                         restaurantRepository.save(
                                 Restaurant.builder()
-                                        .addr(restaurant.getAddress())
-                                        .name(restaurant.getName())
-                                        .lat(restaurant.getLatitude())
-                                        .lon(restaurant.getLongitude())
+                                        .addr(restaurantCreateDto.getAddress())
+                                        .name(restaurantCreateDto.getName())
+                                        .lat(restaurantCreateDto.getLatitude())
+                                        .lon(restaurantCreateDto.getLongitude())
                                         .build()));
 
     }

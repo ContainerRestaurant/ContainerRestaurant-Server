@@ -134,7 +134,7 @@ public class FeedService {
     @Transactional
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
-        Restaurant restaurant = restaurantService.save(dto.getRestaurant());
+        Restaurant restaurant = restaurantService.findByRestaurantCreateDto(dto.getRestaurantCreateDto());
 
         statisticsService.addRecentUser(user);
         user.feedCountUp();
@@ -162,7 +162,7 @@ public class FeedService {
         List<Container> newMenus = dto.toContainerListWith(feed, feed.getRestaurant());
         List<Container> toDelete = feed.getContainerList();
 
-        Restaurant restaurant = restaurantService.findById(dto.getRestaurant().getId());
+        Restaurant restaurant = restaurantService.findById(dto.getRestaurantCreateDto().getId());
         if (!feed.getRestaurant().getId().equals(restaurant.getId())) {
             // 식당이 바뀐 경우 식당을 업데이트하고, 기존 모든 메뉴 삭제
             feed.setRestaurant(restaurant);
