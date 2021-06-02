@@ -62,10 +62,8 @@ public class FeedService {
         if (loginId != null && !checkHit(loginId, feedId))
             updateHit(loginId, feedId);
 
-        Feed feed = findById(feedId);
         return FeedDetailDto.builder()
-                .feed(feed)
-                .thumbnailUrl(ImageService.getUrlFromImage(feed.getThumbnail()))
+                .feed(findById(feedId))
                 .isLike(feedLikeRepository.existsByUserIdAndFeedId(loginId, feedId))
                 .isScraped(scrapFeedRepository.existsByUserIdAndFeedId(loginId, feedId))
                 .build();
