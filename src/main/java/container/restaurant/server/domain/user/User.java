@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
+import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,7 +44,9 @@ public class User extends BaseCreatedTimeEntity {
 
     private Boolean banned;
 
-    private String pushToken;
+    @OneToOne
+    private PushToken pushToken;
+
     @Builder
     protected User(String email, String profile, String nickname) {
         this.email = email;
@@ -57,7 +60,6 @@ public class User extends BaseCreatedTimeEntity {
         this.bookmarkedCount = 0;
         this.role = Role.USER;
         this.banned = false;
-        this.pushToken = "";
 
     }
 
@@ -114,5 +116,9 @@ public class User extends BaseCreatedTimeEntity {
         } else {
             this.level = 4;
         }
+    }
+
+    public void setPushToken(PushToken pushToken) {
+        this.pushToken = pushToken;
     }
 }

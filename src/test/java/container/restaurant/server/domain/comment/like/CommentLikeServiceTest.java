@@ -73,7 +73,7 @@ class CommentLikeServiceTest {
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(image.getId())
+                .thumbnail(image)
                 .build());
 
         feed = feedRepository.save(Feed.builder()

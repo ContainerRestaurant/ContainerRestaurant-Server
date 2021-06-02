@@ -83,7 +83,7 @@ public class FeedRepositoryTest {
                     .addr("address")
                     .lat(1f)
                     .lon(1f)
-                    .image_ID(image.getId())
+                    .thumbnail(image)
                     .build()));
         }
         restaurants = restaurantRepository.saveAll(restaurants);

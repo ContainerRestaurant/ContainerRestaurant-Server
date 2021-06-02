@@ -4,7 +4,7 @@ import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
-import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.web.dto.user.NicknameExistsDto;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;

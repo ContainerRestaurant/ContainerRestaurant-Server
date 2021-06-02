@@ -2,6 +2,7 @@ package container.restaurant.server.domain.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import container.restaurant.server.domain.base.BaseEntity;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import org.locationtech.jts.geom.Point;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -41,8 +43,8 @@ public class Restaurant extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     private List<Menu> menu;
 
-    @NotNull
-    private Long image_ID;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Image thumbnail;
 
     @ColumnDefault("0")
     private int vanishCount;
@@ -58,13 +60,13 @@ public class Restaurant extends BaseEntity {
 
     @SneakyThrows
     @Builder
-    protected Restaurant(String name, String addr, double lon, double lat, Long image_ID) {
+    protected Restaurant(String name, String addr, double lon, double lat, Image thumbnail) {
         this.name = name;
         this.address = addr;
         this.location = createPointType(lat, lon);
         this.longitude = lon;
         this.latitude = lat;
-        this.image_ID = image_ID;
+        this.thumbnail = thumbnail;
     }
 
     public void favoriteCountUp() {

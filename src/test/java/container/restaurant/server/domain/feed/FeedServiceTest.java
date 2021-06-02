@@ -2,12 +2,14 @@ package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.BaseServiceTest;
 import container.restaurant.server.domain.feed.container.Container;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedMenuDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -33,6 +35,8 @@ class FeedServiceTest extends BaseServiceTest {
     private User user;
     @Mock
     private Restaurant restaurant;
+    @Mock
+    private Image thumbnail;
 
     private List<Container> mainMenus;
     private List<Container> subMenus;
@@ -82,7 +86,8 @@ class FeedServiceTest extends BaseServiceTest {
         // given
         when(feedRepository.save(any())).thenReturn(feed);
         when(userService.findById(user.getId())).thenReturn(user);
-        when(restaurantService.findById(restaurant.getId())).thenReturn(restaurant);
+        when(restaurantService.findByDto(any())).thenReturn(restaurant);
+        when(imageService.findById(any())).thenReturn(thumbnail);
 
         FeedMenuDto mainMenuDto = FeedMenuDto.builder()
                 .menuName("mainMenu")
@@ -95,13 +100,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(restaurant.getId())
+                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(mainMenuDto))
                 .subMenu(List.of(subMenuDto))
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("test url")
+                .thumbnailImageId(thumbnail.getId())
                 .content("this is new Feed")
                 .build();
 
@@ -117,7 +122,7 @@ class FeedServiceTest extends BaseServiceTest {
         assertThat(saved.getCategory()).isEqualTo(dto.getCategory());
         assertThat(saved.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(saved.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(saved.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(saved.getThumbnail().getId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(saved.getContent()).isEqualTo(dto.getContent());
 
         verify(containerService).save(containersCaptor.capture());
@@ -169,13 +174,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(restaurant.getId())
+                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("test url")
+                .thumbnailImageId(thumbnail.getId())
                 .content("this is new Feed")
                 .build();
 
@@ -183,11 +188,11 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.updateFeed(feed.getId(), dto, user.getId());
 
         //then
-        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantId());
+        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantCreateDto().getId());
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getThumbnail().getId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
 
         assertThat(feed.getContainerList())
@@ -233,13 +238,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantId(newRestaurant.getId())
+                .restaurantCreateDto(RestaurantInfoDto.from(newRestaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())
                 .difficulty(3)
                 .welcome(true)
-                .thumbnailUrl("test url")
+                .thumbnailImageId(thumbnail.getId())
                 .content("this is new Feed")
                 .build();
 
@@ -247,11 +252,11 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.updateFeed(feed.getId(), dto, user.getId());
 
         //then
-        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantId());
+        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantCreateDto().getId());
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
-        assertThat(feed.getThumbnailUrl()).isEqualTo(dto.getThumbnailUrl());
+        assertThat(feed.getThumbnail().getId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(dto.getContent());
 
         assertThat(feed.getContainerList())
@@ -291,6 +296,7 @@ class FeedServiceTest extends BaseServiceTest {
         when(feed.getId()).thenReturn(2L);
         when(restaurant.getId()).thenReturn(3L);
         when(feedRepository.findById(feed.getId())).thenReturn(of(feed));
+        when(imageService.findById(any())).thenReturn(thumbnail);
     }
 
     private void assertEqualsMenuAndDto(List<Container> containerList, List<FeedMenuDto> dtoList) {

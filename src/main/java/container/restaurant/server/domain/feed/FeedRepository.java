@@ -14,36 +14,36 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Override
     @NonNull
-    @EntityGraph(attributePaths = {"owner", "restaurant", "containerList", "containerList.menu"})
+    @EntityGraph(attributePaths = { "owner", "thumbnail", "restaurant", "containerList", "containerList.menu" })
     Optional<Feed> findById(@NonNull Long id);
 
     @Override
     @NonNull
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAll(@NonNull Pageable pageable);
 
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByOwnerId(Long userId, Pageable pageable);
 
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByRestaurantId(Long restaurantId, Pageable pageable);
 
-    @Query("select f from TB_FEED f join f.scrapedBy s where s.user.id = ?1")
+    @Query("select f from TB_FEED f join f.scrapedBy s join f.owner left join f.thumbnail where s.user.id = ?1")
     Page<Feed> findAllByScraperId(Long userId, Pageable pageable);
 
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByCategory(Pageable pageable, Category category);
 
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByOwnerIdAndCategory(Long userId, Pageable pageable, Category category);
 
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByRestaurantIdAndCategory(Long restaurantId, Pageable pageable, Category category);
 
-    @Query("select f from TB_FEED f join f.scrapedBy s where s.user.id = ?1 and f.category = ?2")
+    @Query("select f from TB_FEED f join f.scrapedBy s join f.owner left join f.thumbnail where s.user.id = ?1 and f.category = ?2")
     Page<Feed> findAllByScraperIdAndCategory(Long userId, Pageable pageable, Category category);
 
-    @EntityGraph(attributePaths = { "owner" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByCreatedDateBetweenOrderByCreatedDateDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
 }

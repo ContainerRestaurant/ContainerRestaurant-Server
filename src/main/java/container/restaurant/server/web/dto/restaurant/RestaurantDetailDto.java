@@ -6,9 +6,8 @@ import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
 @Getter
-public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInfoDto> {
+public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto> {
 
-    private final Long id;
     private final String name;
     private final String address;
     private final double latitude;
@@ -17,12 +16,11 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
     private final Integer feedCount;
     private final Float difficultyAvg;
 
-    public static RestaurantNearInfoDto from(Restaurant restaurant) {
-        return new RestaurantNearInfoDto(restaurant);
+    public static RestaurantDetailDto from(Restaurant restaurant) {
+        return new RestaurantDetailDto(restaurant);
     }
 
-    protected RestaurantNearInfoDto(Restaurant restaurant) {
-        this.id = restaurant.getId();
+    protected RestaurantDetailDto(Restaurant restaurant) {
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();
@@ -30,7 +28,6 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
         this.feedCount = restaurant.getFeedCount();
         this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
-
     }
 
 }

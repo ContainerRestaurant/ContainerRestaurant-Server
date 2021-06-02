@@ -1,6 +1,6 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;

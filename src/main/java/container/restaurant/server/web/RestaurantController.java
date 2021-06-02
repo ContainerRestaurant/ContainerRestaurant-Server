@@ -1,7 +1,7 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.domain.restaurant.RestaurantService;
-import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -23,7 +23,7 @@ public class RestaurantController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        RestaurantInfoDto restaurantInfoDto = restaurantService.getRestaurantInfoById(id);
+        RestaurantDetailDto restaurantInfoDto = restaurantService.getRestaurantInfoById(id);
         return ResponseEntity.ok(EntityModel.of(restaurantInfoDto)
                 .add(linkTo(getController().findById(id)).withSelfRel())
                 .add(linkTo(ImageController.class).slash(restaurantInfoDto.getImage_path()).withRel("image-url"))

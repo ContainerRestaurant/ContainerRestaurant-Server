@@ -1,7 +1,8 @@
 package container.restaurant.server.web.util;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.exception.UsingPushTokenException;
+import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.web.dto.ErrorDto;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,10 @@ public class ExceptionAdvice {
         return response(HttpStatus.FORBIDDEN, e);
     }
 
+    @ExceptionHandler(UsingPushTokenException.class)
+    public ResponseEntity<?> authorizationException(UsingPushTokenException e) {
+        return response(HttpStatus.FORBIDDEN, e);
+    }
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> constraintViolationException(ConstraintViolationException e) {
         return response(HttpStatus.BAD_REQUEST, e);

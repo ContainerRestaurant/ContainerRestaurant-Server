@@ -1,7 +1,7 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import org.hamcrest.Matchers;
@@ -143,7 +143,8 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andDo(document("patch-user",
                         requestFields(
                                 fieldWithPath("nickname").description("변경할 닉네임"),
-                                fieldWithPath("profile").description("변경할 프로필 사진 경로")
+                                fieldWithPath("profile").description("변경할 프로필 사진 경로"),
+                                fieldWithPath("pushToken").description("변경할 푸시 토큰 아이디")
                         )));
     }
 

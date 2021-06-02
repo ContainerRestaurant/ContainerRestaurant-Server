@@ -1,5 +1,6 @@
 package container.restaurant.server.web.dto.user;
 
+import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import lombok.Builder;
@@ -17,10 +18,13 @@ public class UserUpdateDto {
     @URL(message = "프로필의 URL 형식이 잘못되었습니다.")
     private String profile;
 
+    private PushToken pushToken;
+
     @Builder
-    protected UserUpdateDto(String nickname, String profile) {
+    protected UserUpdateDto(String nickname, String profile, PushToken pushToken) {
         this.nickname = nickname;
         this.profile = profile;
+        this.pushToken = pushToken;
     }
 
     public void updateUser(User user) {
@@ -28,6 +32,8 @@ public class UserUpdateDto {
             user.setNickname(nickname);
         if (profile != null)
             user.setProfile(profile);
+        if (pushToken != null)
+            user.setPushToken(pushToken);
     }
 
 }
