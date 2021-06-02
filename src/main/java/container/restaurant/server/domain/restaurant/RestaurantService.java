@@ -1,6 +1,6 @@
 package container.restaurant.server.domain.restaurant;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
