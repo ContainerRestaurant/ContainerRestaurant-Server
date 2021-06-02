@@ -68,4 +68,9 @@ public class UserService {
     public List<User> findByFeedCountTopUsers(LocalDateTime to, LocalDateTime from) {
         return userRepository.findByFeedCountTopUsers(to, from);
     }
+
+    @Transactional(readOnly = true)
+    public User findByPushTokenId(Long pushTokenId) {
+        return userRepository.findByPushTokenId(pushTokenId);
+    }
 }
