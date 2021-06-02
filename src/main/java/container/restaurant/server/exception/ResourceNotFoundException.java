@@ -1,4 +1,4 @@
-package container.restaurant.server.domain.exception;
+package container.restaurant.server.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

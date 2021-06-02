@@ -25,7 +25,7 @@ public class RecommendFeedService {
 
     private final FeedService feedService;
 
-    private CollectionModel<FeedPreviewDto> recommendFeeds = CollectionModel.of(List.of());
+    private List<Feed> recommendFeeds = List.of();
 
     private final static int DEFAULT_PAGE_SIZE = 1000;
     private final static Pageable DEFAULT_PAGEABLE = PageRequest.of(0, DEFAULT_PAGE_SIZE);
@@ -33,7 +33,9 @@ public class RecommendFeedService {
 
 
     public CollectionModel<FeedPreviewDto> getRecommendFeeds() {
-        return recommendFeeds;
+        return CollectionModel.of(recommendFeeds.stream()
+                .map(FeedPreviewDto::from)
+                .collect(Collectors.toList()));
     }
 
     @PostConstruct
@@ -53,9 +55,7 @@ public class RecommendFeedService {
             page = feedService.findForUpdatingRecommend(from, to, p);
         }
 
-        recommendFeeds = CollectionModel.of(queue.getList().stream()
-                .map(FeedPreviewDto::from)
-                .collect(Collectors.toList()));
+        recommendFeeds = queue.getList();
     }
 
     public void setPageSize(int pageSize) {

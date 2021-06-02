@@ -1,6 +1,6 @@
 package container.restaurant.server.domain.user;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 

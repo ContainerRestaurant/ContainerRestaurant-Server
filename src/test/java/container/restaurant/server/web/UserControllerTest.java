@@ -1,7 +1,7 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.exceptioin.FailedAuthorizationException;
+import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import org.hamcrest.Matchers;
