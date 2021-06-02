@@ -26,9 +26,4 @@ public class ImageLinker {
         return linkTo(proxy.getImageFile(path));
     }
 
-    public String getImageURL(Image image) {
-
-        return image != null ? getImage(image.getUrl()).toString() : null;
-    }
-
 }

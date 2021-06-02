@@ -4,8 +4,8 @@ package container.restaurant.server.domain.feed.picture;
 import com.google.gson.JsonObject;
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
 import container.restaurant.server.utils.MultipartUtility;
+import container.restaurant.server.web.linker.ImageLinker;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,15 +16,15 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-@Log4j2
 public class ImageService {
 
     @Value("${server.image.base.url}")
-    private static String BASE_URL;
+    private String BASE_URL;
     private static final String DEFAULT_PATH = "/api/image/";
 
     private final ImageRepository imageRepository;
     private final MultipartUtility multipartUtility;
+    private static final ImageLinker imageLinker = new ImageLinker();
 
     public Image upload(MultipartFile imageFile) throws IOException {
         multipartUtility.init();
@@ -49,7 +49,11 @@ public class ImageService {
                 .orElse(null);
     }
 
-    public static String getUrlFromPath(String path) {
+    public String getFileServerUrl(String path) {
         return String.join("", BASE_URL, DEFAULT_PATH, path);
+    }
+
+    public static String getUrlFromPath(String path) {
+        return imageLinker.getImage(path).toString();
     }
 }
