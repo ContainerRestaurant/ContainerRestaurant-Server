@@ -165,7 +165,7 @@ public class FeedService {
     }
 
     private void updateRelationalAttrs(Feed feed, FeedInfoDto dto) {
-        if (feed.getThumbnail() != null && !dto.getThumbnailImageId().equals(feed.getThumbnail().getId()))
+        if (feed.getThumbnail() != null && !feed.getThumbnail().getId().equals(dto.getThumbnailImageId()))
             feed.setThumbnail(imageService.findById(dto.getThumbnailImageId()));
 
         // 업데이트할 리스트와 삭제할 리스트
