@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import container.restaurant.server.domain.push.FcmMessage;
+import container.restaurant.server.domain.push.PushToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;
@@ -25,8 +26,10 @@ public class FirebaseCloudMessageUtils {
 
     private final ObjectMapper objectMapper;
 
-    public void sendMessage(String target, String title, String body) throws IOException {
-        String message = makeMessage(target, title, body);
+    public void sendMessage(PushToken target, String title, String body) throws IOException {
+        // 타겟이 Null 일 때 종료
+        if (target == null) return;
+        String message = makeMessage(target.getToken(), title, body);
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
