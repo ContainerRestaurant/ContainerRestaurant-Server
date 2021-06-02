@@ -2,6 +2,8 @@ package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.picture.ImageService;
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -35,10 +37,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final Boolean isLike;
     private final Boolean isScraped;
 
-    public static FeedDetailDto from(Feed feed, Boolean isLike, Boolean isScraped) {
-        return new FeedDetailDto(feed, isLike, isScraped);
-    }
-
+    @Builder
     private FeedDetailDto(Feed feed, Boolean isLike, Boolean isScraped) {
         this.id = feed.getId();
         this.ownerId = feed.getOwner().getId();
@@ -47,7 +46,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.ownerNickname = feed.getOwner().getNickname();
         this.restaurantName = feed.getRestaurant().getName();
         this.category = feed.getCategory();
-        this.thumbnailUrl = feed.getThumbnailUrl();
+        this.thumbnailUrl = ImageService.getUrlFromImage(feed.getThumbnail());
         this.content = feed.getContent();
         this.welcome = feed.getWelcome();
         this.difficulty = feed.getDifficulty();

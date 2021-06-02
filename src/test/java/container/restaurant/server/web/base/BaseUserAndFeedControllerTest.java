@@ -61,7 +61,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .addr("address")
                 .lon(0f)
                 .lat(0f)
-                .image_ID(image.getId())
+                .thumbnail(image)
                 .build());
         myFeed = feedRepository.save(Feed.builder()
                 .owner(myself)
@@ -69,7 +69,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .difficulty(4)
                 .category(Category.JAPANESE)
                 .welcome(true)
-                .thumbnailUrl("https://my.thumbnail")
+                .thumbnail(image)
                 .content("Feed Content")
                 .build());
         othersFeed = feedRepository.save(Feed.builder()
@@ -78,7 +78,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .difficulty(3)
                 .category(Category.KOREAN)
                 .welcome(false)
-                .thumbnailUrl("https://others.thumbnail")
+                .thumbnail(image)
                 .build());
         myFeed.setContainerList(containerService.save(List.of(
                 Container.of(myFeed, Menu.mainOf(restaurant, "나의 메인 메뉴1"), "나의 메인 용기1"),

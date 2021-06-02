@@ -1,6 +1,5 @@
 package container.restaurant.server.web.dto.restaurant.favorite;
 
-import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavorite;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
 import lombok.Getter;
@@ -15,15 +14,15 @@ public class RestaurantFavoriteDto extends RepresentationModel<RestaurantFavorit
     private final String createDate;
     private final RestaurantNearInfoDto restaurant;
 
-    public static RestaurantFavoriteDto from(RestaurantFavorite restaurantFavorite, Image image) {
-        return new RestaurantFavoriteDto(restaurantFavorite, image);
+    public static RestaurantFavoriteDto from(RestaurantFavorite restaurantFavorite) {
+        return new RestaurantFavoriteDto(restaurantFavorite);
     }
 
-    protected RestaurantFavoriteDto(RestaurantFavorite restaurantFavorite, Image image) {
+    protected RestaurantFavoriteDto(RestaurantFavorite restaurantFavorite) {
         this.id = restaurantFavorite.getId();
         this.createDate = restaurantFavorite.getCreatedDate()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        this.restaurant = RestaurantNearInfoDto.from(restaurantFavorite.getRestaurant(), image);
+        this.restaurant = RestaurantNearInfoDto.from(restaurantFavorite.getRestaurant());
     }
 
 }

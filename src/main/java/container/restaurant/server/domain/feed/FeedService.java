@@ -6,6 +6,8 @@ import container.restaurant.server.domain.feed.container.ContainerService;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.push.event.FeedHitEvent;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
@@ -45,6 +47,7 @@ public class FeedService {
     private final StatisticsService statisticsService;
     private final ContainerService containerService;
     private final UserLevelFeedCountService userLevelFeedCountService;
+    private final ImageService imageService;
 
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
@@ -59,10 +62,11 @@ public class FeedService {
         if (loginId != null && !checkHit(loginId, feedId))
             updateHit(loginId, feedId);
 
-        return FeedDetailDto.from(
-                findById(feedId),
-                feedLikeRepository.existsByUserIdAndFeedId(loginId, feedId),
-                scrapFeedRepository.existsByUserIdAndFeedId(loginId, feedId));
+        return FeedDetailDto.builder()
+                .feed(findById(feedId))
+                .isLike(feedLikeRepository.existsByUserIdAndFeedId(loginId, feedId))
+                .isScraped(scrapFeedRepository.existsByUserIdAndFeedId(loginId, feedId))
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -134,14 +138,15 @@ public class FeedService {
     @Transactional
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
-        Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
+        Restaurant restaurant = restaurantService.findByDto(dto.getRestaurantCreateDto());
+        Image thumbnail = imageService.findById(dto.getThumbnailImageId());
 
         statisticsService.addRecentUser(user);
         user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
 
-        Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant));
+        Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant, thumbnail));
         containerService.save(dto.toContainerListWith(feed, restaurant));
         userLevelFeedCountService.levelFeedUp(feed);
         return feed.getId();
@@ -153,16 +158,19 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
 
-        dto.update(feed);
-        feedContainerUpdate(feed, dto);
+        dto.updateSimpleAttrs(feed);
+        updateRelationalAttrs(feed, dto);
     }
 
-    private void feedContainerUpdate(Feed feed, FeedInfoDto dto) {
+    private void updateRelationalAttrs(Feed feed, FeedInfoDto dto) {
+        if (feed.getThumbnail() != null && !feed.getThumbnail().getId().equals(dto.getThumbnailImageId()))
+            feed.setThumbnail(imageService.findById(dto.getThumbnailImageId()));
+
         // 업데이트할 리스트와 삭제할 리스트
         List<Container> newMenus = dto.toContainerListWith(feed, feed.getRestaurant());
         List<Container> toDelete = feed.getContainerList();
 
-        Restaurant restaurant = restaurantService.findById(dto.getRestaurantId());
+        Restaurant restaurant = restaurantService.findById(dto.getRestaurantCreateDto().getId());
         if (!feed.getRestaurant().getId().equals(restaurant.getId())) {
             // 식당이 바뀐 경우 식당을 업데이트하고, 기존 모든 메뉴 삭제
             feed.setRestaurant(restaurant);
