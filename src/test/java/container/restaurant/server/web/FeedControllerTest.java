@@ -13,7 +13,7 @@ import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedMenuDto;
-import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -415,7 +415,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     public void testCreateFeed() throws Exception {
         //given
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
+                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.KOREAN)
                 .difficulty(3)
                 .welcome(true)
@@ -479,7 +479,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
         //given
         Feed feed = myFeed;
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
+                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.KOREAN)
                 .difficulty(myFeed.getDifficulty() + 1)
                 .welcome(!myFeed.getWelcome())

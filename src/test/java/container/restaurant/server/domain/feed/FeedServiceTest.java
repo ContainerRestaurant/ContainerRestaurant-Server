@@ -9,7 +9,7 @@ import container.restaurant.server.domain.user.User;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedMenuDto;
-import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -100,7 +100,7 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
+                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(mainMenuDto))
                 .subMenu(List.of(subMenuDto))
@@ -174,7 +174,7 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantCreateDto(RestaurantCreateDto.from(restaurant))
+                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())
@@ -238,7 +238,7 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantCreateDto(RestaurantCreateDto.from(newRestaurant))
+                .restaurantCreateDto(RestaurantInfoDto.from(newRestaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())

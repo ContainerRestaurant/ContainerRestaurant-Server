@@ -1,8 +1,8 @@
 package container.restaurant.server.domain.restaurant;
 
 import container.restaurant.server.domain.exception.ResourceNotFoundException;
-import container.restaurant.server.web.dto.restaurant.RestaurantCreateDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,9 +18,9 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
 
     @Transactional(readOnly = true)
-    public RestaurantInfoDto getRestaurantInfoById(Long id) {
+    public RestaurantDetailDto getRestaurantInfoById(Long id) {
         Restaurant restaurant = findById(id);
-        return RestaurantInfoDto.from(restaurant);
+        return RestaurantDetailDto.from(restaurant);
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +47,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public Restaurant findByDto(RestaurantCreateDto dto) {
+    public Restaurant findByDto(RestaurantInfoDto dto) {
         return restaurantRepository.findByName(dto.getName())
                 .orElseGet(() -> restaurantRepository.save(dto.toEntity()));
     }
