@@ -1,7 +1,5 @@
 package container.restaurant.server.domain.restaurant.favorite;
 
-import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
@@ -22,7 +20,6 @@ public class RestaurantFavoriteService {
 
     private final UserService userService;
     private final RestaurantService restaurantService;
-    private final ImageService imageService;
 
     @Transactional
     public void userFavoriteRestaurant(Long userId, Long restaurantId) {
@@ -57,10 +54,7 @@ public class RestaurantFavoriteService {
 
         return restaurantFavoriteRepository.findAllByUser(user)
                 .stream()
-                .map(restaurantFavorite -> {
-                    Image image = imageService.findById(restaurantFavorite.getRestaurant().getThumbnail().getId());
-                    return RestaurantFavoriteDto.from(restaurantFavorite, image);
-                })
+                .map(RestaurantFavoriteDto::from)
                 .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,6 @@
 package container.restaurant.server.web.dto.restaurant;
 
-import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
@@ -16,18 +16,18 @@ public class RestaurantInfoDto extends RepresentationModel<RestaurantInfoDto> {
     private final Integer feedCount;
     private final Float difficultyAvg;
 
-    public static RestaurantInfoDto from(Restaurant restaurant, Image image) {
-        return new RestaurantInfoDto(restaurant, image);
+    public static RestaurantInfoDto from(Restaurant restaurant) {
+        return new RestaurantInfoDto(restaurant);
     }
 
-    protected RestaurantInfoDto(Restaurant restaurant, Image image) {
+    protected RestaurantInfoDto(Restaurant restaurant) {
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();
         this.longitude = restaurant.getLongitude();
         this.feedCount = restaurant.getFeedCount();
         this.difficultyAvg = restaurant.getDifficultyAvg();
-        this.image_path = image.getUrl();
+        this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
     }
 
 }
