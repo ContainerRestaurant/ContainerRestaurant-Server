@@ -257,6 +257,40 @@ operation::feed-like[snippets='curl-request,http-response,links']
 
 operation::feed-like-cancel[snippets='curl-request,http-response,links']
 
+[[comment]]
+== 댓글
+
+[[comment-create]]
+=== 댓글 작성
+`POST /api/comment/feed/[댓글_작성할_피드_ID]`
+
+operation::comment-create[snippets='curl-request,request-fields,http-response']
+
+응답 필드는 <<comment-info>> 참조
+
+[[feed-comments]]
+
+=== 피드의 댓글 조회
+`GET /api/comment/feed/[댓글_조회할_피드_ID]`
+
+operation::feed-comments[snippets='curl-request,http-response,response-fields']
+
+`commentInfoDtoList` 의 상세 필드는 <<comment-info>> 참조
+
+[[comment-update]]
+=== 댓글 수정
+`PATCH /api/comment/[수정할_댓글_ID]`
+
+operation::comment-update[snippets='curl-request,http-response']
+
+응답 필드는 <<comment-info>> 참조
+
+[[comment-info]]
+=== 댓글 정보
+<<comment-create>>, <<feed-comments>>, <<comment-update>> 의 응답 필드에 관한 추가 설명입니다.
+
+include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDtoList.adoc[]
+
 [[report]]
 == 신고
 
