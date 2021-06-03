@@ -366,13 +366,13 @@ operation::statistics-top[snippets='curl-request,http-response']
 == 푸시 토큰
 
 [[push-token-register]]
-== 푸시 토큰 등록
+=== 푸시 토큰 등록
 `POST /api/push/[푸시_토큰]`
 
 operation::push-token-register[snippets='curl-request,http-response']
 
-[[push-token-register]]
-== 푸시 토큰 삭제
+[[push-token-delete]]
+=== 푸시 토큰 삭제
 `DELETE /api/push/[푸시_토큰_ID]`
 
 operation::push-token-delete[snippets='curl-request,http-response']
