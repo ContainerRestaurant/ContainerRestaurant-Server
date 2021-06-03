@@ -58,7 +58,8 @@ class UserControllerTest extends BaseUserControllerTest {
                                 linkWithRel("delete").description("본 사용자의 계정 탈퇴 링크"),
                                 linkWithRel("nickname-exists").description("닉네임 중복 확인 링크, " +
                                         "템플릿으로 제공되어, {nickname}을 지정해야 사용이 가능하다."),
-                                linkWithRel("scraps").description("본 사용자가 스크랩한 피드 리스트")
+                                linkWithRel("scraps").description("본 사용자가 스크랩한 피드 리스트"),
+                                linkWithRel("restaurant-favorite").description("본 사용자가 즐겨찾기한 식당 리스트")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("본 사용자의 구분자 ID"),

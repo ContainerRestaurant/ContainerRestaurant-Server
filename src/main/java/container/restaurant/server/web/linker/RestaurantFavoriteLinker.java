@@ -1,10 +1,7 @@
 package container.restaurant.server.web.linker;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.web.ImageController;
-import container.restaurant.server.web.RestaurantController;
 import container.restaurant.server.web.RestaurantFavoriteController;
-import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
 
@@ -14,9 +11,6 @@ public class RestaurantFavoriteLinker {
 
     private final RestaurantFavoriteController proxy =
             DummyInvocationUtils.methodOn(RestaurantFavoriteController.class);
-
-    private final RestaurantController restaurantProxy =
-            DummyInvocationUtils.methodOn(RestaurantController.class);
 
     private final SessionUser u =
             DummyInvocationUtils.methodOn(SessionUser.class);
@@ -29,15 +23,8 @@ public class RestaurantFavoriteLinker {
         return linkTo(proxy.userCancelFavoriteRestaurant(u, restaurantId));
     }
 
-    public LinkBuilder userFindAllFavoriteRestaurant() {
-        return linkTo(proxy.userFindAllFavoriteRestaurant(u));
+    public LinkBuilder findAllByUser() {
+        return linkTo(proxy.findAllByUser(u));
     }
 
-    public LinkBuilder findRestaurantById(RestaurantNearInfoDto restaurantNearInfoDto) {
-        return linkTo(restaurantProxy.findById(restaurantNearInfoDto.getId()));
-    }
-
-    public LinkBuilder restaurantImagePath(String imagePath) {
-        return linkTo(ImageController.class).slash(imagePath);
-    }
 }

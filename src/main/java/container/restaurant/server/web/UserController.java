@@ -9,6 +9,7 @@ import container.restaurant.server.web.dto.user.NicknameExistsDto;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
 import container.restaurant.server.web.linker.FeedLinker;
+import container.restaurant.server.web.linker.RestaurantFavoriteLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class UserController {
 
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
+    private final RestaurantFavoriteLinker restaurantFavoriteLinker;
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(
@@ -88,8 +90,8 @@ public class UserController {
                         userLinker.updateUserById(dto.getId()).withRel("patch"),
                         userLinker.deleteById(dto.getId()).withRel("delete"),
                         userLinker.existsNickname().withRel("nickname-exists"),
-                        feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps")
-                        // TODO favorite link
+                        feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps"),
+                        restaurantFavoriteLinker.userFavoriteRestaurant(loginId).withRel("restaurant-favorite")
                 ));
     }
 
