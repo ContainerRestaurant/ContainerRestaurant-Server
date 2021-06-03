@@ -291,6 +291,21 @@ operation::comment-update[snippets='curl-request,http-response']
 
 include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDtoList.adoc[]
 
+[[restaurant]]
+== 식당
+
+[[restaurant-get]]
+=== 식당 정보
+`GET /api/restaurant/[식당_ID]`
+
+operation::restaurant-get[snippets='curl-request,http-response,response-fields,links']
+
+[[restaurant-vanish]]
+=== 식당 없어짐 알림
+`POST /api/restaurant/vanish/[없어진_식당_ID]`
+
+operation::restaurant-vanish[snippets='curl-request,http-response']
+
 [[report]]
 == 신고
 
