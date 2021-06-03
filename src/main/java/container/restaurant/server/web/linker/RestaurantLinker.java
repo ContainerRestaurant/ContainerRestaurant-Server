@@ -17,4 +17,12 @@ public class RestaurantLinker {
         return linkTo(proxy.findById(id));
     }
 
+    public LinkBuilder findNearByRestaurants(double latitude, double longitude, long radius) {
+        return linkTo(proxy.findNearByRestaurants(latitude, longitude, radius));
+    }
+
+    public LinkBuilder updateVanish(Long id) {
+        return linkTo(proxy.updateVanish(id));
+    }
+
 }

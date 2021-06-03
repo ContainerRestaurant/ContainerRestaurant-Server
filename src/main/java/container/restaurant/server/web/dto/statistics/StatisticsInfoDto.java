@@ -16,9 +16,9 @@ public class StatisticsInfoDto extends RepresentationModel<StatisticsInfoDto> im
         return new StatisticsInfoDto(statisticsUserDto, todyFeed);
     }
 
-    protected StatisticsInfoDto(List<StatisticsUserDto> statisticsUserDto, int todyFeed) {
+    protected StatisticsInfoDto(List<StatisticsUserDto> statisticsUserDto, int todayFeed) {
         this.statisticsUserDto = statisticsUserDto;
-        this.todayFeedCount = todyFeed;
+        this.todayFeedCount = todayFeed;
     }
 
 }

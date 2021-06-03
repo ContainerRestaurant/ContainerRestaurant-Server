@@ -49,7 +49,7 @@ public class RestaurantFavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public List<RestaurantFavoriteDto> userFindAllFavoriteRestaurant(Long userId) {
+    public List<RestaurantFavoriteDto> findAllByUserId(Long userId) {
         User user = userService.findById(userId);
 
         return restaurantFavoriteRepository.findAllByUser(user)
