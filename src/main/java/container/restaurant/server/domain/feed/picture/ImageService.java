@@ -38,9 +38,11 @@ public class ImageService {
 
     @Transactional(readOnly = true)
     public Image findById(Long id) {
-        return imageRepository.findById(id)
+        return Optional.ofNullable(id)
+                .map(imageRepository::findById)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "존재하지 않는 이미지입니다.(id: " + id + ")"));
+                        "존재하지 않는 이미지입니다.(id: " + id + ")"))
+                .orElse(null);
     }
 
     public static String getUrlFromImage(Image image) {
