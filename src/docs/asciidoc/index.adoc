@@ -305,3 +305,22 @@ operation::feed-report[snippets='curl-request,http-response']
 `POST /api/report/feed/[신고할_댓글_ID]`
 
 operation::comment-report[snippets='curl-request,http-response']
+
+[[statistics]]
+== 통계
+
+[[statistics-latest]]
+=== 최근 피드 작성자
+`GET /api/statistics/latest`
+
+operation::statistics-latest[snippets='curl-request,http-response']
+
+응답 필드 상세는 <<user-get>> 응답의 일부를 사용한다.
+
+[[statistics-top]]
+=== 최다 피드 작성자
+`GET /api/statistics/top`
+
+operation::statistics-top[snippets='curl-request,http-response']
+
+응답 필드 상세는 <<user-get>> 응답의 일부를 사용한다.
