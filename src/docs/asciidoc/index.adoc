@@ -361,3 +361,18 @@ operation::statistics-latest[snippets='curl-request,http-response']
 operation::statistics-top[snippets='curl-request,http-response']
 
 응답 필드 상세는 <<user-get>> 응답의 일부를 사용한다.
+
+[[push-token]]
+== 푸시 토큰
+
+[[push-token-register]]
+== 푸시 토큰 등록
+`POST /api/push/[푸시_토큰]`
+
+operation::push-token-register[snippets='curl-request,http-response']
+
+[[push-token-register]]
+== 푸시 토큰 삭제
+`DELETE /api/push/[푸시_토큰_ID]`
+
+operation::push-token-delete[snippets='curl-request,http-response']
