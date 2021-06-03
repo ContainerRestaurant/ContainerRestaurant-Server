@@ -300,6 +300,28 @@ include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDt
 
 operation::restaurant-get[snippets='curl-request,http-response,response-fields,links']
 
+[[user-restaurant-favorite]]
+=== 즐겨찾기 한 식당 목록
+`GET /api/favorite/restaurant`
+
+현재 로그인한 유저가 즐겨찾기 한 목록을 조회한다.
+
+operation::user-restaurant-favorite[snippets='curl-request,http-response']
+
+응답 리소스에 대한 상세 내용은 <<restaurant-get>> 을 참조한다.
+
+[[restaurant-favorite]]
+=== 식당 즐겨찾기 추가
+`POST /api/favorite/restaurant/[즐겨찾기_할_식당_ID]`
+
+operation::restaurant-favorite[snippets='curl-request,http-response']
+
+[[restaurant-favorite-cancel]]
+=== 식당 즐겨찾기 삭제
+`DELETE /api/favorite/restaurant/[즐겨찾기_할_식당_ID]`
+
+operation::restaurant-favorite-cancel[snippets='curl-request,http-response']
+
 [[restaurant-vanish]]
 === 식당 없어짐 알림
 `POST /api/restaurant/vanish/[없어진_식당_ID]`
