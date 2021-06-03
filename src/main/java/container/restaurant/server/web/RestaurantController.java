@@ -2,32 +2,32 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
+import container.restaurant.server.web.linker.ImageLinker;
+import container.restaurant.server.web.linker.RestaurantLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.mediatype.hal.HalModelBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/restaurant")
 public class RestaurantController {
 
+    private final RestaurantLinker restaurantLinker;
+    private final ImageLinker imageLinker;
+
     private final RestaurantService restaurantService;
 
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        RestaurantDetailDto restaurantInfoDto = restaurantService.getRestaurantInfoById(id);
-        return ResponseEntity.ok(EntityModel.of(restaurantInfoDto)
-                .add(linkTo(getController().findById(id)).withSelfRel())
-                .add(linkTo(ImageController.class).slash(restaurantInfoDto.getImage_path()).withRel("image-url"))
-                .add(linkTo(getController().updateVanish(id)).withRel("restaurant-vanish"))
+        RestaurantDetailDto dto = restaurantService.getRestaurantInfoById(id);
+        return ResponseEntity.ok(EntityModel.of(dto)
+                .add(restaurantLinker.findById(id).withSelfRel())
+                .add(restaurantLinker.updateVanish(id).withRel("restaurant-vanish"))
         );
     }
 
@@ -42,26 +42,16 @@ public class RestaurantController {
 
         return ResponseEntity.ok(CollectionModel.of(restaurantService.findNearByRestaurants(lat, lon, radius)
                 .stream().map(restaurant -> EntityModel.of(restaurant)
-                        .add(linkTo(getController().findById(restaurant.getId())).withRel("restaurant-info"))
-                        .add(linkTo(getController().updateVanish(restaurant.getId())).withRel("restaurant-vanish"))
-                        .add(linkTo(ImageController.class).slash(restaurant.getImage_path()).withRel("image-url"))
+                        .add(restaurantLinker.findById(restaurant.getId()).withRel("restaurant-info"))
+                        .add(restaurantLinker.updateVanish(restaurant.getId()).withRel("restaurant-vanish"))
                 ).collect(Collectors.toList()))
-                .add(linkTo(getController().findNearByRestaurants(lat, lon, radius)).withSelfRel()));
+                .add(restaurantLinker.findNearByRestaurants(lat, lon, radius).withSelfRel()));
     }
-
-    // 식당 이름 검색 비활성화
-
 
     @PostMapping("vanish/{id}")
     public ResponseEntity<?> updateVanish(@PathVariable("id") Long id) {
         restaurantService.restaurantVanish(id);
-        return ResponseEntity.ok(
-                HalModelBuilder.emptyHalModel().build()
-                        .add(linkTo(getController().updateVanish(id)).withSelfRel()));
-    }
-
-    private RestaurantController getController() {
-        return methodOn(RestaurantController.class);
+        return ResponseEntity.noContent().build();
     }
 
 }
