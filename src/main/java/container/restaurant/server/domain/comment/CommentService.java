@@ -35,10 +35,10 @@ public class CommentService {
         Feed feed = feedService.findById(feedId);
         User user = userService.findById(userId);
 
-        Comment upperReply = ofNullable(commentCreateDto.getUpperReplyId())
+        Comment upperReplies = ofNullable(commentCreateDto.getUpperReplyId())
                 .map(id -> this.findById(id).setIsHaveReply())
                 .orElse(null);
-        Comment comment = commentCreateDto.toEntityWith(user, feed, upperReply);
+        Comment comment = commentCreateDto.toEntityWith(user, feed, upperReplies);
         feed.commentCountUp();
 
         publisher.publishEvent(new FeedCommentedEvent(comment));
@@ -81,7 +81,7 @@ public class CommentService {
         }
         Comment upperReply = comment.getUpperReply();
         // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
-        List<Comment> UpperReplies = commentRepository.findCommentsByUpperReplyId(upperReply.getId());
+        List<Comment> UpperReplies = commentRepository.findAllByUpperReplyId(upperReply.getId());
         if (UpperReplies.size() == 1) {
             upperReply.unSetIsHaveReply();
             // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
