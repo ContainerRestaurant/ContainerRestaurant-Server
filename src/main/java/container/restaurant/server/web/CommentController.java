@@ -6,6 +6,7 @@ import container.restaurant.server.domain.comment.CommentService;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
+import container.restaurant.server.web.linker.CommentLikeLinker;
 import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.ReportLinker;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CommentController {
 
     private final CommentLinker commentLinker;
     private final ReportLinker reportLinker;
+    private final CommentLikeLinker commentLikeLinker;
 
     @PostMapping("feed/{feedId}")
     public ResponseEntity<?> createComment(
@@ -87,9 +89,14 @@ public class CommentController {
         dto
                 .addAllIf(isOwner, () -> List.of(
                         commentLinker.updateComment(dto.getId()).withRel("patch"),
-                        commentLinker.deleteComment(dto.getId()).withRel("delete")))
+                        commentLinker.deleteComment(dto.getId()).withRel("delete"),
+                        commentLikeLinker.userLikeComment(dto.getId()).withRel("like"),
+                        commentLikeLinker.userCancelLikeComment(dto.getId()).withRel("cancel-like")
+                ))
                 .addAllIf(!isOwner, () -> List.of(
-                        reportLinker.reportComment(dto.getId()).withRel("report")
+                        reportLinker.reportComment(dto.getId()).withRel("report"),
+                        commentLikeLinker.userLikeComment(dto.getId()).withRel("like"),
+                        commentLikeLinker.userCancelLikeComment(dto.getId()).withRel("cancel-like")
                 ));
     }
 
