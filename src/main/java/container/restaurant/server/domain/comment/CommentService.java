@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.comment;
 
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
@@ -72,7 +73,7 @@ public class CommentService {
         Comment comment = findById(id);
 
         if (!comment.getOwner().getId().equals(userId))
-            throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
+            throw new FailedAuthorizationException("삭제 할 수 있는 유저가 아닙니다.");
 
         // 대댓글 있다면(isHaveReply) 댓글 isDeleted 처리
         if (comment.getIsHaveReply()) {
