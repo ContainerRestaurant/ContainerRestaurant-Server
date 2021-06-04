@@ -78,6 +78,7 @@ public class CommentService {
         // 대댓글 있다면(isHaveReply) 댓글 isDeleted 처리
         if (comment.getIsHaveReply()) {
             comment.setIsDeleted();
+            comment.getFeed().commentCountDown();
             return;
         }
         Comment upperReply = comment.getUpperReply();
