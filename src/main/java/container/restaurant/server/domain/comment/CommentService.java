@@ -81,8 +81,8 @@ public class CommentService {
         }
         Comment upperReply = comment.getUpperReply();
         // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
-        List<Comment> UpperReplies = commentRepository.findCommentsByUpperReplyId(upperReply.getId());
-        if (UpperReplies.size() == 1) {
+        List<Comment> upperReplies = commentRepository.findAllByUpperReplyId(upperReply.getId());
+        if (upperReplies.size() == 1) {
             upperReply.unSetIsHaveReply();
             // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
             if (upperReply.getIsDeleted())

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByFeed(Feed feed);
-    List<Comment> findCommentsByUpperReplyId(Long id);
+    List<Comment> findAllByUpperReplyId(Long id);
 }
