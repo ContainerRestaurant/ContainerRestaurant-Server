@@ -40,8 +40,8 @@ public class ImageService {
     public Image findById(Long id) {
         return Optional.ofNullable(id)
                 .map(imageRepository::findById)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "존재하지 않는 이미지입니다.(id: " + id + ")"))
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "존재하지 않는 이미지입니다.(id: " + id + ")"))
                 .orElse(null);
     }
 
