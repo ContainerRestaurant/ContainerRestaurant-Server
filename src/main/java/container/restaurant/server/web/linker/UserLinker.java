@@ -40,4 +40,8 @@ public class UserLinker {
     public LinkBuilder existsNickname() {
         return existsNickname(null);
     }
+
+    public LinkBuilder getCurrentUser() {
+        return linkTo(proxy.getCurrentUser(u));
+    }
 }
