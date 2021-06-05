@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
+import static java.util.Optional.ofNullable;
+
 @RequiredArgsConstructor
 @RestController
 @Validated
@@ -30,6 +32,13 @@ public class UserController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
     private final RestaurantFavoriteLinker restaurantFavoriteLinker;
+
+    @GetMapping
+    public ResponseEntity<?> getCurrentUser(@LoginUser SessionUser sessionUser) {
+        return ResponseEntity.of(ofNullable(sessionUser)
+                .map(SessionUser::getId)
+                .map(id -> setLinks(userService.getUserInfoById(id), id)));
+    }
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(

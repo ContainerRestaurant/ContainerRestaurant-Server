@@ -63,12 +63,11 @@ public class IndexController {
                         indexLinker.getBanners().withRel("banner-list")
                 ))
                 .addAllIf(loginId == null, () -> List.of(
-                        Link.of("/login").withRel("login"),
-                        Link.of("/login").withRel("my-info")
+                        Link.of("/login").withRel("login")
                 ))
                 .addAllIf(loginId != null, () -> List.of(
                         Link.of("/logout").withRel("logout"),
-                        userLinker.getUserById(loginId).withRel("my-info")
+                        userLinker.getCurrentUser().withRel("my-info")
                 ));
     }
 

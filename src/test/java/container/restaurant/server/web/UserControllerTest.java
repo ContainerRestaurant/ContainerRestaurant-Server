@@ -287,4 +287,29 @@ class UserControllerTest extends BaseUserControllerTest {
                                         "1~10자의 한글이나 2~20자의 영문/숫자/공백만 입력 가능합니다."));
     }
 
+    @Test
+    @DisplayName("현재 사용자 정보")
+    void getUserId() throws Exception {
+        mvc.perform(
+                get("/api/user")
+                        .session(myselfSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(myself.getId()))
+                .andExpect(jsonPath("email").value(myself.getEmail()))
+                .andExpect(jsonPath("nickname").value(myself.getNickname()))
+                .andExpect(jsonPath("profile").value(myself.getProfile()))
+                .andExpect(jsonPath("level").value(myself.getLevel()))
+                .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
+                .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
+                .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
+                .andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.feeds.href").exists())
+                .andExpect(jsonPath("_links.patch.href").exists())
+                .andExpect(jsonPath("_links.delete.href").exists())
+                .andExpect(jsonPath("_links.nickname-exists.href").exists())
+                .andExpect(jsonPath("_links.scraps.href").exists())
+                .andDo(document("my-info"));
+    }
+
+
 }

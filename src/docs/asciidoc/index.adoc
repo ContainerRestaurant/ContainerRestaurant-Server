@@ -136,6 +136,14 @@ OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및
 
 operation::get-user[snippets='curl-request,http-response,response-fields,links']
 
+[[my-info]]
+=== 내 정보 조회
+`GET /api/user`
+
+operation::my-info[snippets='curl-request,http-response']
+
+내 정보 조회시 응답 형식은 <<user-get>>를 참조합니다.
+
 [[user-update]]
 === 사용자 정보 변경
 `PATCH /api/user/[유저_ID]`
