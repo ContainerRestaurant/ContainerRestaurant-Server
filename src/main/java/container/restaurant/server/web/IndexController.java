@@ -8,10 +8,7 @@ import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.IndexDto;
-import container.restaurant.server.web.linker.IndexLinker;
-import container.restaurant.server.web.linker.FeedLinker;
-import container.restaurant.server.web.linker.StatisticsLinker;
-import container.restaurant.server.web.linker.UserLinker;
+import container.restaurant.server.web.linker.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +29,7 @@ public class IndexController {
     private final FeedLinker feedLinker;
     private final StatisticsLinker statisticsLinker;
     private final IndexLinker indexLinker;
+    private final RestaurantLinker restaurantLinker;
 
     private final UserService userService;
     private final StatisticsService statisticsService;
@@ -60,7 +58,8 @@ public class IndexController {
                         feedLinker.createFeed().withRel("feed-create"),
                         statisticsLinker.getFeedCountTopUsers().withRel("top-users"),
                         statisticsLinker.getRecentFeedUsers().withRel("recent-users"),
-                        indexLinker.getBanners().withRel("banner-list")
+                        indexLinker.getBanners().withRel("banner-list"),
+                        restaurantLinker.findNearByRestaurants().withRel("restaurant-near")
                 ))
                 .addAllIf(loginId == null, () -> List.of(
                         Link.of("/login").withRel("login")

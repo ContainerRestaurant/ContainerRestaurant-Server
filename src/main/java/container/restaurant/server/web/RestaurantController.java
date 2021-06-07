@@ -2,7 +2,6 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
-import container.restaurant.server.web.linker.ImageLinker;
 import container.restaurant.server.web.linker.RestaurantLinker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 public class RestaurantController {
 
     private final RestaurantLinker restaurantLinker;
-    private final ImageLinker imageLinker;
 
     private final RestaurantService restaurantService;
 
@@ -32,13 +30,15 @@ public class RestaurantController {
     }
 
     @GetMapping("{lat}/{lon}/{radius}")
-    public ResponseEntity<CollectionModel<?>> findNearByRestaurants(
-            @PathVariable("lat") double lat,
-            @PathVariable("lon") double lon,
-            @PathVariable("radius") long radius) {
+    public ResponseEntity<?> findNearByRestaurants(
+            @PathVariable("lat") Double lat,
+            @PathVariable("lon") Double lon,
+            @PathVariable("radius") Long radius) {
         /*
             사용자 정보를 PathVariable 형태로 받는 형태로 구현 추후 입력방식 변경 가능
          */
+        if (lat == null || lon == null || radius == null)
+            return ResponseEntity.badRequest().body("위도, 경도, 반경 값이 필요합니다.");
 
         return ResponseEntity.ok(CollectionModel.of(restaurantService.findNearByRestaurants(lat, lon, radius)
                 .stream().map(restaurant -> EntityModel.of(restaurant)

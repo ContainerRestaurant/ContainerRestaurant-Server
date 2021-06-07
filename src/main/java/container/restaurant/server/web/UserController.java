@@ -100,7 +100,7 @@ public class UserController {
                         userLinker.deleteById(dto.getId()).withRel("delete"),
                         userLinker.existsNickname().withRel("nickname-exists"),
                         feedLinker.selectUserScrapFeed(dto.getId()).withRel("scraps"),
-                        restaurantFavoriteLinker.userFavoriteRestaurant(loginId).withRel("restaurant-favorite")
+                        restaurantFavoriteLinker.findAllByUser().withRel("restaurant-favorite")
                 ));
     }
 
