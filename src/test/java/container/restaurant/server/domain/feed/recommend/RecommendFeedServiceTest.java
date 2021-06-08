@@ -3,6 +3,7 @@ package container.restaurant.server.domain.feed.recommend;
 import container.restaurant.server.domain.BaseServiceTest;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,7 +48,6 @@ class RecommendFeedServiceTest extends BaseServiceTest {
                     int to = Math.min(from + p.getPageSize(), input.size());
                     return new PageImpl<>(input.subList(from, to), p, input.size());
                 }));
-
         //when 추천 업데이트 작업을 실행하고 결과 리스트를 ID 로 리스트로 변환
         recommendFeedService.updateRecommendFeed();
         List<Long> actualRes = recommendFeedService.getRecommendFeeds()
@@ -117,12 +117,15 @@ class RecommendFeedServiceTest extends BaseServiceTest {
         Feed feed = mock(Feed.class);
         User user = mock(User.class);
         Image image = mock(Image.class);
+        Restaurant restaurant = mock(Restaurant.class);
         when(feed.getId()).thenReturn(id);
         when(feed.getRecommendScore()).thenReturn(score);
         when(feed.getCreatedDate()).thenReturn(createDate);
         when(feed.getOwner()).thenReturn(user);
         when(feed.getThumbnail()).thenReturn(image);
+        when(feed.getRestaurant()).thenReturn(restaurant);
         when(image.getUrl()).thenReturn("test.path");
+        when(restaurant.isContainerFriendly()).thenReturn(false);
         return feed;
     }
 }
