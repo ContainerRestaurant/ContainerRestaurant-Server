@@ -1,5 +1,6 @@
 package container.restaurant.server.web.dto.user;
 
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.user.User;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
@@ -25,7 +26,7 @@ public class UserInfoDto extends RepresentationModel<UserInfoDto> {
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
-        this.profile = user.getProfile();
+        this.profile = ImageService.getUrlFromImage(user.getProfile());
         this.level = user.getLevel();
         this.feedCount = user.getFeedCount();
         this.scrapCount = user.getScrapCount();

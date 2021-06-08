@@ -1,10 +1,10 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.exception.FailedAuthorizationException;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import javax.validation.ConstraintViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -38,7 +39,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("id").value(myself.getId()))
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
-                .andExpect(jsonPath("profile").value(myself.getProfile()))
+                .andExpect(jsonPath("profile").value(containsString(image.getUrl())))
                 .andExpect(jsonPath("level").value(myself.getLevel()))
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
@@ -85,7 +86,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("id").value(other.getId()))
                 .andExpect(jsonPath("email").value(other.getEmail()))
                 .andExpect(jsonPath("nickname").value(other.getNickname()))
-                .andExpect(jsonPath("profile").value(other.getProfile()))
+                .andExpect(jsonPath("profile").value(containsString(image.getUrl())))
                 .andExpect(jsonPath("level").value(other.getLevel()))
                 .andExpect(jsonPath("feedCount").value(other.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(other.getScrapCount()))
@@ -117,10 +118,11 @@ class UserControllerTest extends BaseUserControllerTest {
     @DisplayName("사용자 닉네임, 프로필 업데이트")
     void testUpdateUser() throws Exception {
         String nickname = "this는nikname이라능a";
-        String profile = "https://profile.path";
+        Image newImage = newImage();
+
         UserUpdateDto userUpdateDto = UserUpdateDto.builder()
                 .nickname(nickname)
-                .profile(profile)
+                .profileId(newImage.getId())
                 .build();
 
         mvc.perform(
@@ -132,7 +134,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("id").value(myself.getId()))
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(nickname))
-                .andExpect(jsonPath("profile").value(profile))
+                .andExpect(jsonPath("profile").value(containsString(newImage.getUrl())))
                 .andExpect(jsonPath("level").value(myself.getLevel()))
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
@@ -144,7 +146,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andDo(document("patch-user",
                         requestFields(
                                 fieldWithPath("nickname").description("변경할 닉네임"),
-                                fieldWithPath("profile").description("변경할 프로필 사진 경로"),
+                                fieldWithPath("profileId").description("변경할 프로필 사진 식별자"),
                                 fieldWithPath("pushToken").description("변경할 푸시 토큰 아이디")
                         )));
     }
@@ -154,10 +156,9 @@ class UserControllerTest extends BaseUserControllerTest {
     @DisplayName("사용자 업데이트 실패 (400)")
     void testFailToUpdateUserBy400() throws Exception {
         String nickname = "this는nikname이라능!";
-        String profile = "httpprofile.path";
         UserUpdateDto userUpdateDto = UserUpdateDto.builder()
                 .nickname(nickname)
-                .profile(profile)
+                .profileId(newImage().getId())
                 .build();
 
         mvc.perform(
@@ -169,11 +170,6 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(
                         jsonPath("errorType")
                                 .value(ConstraintViolationException.class.getSimpleName()))
-                .andExpect(jsonPath("messages", Matchers.containsInAnyOrder(
-                        "닉네임은 한글/영문/숫자/공백만 입력 가능하며, " +
-                                    "1~10자의 한글이나 2~20자의 영문/숫자/공백만 입력 가능합니다.",
-                                "프로필의 URL 형식이 잘못되었습니다."
-                        )))
                 .andDo(document("error-example",
                         responseFields(
                                 fieldWithPath("errorType").description("발생한 에러의 타입"),
@@ -187,10 +183,9 @@ class UserControllerTest extends BaseUserControllerTest {
     @DisplayName("사용자 업데이트 실패 (403)")
     void testFailToUpdateUserBy403() throws Exception {
         String nickname = "this는nikname이라능a";
-        String profile = "https://profile.path";
         UserUpdateDto userUpdateDto = UserUpdateDto.builder()
                 .nickname(nickname)
-                .profile(profile)
+                .profileId(newImage().getId())
                 .build();
 
         mvc.perform(
@@ -297,7 +292,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("id").value(myself.getId()))
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
-                .andExpect(jsonPath("profile").value(myself.getProfile()))
+                .andExpect(jsonPath("profile").value(containsString(image.getUrl())))
                 .andExpect(jsonPath("level").value(myself.getLevel()))
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
@@ -309,6 +304,10 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andExpect(jsonPath("_links.scraps.href").exists())
                 .andDo(document("my-info"));
+    }
+
+    private Image newImage() {
+        return imageRepository.save(new Image("newImage"));
     }
 
 

@@ -1,6 +1,9 @@
 package container.restaurant.server.web.base;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageRepository;
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -14,23 +17,38 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
     protected UserRepository userRepository;
 
     @Autowired
+    protected ImageRepository imageRepository;
+
+    @Autowired
     protected MockHttpSession myselfSession;
 
     protected User myself;
     protected User other;
+    protected Image image;
+    protected String myselfAuthId = "myselfAuthId";
+    protected String otherAuthId = "otherAuthId";
 
     @BeforeEach
     public void beforeEach() {
+
+        image = imageRepository.save(Image.builder()
+                .url("image_path_url")
+                .build());
+
         myself = userRepository.save(User.builder()
+                .authId(myselfAuthId)
+                .authProvider(AuthProvider.KAKAO)
                 .email("me@test.com")
-                .profile("https://my.profile.path")
+                .profile(image)
                 .nickname("나의닉네임")
                 .build());
 
         myselfSession.setAttribute("user", SessionUser.from(myself));
         other = userRepository.save(User.builder()
+                .authId(otherAuthId)
+                .authProvider(AuthProvider.KAKAO)
                 .email("you@test.com")
-                .profile("https://your.profile.path")
+                .profile(image)
                 .nickname("남의닉네임")
                 .build());
     }
@@ -38,6 +56,7 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
     @AfterEach
     public void afterEach() {
         userRepository.deleteAll();
+        imageRepository.deleteAll();
         myselfSession.clearAttributes();
     }
 }

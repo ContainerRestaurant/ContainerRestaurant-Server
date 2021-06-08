@@ -1,33 +1,36 @@
 package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 
 @Getter
 @NoArgsConstructor
 @Entity(name = "TB_USERS")
 public class User extends BaseCreatedTimeEntity {
 
-    @Email(message = "잘못된 이메일 형식입니다.")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
+    private String authId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
+
+    @Column(nullable = false)
     private String email;
 
     @NicknameConstraint
     @Column(unique = true)
     private String nickname;
 
-    @URL(message = "프로필의 URL 형식이 잘못되었습니다.")
-    private String profile;
-
-    private String greeting;
+    @OneToOne
+    private Image profile;
 
     private Integer level;
 
@@ -39,40 +42,38 @@ public class User extends BaseCreatedTimeEntity {
 
     private Integer bookmarkedCount;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
     private Boolean banned;
 
     @OneToOne
     private PushToken pushToken;
 
     @Builder
-    protected User(String email, String profile, String nickname) {
+    protected User(String authId, AuthProvider authProvider, String email,
+                   Image profile, String nickname, PushToken pushToken) {
+        this.authId = authId;
+        this.authProvider = authProvider;
         this.email = email;
         this.nickname = nickname;
         this.profile = profile;
-        this.greeting = null;
-        this.level = 1;
+        this.level = 0;
         this.levelFeedCount = 0;
         this.feedCount = 0;
         this.scrapCount = 0;
         this.bookmarkedCount = 0;
-        this.role = Role.USER;
         this.banned = false;
-
+        this.pushToken = pushToken;
     }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    public void setProfile(String profile) {
+    public void setProfile(Image profile) {
         this.profile = profile;
     }
 
-    public String getRoleKey() {
-        return this.role.getKey();
+    public void setPushToken(PushToken pushToken) {
+        this.pushToken = pushToken;
     }
 
     public void scrapCountUp() {
@@ -116,9 +117,5 @@ public class User extends BaseCreatedTimeEntity {
         } else {
             this.level = 4;
         }
-    }
-
-    public void setPushToken(PushToken pushToken) {
-        this.pushToken = pushToken;
     }
 }

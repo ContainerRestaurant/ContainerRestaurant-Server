@@ -13,12 +13,10 @@ public class SessionUser implements Serializable {
 
     private Long id;
     private String email;
-    private String profile;
 
     protected SessionUser(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
-        this.profile = user.getProfile();
     }
 
     public static SessionUser from(@Valid User user) {

@@ -15,7 +15,7 @@ public class PushToken extends BaseCreatedTimeEntity {
     private String token;
 
     @Builder
-    protected PushToken(String token) {
+    public PushToken(String token) {
         this.token = token;
     }
 }

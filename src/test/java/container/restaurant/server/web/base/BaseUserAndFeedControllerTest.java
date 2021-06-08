@@ -28,9 +28,6 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     protected RestaurantRepository restaurantRepository;
 
     @Autowired
-    protected ImageRepository imageRepository;
-
-    @Autowired
     private ContainerRepository containerRepository;
 
     @Autowired
@@ -45,16 +42,11 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     protected Restaurant restaurant;
     protected Feed myFeed;
     protected Feed othersFeed;
-    protected Image image;
 
     @Override
     @BeforeEach
     public void beforeEach() {
         super.beforeEach();
-
-        image = imageRepository.save(Image.builder()
-                .url("image_path_url")
-                .build());
 
         restaurant = restaurantRepository.save(Restaurant.builder()
                 .name("restaurant")
@@ -101,7 +93,6 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
         menuRepository.deleteAll();
         feedRepository.deleteAll();
         restaurantRepository.deleteAll();
-        imageRepository.deleteAll();
         userLevelFeedCountRepository.deleteAll();
         super.afterEach();
     }

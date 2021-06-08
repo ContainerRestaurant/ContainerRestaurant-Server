@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.comment;
 
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
@@ -57,20 +58,23 @@ class CommentServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        // 3명의 유저
-        users = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            users.add(User.builder()
-                    .email("me" + i + "@test.com")
-                    .profile("https://my" + i + ".profile.path")
-                    .nickname("TestNickname" + i)
-                    .build());
-        }
-        users = userRepository.saveAll(users);
 
         Image image = imageRepository.save(Image.builder()
                 .url("image_path_url")
                 .build());
+
+        // 3명의 유저
+        users = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            users.add(User.builder()
+                    .authId("authId" + i)
+                    .authProvider(AuthProvider.KAKAO)
+                    .email("me" + i + "@test.com")
+                    .profile(image)
+                    .nickname("TestNickname" + i)
+                    .build());
+        }
+        users = userRepository.saveAll(users);
 
         // 5개의 식당
         restaurants = new ArrayList<>();
@@ -128,7 +132,7 @@ class CommentServiceTest {
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
-        assertThat(feedRepository.findById(feeds.get(0).getId()).get().getReplyCount())
+        assertThat(feedRepository.findById(feeds.get(0).getId()).orElseThrow().getReplyCount())
                 .isEqualTo(orgCommentCount + 1);
     }
 
@@ -142,7 +146,7 @@ class CommentServiceTest {
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
-        assertThat(feedRepository.findById(feeds.get(0).getId()).get().getReplyCount())
+        assertThat(feedRepository.findById(feeds.get(0).getId()).orElseThrow().getReplyCount())
                 .isEqualTo(orgCommentCount + 1);
     }
 
@@ -169,7 +173,7 @@ class CommentServiceTest {
                 comments.get(0).getId(),
                 users.get(0).getId()
         );
-        // then : 총 댓글 개수에 영향을 주지 않고, 상위 댓글의 isDeleted 값이 true로 변경
+        // then : 총 댓글 개수에 영향을 주지 않고, 상위 댓글의 isDeleted 값이 true 로 변경
         assertThat(commentRepository.findAll().size()).isEqualTo(11);
         assertThat(commentRepository.findById(comments.get(0).getId())
                 .orElseThrow(()->new ResourceNotFoundException("없음")).getIsDeleted() )

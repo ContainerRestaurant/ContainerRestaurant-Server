@@ -7,6 +7,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -52,8 +53,11 @@ class CommentRepositoryTest {
                 .build());
 
         user = userRepository.save(User.builder()
+                .authId("authId")
+                .authProvider(AuthProvider.KAKAO)
                 .email("test@test.com")
-                .profile("https://test")
+                .nickname("testNickname")
+                .profile(image)
                 .build());
 
         restaurant = restaurantRepository.save(Restaurant.builder()

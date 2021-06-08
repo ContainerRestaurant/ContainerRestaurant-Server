@@ -13,16 +13,16 @@ public class NicknameConstraintValidator implements ConstraintValidator<Nickname
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null)
-            return true;
+            return false;
 
         int length = 0;
 
-        if (!value.matches("[a-zA-z0-9가-힣]+"))
+        if (!value.matches("[a-zA-z0-9 가-힣]+"))
             return false;
 
-        Pattern alnum = Pattern.compile("[a-zA-z0-9]");
-        Matcher alnumMatch = alnum.matcher(value);
-        while (alnumMatch.find()) {
+        Pattern alnumsp = Pattern.compile("[a-zA-z0-9 ]");
+        Matcher alnumspMatch = alnumsp.matcher(value);
+        while (alnumspMatch.find()) {
             if (++length > MAX_LENGTH)
                 return false;
         }

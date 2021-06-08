@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.user;
 
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.user.UserInfoDto;
 import container.restaurant.server.web.dto.user.UserUpdateDto;
@@ -13,11 +14,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static java.util.Optional.ofNullable;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+
+    private final ImageService imageService;
 
     @Transactional
     public User createOrUpdateByEmail(
@@ -36,9 +41,14 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoDto update(Long id, UserUpdateDto updateDto) {
+    public UserInfoDto update(Long id, UserUpdateDto dto) {
         User user = findById(id);
-        updateDto.updateUser(user);
+        ofNullable(dto.getNickname()).ifPresent(user::setNickname);
+        ofNullable(dto.getProfileId())
+                .map(imageService::findById)
+                .ifPresent(user::setProfile);
+        ofNullable(dto.getPushToken())
+                .ifPresent(user::setPushToken);
         return UserInfoDto.from(user);
     }
 
