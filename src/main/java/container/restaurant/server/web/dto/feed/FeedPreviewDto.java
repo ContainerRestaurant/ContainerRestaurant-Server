@@ -19,6 +19,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
     private final String content;
     private final Integer likeCount;
     private final Integer replyCount;
+    private final Boolean isContainerFriendly;
 
     @NonNull
     public static FeedPreviewDto from(Feed feed) {
@@ -34,6 +35,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();
         this.replyCount = feed.getReplyCount();
+        this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
     }
 
 }

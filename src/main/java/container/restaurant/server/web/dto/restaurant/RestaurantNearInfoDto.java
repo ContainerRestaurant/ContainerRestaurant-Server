@@ -16,6 +16,7 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
     private final String image_path;
     private final Integer feedCount;
     private final Float difficultyAvg;
+    private final Boolean isContainerFriendly;
 
     public static RestaurantNearInfoDto from(Restaurant restaurant) {
         return new RestaurantNearInfoDto(restaurant);
@@ -30,7 +31,7 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
         this.feedCount = restaurant.getFeedCount();
         this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
-
+        this.isContainerFriendly = restaurant.isContainerFriendly();
     }
 
 }
