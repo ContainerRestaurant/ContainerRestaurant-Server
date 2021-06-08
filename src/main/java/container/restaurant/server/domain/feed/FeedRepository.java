@@ -19,7 +19,7 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Override
     @NonNull
-    @EntityGraph(attributePaths = { "owner", "thumbnail" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail","restaurant" })
     Page<Feed> findAll(@NonNull Pageable pageable);
 
     @EntityGraph(attributePaths = { "owner", "thumbnail" })
