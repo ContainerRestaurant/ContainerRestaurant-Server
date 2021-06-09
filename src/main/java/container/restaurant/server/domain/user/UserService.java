@@ -2,8 +2,7 @@ package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.web.dto.user.UserInfoDto;
-import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,13 +34,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfoDto getUserInfoById(Long id) throws ResourceNotFoundException {
+    public UserDto.Info getUserInfoById(Long id) throws ResourceNotFoundException {
 
-        return UserInfoDto.from(findById(id));
+        return UserDto.Info.from(findById(id));
     }
 
     @Transactional
-    public UserInfoDto update(Long id, UserUpdateDto dto) {
+    public UserDto.Info update(Long id, UserDto.Update dto) {
         User user = findById(id);
         ofNullable(dto.getNickname()).ifPresent(user::setNickname);
         ofNullable(dto.getProfileId())
@@ -49,7 +48,7 @@ public class UserService {
                 .ifPresent(user::setProfile);
         ofNullable(dto.getPushToken())
                 .ifPresent(user::setPushToken);
-        return UserInfoDto.from(user);
+        return UserDto.Info.from(user);
     }
 
     @Transactional(readOnly = true)

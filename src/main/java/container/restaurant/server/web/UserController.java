@@ -5,9 +5,7 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exception.FailedAuthorizationException;
-import container.restaurant.server.web.dto.user.NicknameExistsDto;
-import container.restaurant.server.web.dto.user.UserInfoDto;
-import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.dto.user.UserDto;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.RestaurantFavoriteLinker;
 import container.restaurant.server.web.linker.UserLinker;
@@ -54,7 +52,7 @@ public class UserController {
     @PatchMapping("{id}")
     public ResponseEntity<?> updateUserById(
             @PathVariable Long id, @LoginUser SessionUser sessionUser,
-            @RequestBody UserUpdateDto updateDto
+            @RequestBody UserDto.Update updateDto
     ) {
         if (!id.equals(sessionUser.getId()))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
@@ -81,15 +79,15 @@ public class UserController {
             @NicknameConstraint @RequestParam String nickname
     ) {
         return ResponseEntity.ok(
-                setLinks(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
+                setLinks(UserDto.NicknameExists.of(nickname, userService.existsUserByNickname(nickname)))
         );
     }
 
-    private NicknameExistsDto setLinks(NicknameExistsDto dto) {
+    private UserDto.NicknameExists setLinks(UserDto.NicknameExists dto) {
         return dto.add(userLinker.existsNickname(dto.getNickname()).withSelfRel());
     }
 
-    private UserInfoDto setLinks(UserInfoDto dto, Long loginId) {
+    private UserDto.Info setLinks(UserDto.Info dto, Long loginId) {
         return dto
                 .add(
                         userLinker.getUserById(dto.getId()).withSelfRel(),

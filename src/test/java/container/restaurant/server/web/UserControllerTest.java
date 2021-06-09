@@ -4,7 +4,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.base.BaseUserControllerTest;
-import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.dto.user.UserDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -120,7 +120,7 @@ class UserControllerTest extends BaseUserControllerTest {
         String nickname = "this는nikname이라능a";
         Image newImage = newImage();
 
-        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+        UserDto.Update userUpdateDto = UserDto.Update.builder()
                 .nickname(nickname)
                 .profileId(newImage.getId())
                 .build();
@@ -156,7 +156,7 @@ class UserControllerTest extends BaseUserControllerTest {
     @DisplayName("사용자 업데이트 실패 (400)")
     void testFailToUpdateUserBy400() throws Exception {
         String nickname = "this는nikname이라능!";
-        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+        UserDto.Update userUpdateDto = UserDto.Update.builder()
                 .nickname(nickname)
                 .profileId(newImage().getId())
                 .build();
@@ -183,7 +183,7 @@ class UserControllerTest extends BaseUserControllerTest {
     @DisplayName("사용자 업데이트 실패 (403)")
     void testFailToUpdateUserBy403() throws Exception {
         String nickname = "this는nikname이라능a";
-        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+        UserDto.Update userUpdateDto = UserDto.Update.builder()
                 .nickname(nickname)
                 .profileId(newImage().getId())
                 .build();
