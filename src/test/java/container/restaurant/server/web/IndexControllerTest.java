@@ -5,7 +5,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -43,7 +42,6 @@ class IndexControllerTest extends BaseUserControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("로그인 index 링크 테스트")
     void testAuthIndexLinks() throws Exception {
         String testPath = "/";

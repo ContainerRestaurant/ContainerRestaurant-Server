@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 
@@ -39,7 +38,6 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     @DisplayName("피드 좋아요")
     void testUserLikeFeed() throws Exception {
         //given 초기 FeeLike 사이즈가 주어졌을 때
@@ -74,7 +72,6 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     @DisplayName("이미 좋아요한 피드 좋아요 - 아무일 엄슴")
     void testUserLikeFeedExists() throws Exception {
         //given otherFeed 를 좋아요한 myself 가 주어졌을 때
@@ -119,7 +116,6 @@ class FeedLikeControllerTest extends BaseUserAndFeedControllerTest {
 //    }
 
     @Test
-    @WithMockUser(roles = "USER")
     @DisplayName("피드 좋아요 취소")
     void testUserCancelLikeFeed() throws Exception {
         //given otherFeed 를 좋아요한 myself 가 주어졌을 때

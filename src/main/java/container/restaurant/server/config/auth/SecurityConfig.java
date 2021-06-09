@@ -12,22 +12,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
-    private final static String[] PERMITTED_ALL_PATH = {
-            "/",
-            "/banners",
-            "/docs/index.html",
-            "/api/contract",
-            "/auth/list",
-            "/api/user/nickname/**/exists",
-            "/api/feed/**",
-            "/api/comment/**",
-            "/api/image/**",
-            "/api/restaurant/**",
-            "/api/statistics/**",
-            "/api/push/**",
-            "/profile"
-    };
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -35,11 +19,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers(h -> h
                         .frameOptions().disable()
                 )
-                // FIXME 임시 로그인 방편
                 .authorizeRequests(a -> a
                         .anyRequest().permitAll()
-//                        .antMatchers(HttpMethod.GET, PERMITTED_ALL_PATH).permitAll()
-//                        .anyRequest().authenticated()
                 )
                 .logout(l -> l
                         .logoutSuccessUrl("/")

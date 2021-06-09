@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -66,7 +65,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("내가 작성한 피드 상세")
     public void testGetMyFeedDetail() throws Exception {
         //given
@@ -107,7 +105,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("내가 좋아요한 피드 상세")
     public void testGetMyLikeFeedDetail() throws Exception {
         //given
@@ -130,7 +127,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("내가 스크랩한 피드 상세")
     public void testGetMyScrapFeedDetail() throws Exception {
         //given
@@ -150,7 +146,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("내가 좋아요와 스크랩한 피드 상세")
     public void testGetMyLikeAndScrapFeedDetail() throws Exception {
         //given
@@ -413,7 +408,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 쓰기")
     public void testCreateFeed() throws Exception {
         //given
@@ -456,7 +450,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 쓰기 실패")
     public void testCreateFeedFailed() throws Exception {
         //given
@@ -476,7 +469,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 수정")
     public void testUpdateFeed() throws Exception {
         //given
@@ -530,7 +522,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 수정 실패")
     public void testFailedUpdateFeed() throws Exception {
         //given
@@ -566,7 +557,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 삭제")
     public void testDeleteFeed() throws Exception {
         //given
@@ -584,7 +574,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 삭제 실패 - 존재않는 피드")
     public void testFailedDeleteFeedById() throws Exception {
         //given
@@ -598,7 +587,6 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("피드 삭제 실패 - 다른 사용자의 피드")
     public void testFailedDeleteFeedBySession() throws Exception {
         //given
