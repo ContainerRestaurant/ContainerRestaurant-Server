@@ -5,6 +5,7 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exception.FailedAuthorizationException;
+import container.restaurant.server.exception.UnauthorizedException;
 import container.restaurant.server.web.dto.user.UserDto;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.RestaurantFavoriteLinker;
@@ -30,6 +31,22 @@ public class UserController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
     private final RestaurantFavoriteLinker restaurantFavoriteLinker;
+
+    @PostMapping("login")
+    public ResponseEntity<?> tokenLogin(
+            @LoginUser SessionUser sessionUser, @RequestBody UserDto.TokenLogin dto
+    ) {
+        if (sessionUser != null)
+            return ResponseEntity.noContent().build();
+
+
+        return userService.tokenLogin(dto)
+                .map(info -> {
+                    httpSession.setAttribute("user", SessionUser.from(info));
+                    return ResponseEntity.ok(setLinks(info, info.getId()));
+                })
+                .orElseThrow(() -> new UnauthorizedException("로그인 실패 - 해당 사용자를 찾을 수 없습니다."));
+    }
 
     @GetMapping
     public ResponseEntity<?> getCurrentUser(@LoginUser SessionUser sessionUser) {

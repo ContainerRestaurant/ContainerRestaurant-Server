@@ -112,15 +112,15 @@ operation::index-guest[snippets='curl-request,http-response,links']
 OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및 회원가입을 할 수 있습니다.
 (웹에서 로그인/회원 가입시 사용하는 API 로, 모바일 앱에서는 다른 방식을 이용합니다.)
 
-[[login-mobile]]
-=== 모바일 앱에서의 로그인
-모바일 SDK 에서 OAuth 2.0 제공자에게 인증 받은 뒤,
-용기낸 식당 서버의 아래 URI 로 리다이렉트하여 간편 로그인/회원가입을 할 수 있습니다.
+[[login-token]]
+=== 액세스 토큰으로 로그인
 
-* 카카오
-** `POST /login/oauth2/code/kakao`
-* 구글
-** `POST /login/oauth2/code/google`
+OAuth 2.0 제공자와 응답받은 액세스 토큰 만으로도 로그인이 가능합니다.
+서버에서는 해당 정보를 이용해 OAuth 2.0 에게 인증받은 유효한 토큰인지 확인 후 로그인 됩니다.
+
+operation::login-token[snippets='curl-request,request-fields,http-response']
+
+응답 형식은 <<user-get>> 을 참조합니다.
 
 [[logout]]
 == 로그아웃

@@ -1,19 +1,29 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.config.auth.dto.OAuthAttributes;
+import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.process.oauth.OAuthAgent;
+import container.restaurant.server.process.oauth.OAuthAgentFactory;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolationException;
 
+import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -26,6 +36,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 class UserControllerTest extends BaseUserControllerTest {
+
+    @MockBean
+    private OAuthAgentFactory oAuthAgentFactory;
+
+    @Autowired
+    HttpSession httpSession;
+
+    @Test
+    @DisplayName("토큰으로 로그인")
+    void tokenLogin() throws Exception {
+        //given-1 테스트용 액세스 토큰과 요청
+        String testToken = "[ACCESS_TOKEN]";
+        UserDto.TokenLogin dto = new UserDto.TokenLogin(testToken, myself.getAuthProvider());
+
+        //given-2 OAuth Provider 로 부터 제공받은 사용자 정보 모킹 - myself 정보
+        OAuthAgent agent = mock(OAuthAgent.class);
+        when(oAuthAgentFactory.get(myself.getAuthProvider())).thenReturn(agent);
+        when(agent.getAuthAttrFrom(testToken)).thenReturn(of(OAuthAttributes.builder()
+                .provider(myself.getAuthProvider())
+                .nickname("ProviderNickname")
+                .authId(myself.getAuthId())
+                .email(myself.getEmail())
+                .build()));
+
+        //when
+        mvc.perform(post("/api/user/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andDo(document("login-token",
+                        requestFields(
+                                fieldWithPath("provider").description("로그인할 사용자의 OAuth 제공자 +\n(KAKAO)"),
+                                fieldWithPath("accessToken").description("로그인 인증할 액세스 토큰")
+                        )
+                ));
+
+        //then myself 로 로그인 되어있다.
+        assertThat(httpSession.getAttribute("user")).isNotNull();
+        assertThat(((SessionUser) httpSession.getAttribute("user")).getId()).isEqualTo(myself.getId());
+    }
 
     @Test
     @DisplayName("사용자 정보 조회")

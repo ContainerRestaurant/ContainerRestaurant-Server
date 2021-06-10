@@ -95,4 +95,13 @@ public interface UserDto {
         }
     }
 
+    @Getter
+    @AllArgsConstructor
+    class TokenLogin {
+
+        private final String accessToken;
+        private final AuthProvider provider;
+
+    }
+
 }

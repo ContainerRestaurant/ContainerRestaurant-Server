@@ -2,6 +2,7 @@ package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.process.oauth.OAuthAgentFactory;
 import container.restaurant.server.web.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
@@ -23,6 +25,8 @@ public class UserService {
 
     private final ImageService imageService;
 
+    private final OAuthAgentFactory authAgentFactory;
+
     @Transactional
     public User createOrUpdateByEmail(
             @Email String email,
@@ -31,6 +35,14 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElse(supplier.get());
         return userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserDto.Info> tokenLogin(UserDto.TokenLogin dto) {
+        return authAgentFactory.get(dto.getProvider())
+                .getAuthAttrFrom(dto.getAccessToken())
+                .flatMap(attributes -> userRepository.findByAuthId(attributes.getAuthId())
+                        .map(UserDto.Info::from));
     }
 
     @Transactional(readOnly = true)
