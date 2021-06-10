@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.user;
 
+import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgentFactory;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +37,21 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElse(supplier.get());
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public Long createFrom(UserDto.Create dto) {
+        OAuthAttributes attrs = authAgentFactory.get(dto.getProvider())
+                .getAuthAttrFrom(dto.getAccessToken())
+                .orElseThrow(() -> new ValidationException("유효하지 않은 액세스토큰입니다."));
+
+        User newUser = userRepository.save(attrs.toEntity());
+        ofNullable(dto.getNickname())
+                .ifPresent(newUser::setNickname);
+        ofNullable(dto.getProfileId())
+                .ifPresent(profileId -> newUser.setProfile(imageService.findById(profileId)));
+
+        return newUser.getId();
     }
 
     @Transactional(readOnly = true)

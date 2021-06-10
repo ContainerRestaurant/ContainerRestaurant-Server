@@ -130,6 +130,12 @@ operation::login-token[snippets='curl-request,request-fields,http-response']
 == 사용자
 외부 OAuth 2.0 제공자를 통해 최초 로그인 한 경우, 로그인한 계정의 이메일로 "용기낸 식당" 계정이 생성된다.
 
+[[user-create]]
+=== 사용자 정보생성(가입)
+`POST /api/user`
+
+operation::user-create[snippets='curl-request,request-fields,http-response,response-headers']
+
 [[user-get]]
 === 사용자 정보 조회
 `GET /api/user/[유저_ID]`

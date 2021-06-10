@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -31,6 +32,18 @@ public class UserController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
     private final RestaurantFavoriteLinker restaurantFavoriteLinker;
+
+    @PostMapping
+    public ResponseEntity<?> createWithToken(
+            @LoginUser SessionUser sessionUser, @RequestBody @Valid UserDto.Create dto
+    ) {
+        if (sessionUser != null)
+            return ResponseEntity.noContent().build();
+
+        return ResponseEntity
+                .created(userLinker.getUserById(userService.createFrom(dto)).toUri())
+                .build();
+    }
 
     @PostMapping("login")
     public ResponseEntity<?> tokenLogin(

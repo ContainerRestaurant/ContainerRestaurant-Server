@@ -3,6 +3,8 @@ package container.restaurant.server.web;
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.User;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgent;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpSession;
@@ -24,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -75,6 +80,63 @@ class UserControllerTest extends BaseUserControllerTest {
         //then myself 로 로그인 되어있다.
         assertThat(httpSession.getAttribute("user")).isNotNull();
         assertThat(((SessionUser) httpSession.getAttribute("user")).getId()).isEqualTo(myself.getId());
+    }
+
+    @Test
+    @DisplayName("토큰으로 회원가입")
+    void createWithToken() throws Exception {
+        //given-1 회원 가입 요청이 주어진다.
+        AuthProvider testProvider = AuthProvider.KAKAO;
+        String testAccessToken = "[ACCESS_TOKEN]";
+        String testNickname = "userNickname";
+        Long testProfileId = image.getId();
+
+        UserDto.Create dto = UserDto.Create.builder()
+                .accessToken(testAccessToken)
+                .provider(testProvider)
+                .nickname(testNickname)
+                .profileId(testProfileId)
+                .build();
+
+        // given-2 OAuth Provider 로 부터 제공받은 사용자 정보 모킹
+        String testAuthId = "123123123";
+        String testEmail = "test@test.com";
+        OAuthAgent agent = mock(OAuthAgent.class);
+        when(oAuthAgentFactory.get(testProvider)).thenReturn(agent);
+        when(agent.getAuthAttrFrom(testAccessToken)).thenReturn(of(OAuthAttributes.builder()
+                .provider(testProvider)
+                .nickname("ProviderNickname")
+                .authId(testAuthId)
+                .email(testEmail)
+                .build()));
+
+        //when
+        mvc.perform(post("/api/user")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andDo(document("user-create",
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 사용자의 리소스 경로")
+                        ),
+                        requestFields(
+                                fieldWithPath("provider").description("가입 시 사용자 정보를 가져올 OAuth 제공자 +\n(KAKAO)"),
+                                fieldWithPath("accessToken").description("OAuth 제공자에서 사용할 액세스 토큰"),
+                                fieldWithPath("nickname").description("가입 시 사용할 닉네임 +\n 기본값: OAuth 사용자 닉네임"),
+                                fieldWithPath("profileId").description("가입 시 사용할 프로필 사진 식별 ID"),
+                                fieldWithPath("pushToken").description("가입하는 사용자가 사용하고있는 푸쉬 토큰")
+                        )
+                ));
+
+        //then
+        User newUser = userRepository.findByAuthId(testAuthId)
+                .orElseThrow();
+
+        assertThat(newUser.getId()).isNotNull();
+        assertThat(newUser.getAuthId()).isEqualTo(testAuthId);
+        assertThat(newUser.getNickname()).isEqualTo(testNickname);
+        assertThat(newUser.getProfile().getId()).isEqualTo(testProfileId);
+        assertThat(newUser.getEmail()).isEqualTo(testEmail);
     }
 
     @Test
