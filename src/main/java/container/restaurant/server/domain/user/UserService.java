@@ -30,12 +30,12 @@ public class UserService {
     private final OAuthAgentFactory authAgentFactory;
 
     @Transactional
-    public User createOrUpdateByEmail(
-            @Email String email,
-            Supplier<@Valid ? extends User> supplier
+    public User createOrUpdate(
+            AuthProvider provider, String authId, Supplier<@Valid ? extends User> supplier
     ) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByAuthProviderAndAuthId(provider, authId)
                 .orElse(supplier.get());
+
         return userRepository.save(user);
     }
 
@@ -58,7 +58,8 @@ public class UserService {
     public Optional<UserDto.Info> tokenLogin(UserDto.TokenLogin dto) {
         return authAgentFactory.get(dto.getProvider())
                 .getAuthAttrFrom(dto.getAccessToken())
-                .flatMap(attributes -> userRepository.findByAuthId(attributes.getAuthId())
+                .flatMap(attributes -> userRepository
+                        .findByAuthProviderAndAuthId(attributes.getProvider(), attributes.getAuthId())
                         .map(UserDto.Info::from));
     }
 

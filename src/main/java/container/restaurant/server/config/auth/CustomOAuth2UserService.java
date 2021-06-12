@@ -36,8 +36,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.of(
                 registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        User user = userService.createOrUpdateByEmail(
-                attributes.getEmail(), attributes::toEntity);
+        User user = userService.createOrUpdate(
+                attributes.getProvider(), attributes.getAuthId(), attributes::toEntity);
 
         httpSession.setAttribute("user", SessionUser.from(user));
 

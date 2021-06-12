@@ -129,7 +129,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 ));
 
         //then
-        User newUser = userRepository.findByAuthId(testAuthId)
+        User newUser = userRepository.findByAuthProviderAndAuthId(testProvider, testAuthId)
                 .orElseThrow();
 
         assertThat(newUser.getId()).isNotNull();

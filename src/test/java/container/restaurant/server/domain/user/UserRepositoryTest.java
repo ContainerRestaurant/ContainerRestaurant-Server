@@ -22,19 +22,21 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("이메일로 찾을 수 있다.")
+    @DisplayName("AuthId 와 Provider 로 찾을 수 있다.")
     void testFindByEmail() {
         //given
         String email = "test@test";
+        String authId = "authId";
+        AuthProvider provider = AuthProvider.KAKAO;
         User newUser = userRepository.save(User.builder()
-                .authId("authId")
-                .authProvider(AuthProvider.KAKAO)
+                .authId(authId)
+                .authProvider(provider)
                 .nickname("testNickname")
                 .email(email)
                 .build());
 
         //when
-        User found = userRepository.findByEmail(email)
+        User found = userRepository.findByAuthProviderAndAuthId(provider, authId)
                 .orElse(null);
 
         //then
