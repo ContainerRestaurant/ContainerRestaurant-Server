@@ -30,6 +30,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final Integer likeCount;
     private final Integer scrapCount;
     private final Integer replyCount;
+    private final Boolean isContainerFriendly;
 
     private final List<FeedMenuDto> mainMenu;
     private final List<FeedMenuDto> subMenu;
@@ -45,6 +46,7 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
 
         this.ownerNickname = feed.getOwner().getNickname();
         this.restaurantName = feed.getRestaurant().getName();
+        this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
         this.category = feed.getCategory();
         this.thumbnailUrl = ImageService.getUrlFromImage(feed.getThumbnail());
         this.content = feed.getContent();

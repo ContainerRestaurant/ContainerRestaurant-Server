@@ -229,6 +229,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("replyCount").description("본 피드의 댓글 개수"),
                                 fieldWithPath("isLike").description("현재 사용자가 본 피드를 좋아요 했는지 여부"),
                                 fieldWithPath("isScraped").description("현재 사용자가 본 피드를 스크랩 했는지 여부"),
+                                fieldWithPath("isContainerFriendly").description("용기 친화 식당 여부"),
                                 subsectionWithPath("mainMenu").description("본 피드에 등록된 메인 메뉴 리스트"),
                                 subsectionWithPath("subMenu").description("본 피드에 등록된 서브 메뉴 리스트"),
                                 subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세")
@@ -282,6 +283,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath(LIST_PATH + "[].likeCount").description("해당 피드 좋아요 개수"),
                                 fieldWithPath(LIST_PATH + "[].replyCount").description("해당 피드 답글 개수"),
                                 fieldWithPath(LIST_PATH + "[]._links.self.href").description("해당 피드의 상세 정보 링크"),
+                                fieldWithPath(LIST_PATH + "[].isContainerFriendly").description("용기 친화 식당 여부"),
                                 subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세"),
                                 fieldWithPath("page.size").description("본 피드 리스트의 페이지 당 피드 개수"),
                                 fieldWithPath("page.totalElements").description("본 피드 리스트의 전체 피드 개수"),

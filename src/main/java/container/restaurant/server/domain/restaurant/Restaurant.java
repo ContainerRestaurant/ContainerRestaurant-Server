@@ -58,6 +58,9 @@ public class Restaurant extends BaseEntity {
     @ColumnDefault("0.0")
     private float difficultySum;
 
+    @ColumnDefault("0")
+    private int welcomeCount;
+
     @SneakyThrows
     @Builder
     protected Restaurant(String name, String addr, double lon, double lat, Image thumbnail) {
@@ -102,4 +105,17 @@ public class Restaurant extends BaseEntity {
             return 0.0f;
         return this.difficultySum / this.feedCount;
     }
+
+    public void welcomeCountUp(boolean welcome) {
+        if (welcome) welcomeCount++;
+    }
+
+    public void welcomeCountDown(boolean welcome) {
+        if (welcome) welcomeCount--;
+    }
+
+    public boolean isContainerFriendly() {
+        return  welcomeCount >= 2;
+    }
+
 }

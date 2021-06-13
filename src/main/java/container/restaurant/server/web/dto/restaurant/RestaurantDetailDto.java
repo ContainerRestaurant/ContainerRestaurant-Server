@@ -15,6 +15,7 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
     private final String image_path;
     private final Integer feedCount;
     private final Float difficultyAvg;
+    private final Boolean isContainerFriendly;
 
     public static RestaurantDetailDto from(Restaurant restaurant) {
         return new RestaurantDetailDto(restaurant);
@@ -28,6 +29,7 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
         this.feedCount = restaurant.getFeedCount();
         this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
+        this.isContainerFriendly = restaurant.isContainerFriendly();
     }
 
 }

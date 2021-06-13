@@ -128,6 +128,7 @@ public class FeedService {
         feed.getOwner().feedCountDown();
         feed.getRestaurant().feedCountDown();
         feed.getRestaurant().subDifficultySum(feed.getDifficulty());
+        feed.getRestaurant().welcomeCountDown(feed.getWelcome());
 
         containerService.deleteAll(feed.getContainerList());
         feedHitRepository.deleteAllByFeed(feed);
@@ -145,6 +146,7 @@ public class FeedService {
         user.feedCountUp();
         restaurant.feedCountUp();
         restaurant.addDifficultySum(dto.getDifficulty());
+        restaurant.welcomeCountUp(dto.getWelcome());
 
         Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant, thumbnail));
         containerService.save(dto.toContainerListWith(feed, restaurant));
