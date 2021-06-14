@@ -2,7 +2,7 @@ package container.restaurant.server.web.linker;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.UserController;
-import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.web.dto.user.UserDto;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
 import org.springframework.stereotype.Component;
@@ -18,8 +18,8 @@ public class UserLinker {
     SessionUser u =
             DummyInvocationUtils.methodOn(SessionUser.class);
 
-    UserUpdateDto updateDto =
-            DummyInvocationUtils.methodOn(UserUpdateDto.class);
+    UserDto.Update updateDto =
+            DummyInvocationUtils.methodOn(UserDto.Update.class);
 
     public LinkBuilder getUserById(Long userId) {
         return linkTo(proxy.getUserById(userId, u));

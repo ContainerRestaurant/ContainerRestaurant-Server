@@ -1,5 +1,6 @@
-package container.restaurant.server.web.util;
+package container.restaurant.server.exception;
 
+import container.restaurant.server.exception.UnauthorizedException;
 import container.restaurant.server.exception.UsingPushTokenException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.exception.FailedAuthorizationException;
@@ -29,9 +30,15 @@ public class ExceptionAdvice {
     public ResponseEntity<?> authorizationException(UsingPushTokenException e) {
         return response(HttpStatus.FORBIDDEN, e);
     }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> constraintViolationException(ConstraintViolationException e) {
         return response(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> unauthorizedException(UnauthorizedException e) {
+        return response(HttpStatus.UNAUTHORIZED, e);
     }
 
     private ResponseEntity<EntityModel<ErrorDto>> response(HttpStatus status, Exception exception) {

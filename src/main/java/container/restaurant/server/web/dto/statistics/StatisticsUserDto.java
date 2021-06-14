@@ -1,5 +1,6 @@
 package container.restaurant.server.web.dto.statistics;
 
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.user.User;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
@@ -22,7 +23,7 @@ public class StatisticsUserDto extends RepresentationModel<StatisticsUserDto> im
         this.id = user.getId();
         this.level = user.getLevel();
         this.nickname = user.getNickname();
-        this.profile = user.getProfile();
+        this.profile = ImageService.getUrlFromImage(user.getProfile());
     }
 
 }

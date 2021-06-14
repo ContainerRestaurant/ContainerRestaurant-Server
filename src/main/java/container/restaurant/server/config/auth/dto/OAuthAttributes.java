@@ -1,5 +1,6 @@
 package container.restaurant.server.config.auth.dto;
 
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +14,13 @@ import java.util.Map;
 public class OAuthAttributes {
 
     private final Map<String, Object> attributes;
-    private final String nameAttributeKey;
+
+    private final String authId;
+    private final String nickname;
     private final String email;
-    private final String profile;
+    private final AuthProvider provider;
+
+    private final String nameAttributeKey;
 
     public static OAuthAttributes of(
             String registrationId, String userNameAttributeName, Map<String, Object> attributes
@@ -27,11 +32,17 @@ public class OAuthAttributes {
 
     public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
+                .provider(AuthProvider.GOOGLE)
+                .authId(attributes.get("sub").toString())
                 .email((String) attributes.get("email"))
-                .profile((String) attributes.get("picture"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
+                .nickname((String) attributes.get("name"))
                 .build();
+    }
+
+    public static OAuthAttributes ofKakao(Map<String, Object> attributes) {
+        return ofKakao(null, attributes);
     }
 
     @SuppressWarnings("unchecked")
@@ -40,17 +51,20 @@ public class OAuthAttributes {
         Map<String, String> kakaoAccount = (Map<String, String>) attributes.get("kakao_account");
 
         return OAuthAttributes.builder()
+                .provider(AuthProvider.KAKAO)
+                .authId(attributes.get("id").toString())
                 .email(kakaoAccount.get("email"))
-                .profile(properties.get("profile_image"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
+                .nickname(properties.get("nickname"))
                 .build();
     }
 
     public User toEntity() {
         return User.builder()
+                .authProvider(provider)
+                .authId(authId)
                 .email(email)
-                .profile(profile)
                 .build();
     }
 }

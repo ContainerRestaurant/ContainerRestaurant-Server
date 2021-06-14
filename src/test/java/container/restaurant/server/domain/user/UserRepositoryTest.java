@@ -22,16 +22,21 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("이메일로 찾을 수 있다.")
+    @DisplayName("AuthId 와 Provider 로 찾을 수 있다.")
     void testFindByEmail() {
         //given
         String email = "test@test";
+        String authId = "authId";
+        AuthProvider provider = AuthProvider.KAKAO;
         User newUser = userRepository.save(User.builder()
+                .authId(authId)
+                .authProvider(provider)
+                .nickname("testNickname")
                 .email(email)
                 .build());
 
         //when
-        User found = userRepository.findByEmail(email)
+        User found = userRepository.findByAuthProviderAndAuthId(provider, authId)
                 .orElse(null);
 
         //then
@@ -44,20 +49,12 @@ class UserRepositoryTest {
     @DisplayName("닉네임 null 테스트")
     void testNickNameNullable() {
         //given
-        User user1 = User.builder()
+        final User user1 = User.builder()
                 .email("test1@test")
                 .build();
-        User user2 = User.builder()
-                .email("test2@test")
-                .build();
 
-        //when
-        user1 = userRepository.save(user1);
-        user2 = userRepository.save(user2);
-
-        //then
-        assertThat(user1.getNickname()).isNull();
-        assertThat(user2.getNickname()).isNull();
+        //expect
+        assertThatThrownBy(() -> userRepository.save(user1));
     }
 
     @Test
@@ -65,6 +62,8 @@ class UserRepositoryTest {
     void testDuplicatedNickname() {
         //given
         User user1 = User.builder()
+                .authId("authId")
+                .authProvider(AuthProvider.KAKAO)
                 .email("test1@test")
                 .build();
         final User user2 = User.builder()
@@ -84,40 +83,22 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("이메일 중복 불가 테스트")
-    void testDuplicatedEmail() {
-        //given
-        String email = "test@test";
-        User user1 = User.builder()
-                .email(email)
-                .build();
-        final User user2 = User.builder()
-                .email(email)
-                .build();
-
-        //when
-        user1 = userRepository.save(user1);
-
-        //then
-        assertThat(user1.getEmail()).isEqualTo(email);
-        assertThatThrownBy(() -> userRepository.save(user2))
-                .isInstanceOf(DataIntegrityViolationException.class);
-    }
-
-    @Test
     @DisplayName("닉네인 중복 확인 테스트")
     void testExistsNickname() {
         //given
         String nickname = "추가된닉네임";
         User user1 = User.builder()
+                .authId("authId")
+                .authProvider(AuthProvider.KAKAO)
                 .email("test@test")
+                .nickname(nickname)
                 .build();
-        user1.setNickname(nickname);
         assertThat(userRepository.existsUserByNickname(nickname)).isFalse();
 
         //when
-        user1 = userRepository.save(user1);
+        userRepository.save(user1);
 
+        //then
         assertThat(userRepository.existsUserByNickname(nickname)).isTrue();
     }
 

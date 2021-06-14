@@ -5,6 +5,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
@@ -60,20 +61,23 @@ public class FeedRepositoryTest {
 
     @BeforeEach
     void beforeEach() throws InterruptedException {
-        // 3명의 유저
-        users = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            users.add(User.builder()
-                    .email("me" + i + "@test.com")
-                    .profile("https://my" + i + ".profile.path")
-                    .nickname("TestNickname" + i)
-                    .build());
-        }
-        users = userRepository.saveAll(users);
 
         Image image = imageRepository.save(Image.builder()
                 .url("image_path_url")
                 .build());
+
+        // 3명의 유저
+        users = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            users.add(User.builder()
+                    .authId("authId" + i)
+                    .authProvider(AuthProvider.KAKAO)
+                    .email("me" + i + "@test.com")
+                    .profile(image)
+                    .nickname("TestNickname" + i)
+                    .build());
+        }
+        users = userRepository.saveAll(users);
 
         // 5개의 식당
         restaurants = new ArrayList<>();

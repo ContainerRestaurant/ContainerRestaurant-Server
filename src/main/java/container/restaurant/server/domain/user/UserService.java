@@ -1,17 +1,23 @@
 package container.restaurant.server.domain.user;
 
+import container.restaurant.server.config.auth.dto.OAuthAttributes;
+import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.web.dto.user.UserInfoDto;
-import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.process.oauth.OAuthAgentFactory;
+import container.restaurant.server.web.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Service
@@ -19,27 +25,61 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final ImageService imageService;
+
+    private final OAuthAgentFactory authAgentFactory;
+
     @Transactional
-    public User createOrUpdateByEmail(
-            @Email String email,
-            Supplier<@Valid ? extends User> supplier
+    public User createOrUpdate(
+            AuthProvider provider, String authId, Supplier<@Valid ? extends User> supplier
     ) {
-        User user = userRepository.findByEmail(email)
-                .orElse(supplier.get());
+        User user = userRepository.findByAuthProviderAndAuthId(provider, authId)
+                .orElseGet(supplier);
+
         return userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
-    public UserInfoDto getUserInfoById(Long id) throws ResourceNotFoundException {
+    @Transactional
+    public UserDto.Info createFrom(UserDto.Create dto) {
+        OAuthAttributes attrs = authAgentFactory.get(dto.getProvider())
+                .getAuthAttrFrom(dto.getAccessToken())
+                .orElseThrow(() -> new ValidationException("유효하지 않은 액세스토큰입니다."));
 
-        return UserInfoDto.from(findById(id));
+        User newUser = of(attrs.toEntity())
+                .flatMap(user -> userRepository.findByAuthProviderAndAuthId(user.getAuthProvider(), user.getAuthId()))
+                .orElseGet(() -> userRepository.save(attrs.toEntity()));
+
+        ofNullable(dto.getProfileId())
+                .ifPresent(profileId -> newUser.setProfile(imageService.findById(profileId)));
+
+        return UserDto.Info.from(newUser);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserDto.Info> tokenLogin(UserDto.TokenLogin dto) {
+        return authAgentFactory.get(dto.getProvider())
+                .getAuthAttrFrom(dto.getAccessToken())
+                .flatMap(attributes -> userRepository
+                        .findByAuthProviderAndAuthId(attributes.getProvider(), attributes.getAuthId())
+                        .map(UserDto.Info::from));
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto.Info getUserInfoById(Long id) throws ResourceNotFoundException {
+
+        return UserDto.Info.from(findById(id));
     }
 
     @Transactional
-    public UserInfoDto update(Long id, UserUpdateDto updateDto) {
+    public UserDto.Info update(Long id, UserDto.Update dto) {
         User user = findById(id);
-        updateDto.updateUser(user);
-        return UserInfoDto.from(user);
+        ofNullable(dto.getNickname()).ifPresent(user::setNickname);
+        ofNullable(dto.getProfileId())
+                .map(imageService::findById)
+                .ifPresent(user::setProfile);
+        ofNullable(dto.getPushToken())
+                .ifPresent(user::setPushToken);
+        return UserDto.Info.from(user);
     }
 
     @Transactional(readOnly = true)

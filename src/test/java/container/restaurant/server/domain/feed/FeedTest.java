@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.feed;
 
+import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class FeedTest {
         //given
         User user = User.builder()
                 .email("test@test.com")
-                .profile("https://my.profile")
+                .profile(new Image("testImage"))
                 .build();
         String description = "description";
         Boolean welcome = true;

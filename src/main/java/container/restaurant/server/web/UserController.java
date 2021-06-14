@@ -5,9 +5,8 @@ import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exception.FailedAuthorizationException;
-import container.restaurant.server.web.dto.user.NicknameExistsDto;
-import container.restaurant.server.web.dto.user.UserInfoDto;
-import container.restaurant.server.web.dto.user.UserUpdateDto;
+import container.restaurant.server.exception.UnauthorizedException;
+import container.restaurant.server.web.dto.user.UserDto;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.RestaurantFavoriteLinker;
 import container.restaurant.server.web.linker.UserLinker;
@@ -17,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -32,6 +32,36 @@ public class UserController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
     private final RestaurantFavoriteLinker restaurantFavoriteLinker;
+
+    @PostMapping
+    public ResponseEntity<?> createWithToken(
+            @LoginUser SessionUser sessionUser, @RequestBody @Valid UserDto.Create dto
+    ) {
+        if (sessionUser != null)
+            return ResponseEntity.noContent().build();
+
+        SessionUser newSession = SessionUser.from(userService.createFrom(dto));
+        setLoginUser(newSession);
+
+        return ResponseEntity
+                .created(userLinker.getUserById(newSession.getId()).toUri())
+                .build();
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<?> tokenLogin(
+            @LoginUser SessionUser sessionUser, @RequestBody UserDto.TokenLogin dto
+    ) {
+        if (sessionUser != null)
+            return ResponseEntity.noContent().build();
+
+        return userService.tokenLogin(dto)
+                .map(info -> {
+                    setLoginUser(SessionUser.from(info));
+                    return ResponseEntity.ok(setLinks(info, info.getId()));
+                })
+                .orElseThrow(() -> new UnauthorizedException("로그인 실패 - 해당 사용자를 찾을 수 없습니다."));
+    }
 
     @GetMapping
     public ResponseEntity<?> getCurrentUser(@LoginUser SessionUser sessionUser) {
@@ -54,7 +84,7 @@ public class UserController {
     @PatchMapping("{id}")
     public ResponseEntity<?> updateUserById(
             @PathVariable Long id, @LoginUser SessionUser sessionUser,
-            @RequestBody UserUpdateDto updateDto
+            @RequestBody UserDto.Update updateDto
     ) {
         if (!id.equals(sessionUser.getId()))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
@@ -72,6 +102,7 @@ public class UserController {
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         userService.deleteById(id);
+        logout();
 
         return ResponseEntity.noContent().build();
     }
@@ -81,15 +112,15 @@ public class UserController {
             @NicknameConstraint @RequestParam String nickname
     ) {
         return ResponseEntity.ok(
-                setLinks(NicknameExistsDto.of(nickname, userService.existsUserByNickname(nickname)))
+                setLinks(UserDto.NicknameExists.of(nickname, userService.existsUserByNickname(nickname)))
         );
     }
 
-    private NicknameExistsDto setLinks(NicknameExistsDto dto) {
+    private UserDto.NicknameExists setLinks(UserDto.NicknameExists dto) {
         return dto.add(userLinker.existsNickname(dto.getNickname()).withSelfRel());
     }
 
-    private UserInfoDto setLinks(UserInfoDto dto, Long loginId) {
+    private UserDto.Info setLinks(UserDto.Info dto, Long loginId) {
         return dto
                 .add(
                         userLinker.getUserById(dto.getId()).withSelfRel(),
@@ -108,8 +139,16 @@ public class UserController {
     private final HttpSession httpSession;
     @GetMapping("temp-login")
     public ResponseEntity<?> tempLogin() {
-        httpSession.setAttribute("user", SessionUser.from(userService.findById(1L)));
+        setLoginUser(SessionUser.from(userService.findById(1L)));
         return ResponseEntity.noContent().build();
+    }
+
+    private void setLoginUser(SessionUser newSession) {
+        httpSession.setAttribute("user", newSession);
+    }
+
+    private void logout() {
+        setLoginUser(null);
     }
 
 }

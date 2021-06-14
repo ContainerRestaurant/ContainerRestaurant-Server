@@ -11,6 +11,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByAuthProviderAndAuthId(AuthProvider provider, String authId);
+
     boolean existsUserByNickname(String nickName);
 
     @Query("select distinct u from TB_USERS u join TB_FEED  f on f.owner.id = u.id where f.createdDate between ?1 and ?2")

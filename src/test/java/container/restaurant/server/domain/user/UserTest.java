@@ -1,5 +1,7 @@
 package container.restaurant.server.domain.user;
 
+import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.push.PushToken;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,24 +21,34 @@ class UserTest {
     @DisplayName("빌더 테스트")
     void testBuilder() {
         //given
+        String authId = "testId";
+        AuthProvider provider = AuthProvider.KAKAO;
         String email = "test@test.com";
-        String profile = "profilePath";
+        String nickname = "testNickname";
+        Image profile = new Image("profilePath");
+        PushToken pushToken = new PushToken("testToken");
 
         //when
         User user = User.builder()
+                .authId(authId)
+                .authProvider(provider)
                 .email(email)
+                .nickname(nickname)
                 .profile(profile)
+                .pushToken(pushToken)
                 .build();
 
         //then
+        assertThat(user.getAuthId()).isEqualTo(authId);
+        assertThat(user.getAuthProvider()).isEqualTo(provider);
         assertThat(user.getEmail()).isEqualTo(email);
-        assertThat(user.getNickname()).isNull();
-        assertThat(user.getProfile()).isEqualTo(profile);
-        assertThat(user.getGreeting()).isNull();
-        assertThat(user.getLevel()).isEqualTo(1);
+        assertThat(user.getNickname()).isEqualTo(nickname);
+        assertThat(user.getProfile().getUrl()).isEqualTo(profile.getUrl());
+        assertThat(user.getLevel()).isEqualTo(0);
         assertThat(user.getLevelFeedCount()).isEqualTo(0);
         assertThat(user.getFeedCount()).isEqualTo(0);
         assertThat(user.getBanned()).isFalse();
+        assertThat(user.getPushToken()).isEqualTo(pushToken);
     }
 
     @ParameterizedTest

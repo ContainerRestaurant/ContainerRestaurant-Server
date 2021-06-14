@@ -7,6 +7,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -50,13 +51,16 @@ class ScrapFeedRepositoryTest {
     @Test
     void testExistsByUserAndFeed() {
         //given: user 와 feed 가 주어졌을 때
-        User user = userRepository.save(User.builder()
-                .email("test@test.com")
-                .profile("https://my.profile")
-                .build());
-
         Image image = imageRepository.save(Image.builder()
                 .url("image_path_url")
+                .build());
+
+        User user = userRepository.save(User.builder()
+                .authId("authId")
+                .authProvider(AuthProvider.KAKAO)
+                .email("test@test.com")
+                .nickname("testNickname")
+                .profile(image)
                 .build());
 
         Restaurant restaurant = restaurantRepository.save(Restaurant.builder()

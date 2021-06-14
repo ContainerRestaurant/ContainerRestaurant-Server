@@ -10,6 +10,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
+import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -59,13 +60,16 @@ class CommentLikeServiceTest {
     @BeforeEach
     void beforeEach(){
 
-        user = userRepository.save(User.builder()
-                .email("test@test.com")
-                .profile("https://my.profile")
-                .build());
-
         image = imageRepository.save(Image.builder()
                 .url("image_path_url")
+                .build());
+
+        user = userRepository.save(User.builder()
+                .authId("authId")
+                .authProvider(AuthProvider.KAKAO)
+                .email("test@test.com")
+                .profile(image)
+                .nickname("testNickname")
                 .build());
 
         restaurant = restaurantRepository.save(Restaurant.builder()
