@@ -40,8 +40,11 @@ public class UserController {
         if (sessionUser != null)
             return ResponseEntity.noContent().build();
 
+        SessionUser newSession = SessionUser.from(userService.createFrom(dto));
+        setLoginUser(newSession);
+
         return ResponseEntity
-                .created(userLinker.getUserById(userService.createFrom(dto)).toUri())
+                .created(userLinker.getUserById(newSession.getId()).toUri())
                 .build();
     }
 
@@ -54,7 +57,7 @@ public class UserController {
 
         return userService.tokenLogin(dto)
                 .map(info -> {
-                    httpSession.setAttribute("user", SessionUser.from(info));
+                    setLoginUser(SessionUser.from(info));
                     return ResponseEntity.ok(setLinks(info, info.getId()));
                 })
                 .orElseThrow(() -> new UnauthorizedException("로그인 실패 - 해당 사용자를 찾을 수 없습니다."));
@@ -99,6 +102,7 @@ public class UserController {
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         userService.deleteById(id);
+        logout();
 
         return ResponseEntity.noContent().build();
     }
@@ -135,8 +139,16 @@ public class UserController {
     private final HttpSession httpSession;
     @GetMapping("temp-login")
     public ResponseEntity<?> tempLogin() {
-        httpSession.setAttribute("user", SessionUser.from(userService.findById(1L)));
+        setLoginUser(SessionUser.from(userService.findById(1L)));
         return ResponseEntity.noContent().build();
+    }
+
+    private void setLoginUser(SessionUser newSession) {
+        httpSession.setAttribute("user", newSession);
+    }
+
+    private void logout() {
+        setLoginUser(null);
     }
 
 }
