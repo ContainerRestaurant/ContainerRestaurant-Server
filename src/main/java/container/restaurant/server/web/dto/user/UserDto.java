@@ -27,9 +27,6 @@ public interface UserDto {
         @NotEmpty
         private final String accessToken;
 
-        @NicknameConstraint
-        private final String nickname;
-
         private final Long profileId;
 
         private final PushToken pushToken;

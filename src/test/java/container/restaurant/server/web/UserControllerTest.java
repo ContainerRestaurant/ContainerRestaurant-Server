@@ -88,13 +88,11 @@ class UserControllerTest extends BaseUserControllerTest {
         //given-1 회원 가입 요청이 주어진다.
         AuthProvider testProvider = AuthProvider.KAKAO;
         String testAccessToken = "[ACCESS_TOKEN]";
-        String testNickname = "userNickname";
         Long testProfileId = image.getId();
 
         UserDto.Create dto = UserDto.Create.builder()
                 .accessToken(testAccessToken)
                 .provider(testProvider)
-                .nickname(testNickname)
                 .profileId(testProfileId)
                 .build();
 
@@ -105,7 +103,6 @@ class UserControllerTest extends BaseUserControllerTest {
         when(oAuthAgentFactory.get(testProvider)).thenReturn(agent);
         when(agent.getAuthAttrFrom(testAccessToken)).thenReturn(of(OAuthAttributes.builder()
                 .provider(testProvider)
-                .nickname("ProviderNickname")
                 .authId(testAuthId)
                 .email(testEmail)
                 .build()));
@@ -122,7 +119,6 @@ class UserControllerTest extends BaseUserControllerTest {
                         requestFields(
                                 fieldWithPath("provider").description("가입 시 사용자 정보를 가져올 OAuth 제공자 +\n(KAKAO)"),
                                 fieldWithPath("accessToken").description("OAuth 제공자에서 사용할 액세스 토큰"),
-                                fieldWithPath("nickname").description("가입 시 사용할 닉네임 +\n 기본값: OAuth 사용자 닉네임"),
                                 fieldWithPath("profileId").description("가입 시 사용할 프로필 사진 식별 ID"),
                                 fieldWithPath("pushToken").description("가입하는 사용자가 사용하고있는 푸쉬 토큰")
                         )
@@ -134,7 +130,7 @@ class UserControllerTest extends BaseUserControllerTest {
 
         assertThat(newUser.getId()).isNotNull();
         assertThat(newUser.getAuthId()).isEqualTo(testAuthId);
-        assertThat(newUser.getNickname()).isEqualTo(testNickname);
+        assertThat(newUser.getNickname()).isNull();
         assertThat(newUser.getProfile().getId()).isEqualTo(testProfileId);
         assertThat(newUser.getEmail()).isEqualTo(testEmail);
     }

@@ -46,8 +46,6 @@ public class UserService {
                 .orElseThrow(() -> new ValidationException("유효하지 않은 액세스토큰입니다."));
 
         User newUser = userRepository.save(attrs.toEntity());
-        ofNullable(dto.getNickname())
-                .ifPresent(newUser::setNickname);
         ofNullable(dto.getProfileId())
                 .ifPresent(profileId -> newUser.setProfile(imageService.findById(profileId)));
 

@@ -52,7 +52,6 @@ public class UserController {
         if (sessionUser != null)
             return ResponseEntity.noContent().build();
 
-
         return userService.tokenLogin(dto)
                 .map(info -> {
                     httpSession.setAttribute("user", SessionUser.from(info));

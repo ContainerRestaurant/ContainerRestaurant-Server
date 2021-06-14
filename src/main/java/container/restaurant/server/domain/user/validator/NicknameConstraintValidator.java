@@ -13,7 +13,7 @@ public class NicknameConstraintValidator implements ConstraintValidator<Nickname
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null)
-            return false;
+            return true;
 
         int length = 0;
 

@@ -65,7 +65,6 @@ public class OAuthAttributes {
                 .authProvider(provider)
                 .authId(authId)
                 .email(email)
-                .nickname(nickname)
                 .build();
     }
 }
