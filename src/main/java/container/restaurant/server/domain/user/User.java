@@ -22,7 +22,6 @@ public class User extends BaseCreatedTimeEntity {
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
 
-    @Column(nullable = false)
     private String email;
 
     @NicknameConstraint
