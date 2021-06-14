@@ -119,8 +119,8 @@ class UserControllerTest extends BaseUserControllerTest {
                         requestFields(
                                 fieldWithPath("provider").description("가입 시 사용자 정보를 가져올 OAuth 제공자 +\n(KAKAO)"),
                                 fieldWithPath("accessToken").description("OAuth 제공자에서 사용할 액세스 토큰"),
-                                fieldWithPath("profileId").description("가입 시 사용할 프로필 사진 식별 ID"),
-                                fieldWithPath("pushToken").description("가입하는 사용자가 사용하고있는 푸쉬 토큰")
+                                fieldWithPath("profileId").description("(Optional) 가입 시 사용할 프로필 사진 식별 ID"),
+                                fieldWithPath("pushToken").description("(Optional) 가입하는 사용자가 사용하고있는 푸쉬 토큰")
                         )
                 ));
 

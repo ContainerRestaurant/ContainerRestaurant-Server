@@ -120,7 +120,9 @@ OAuth 2.0 제공자와 응답받은 액세스 토큰 만으로도 로그인이 �
 
 operation::login-token[snippets='curl-request,request-fields,http-response']
 
-응답 형식은 <<user-get>> 을 참조합니다.
+응답 형식은 <<user-get>> 을 참조합니다. 로그인에 실패한 경우 _401 Unauthorized_ 상태를 응답합니다.
+
+로그인에 실패한 경우 <<user-create>>를 참조합니다.
 
 [[logout]]
 == 로그아웃
@@ -128,10 +130,9 @@ operation::login-token[snippets='curl-request,request-fields,http-response']
 
 [[user]]
 == 사용자
-외부 OAuth 2.0 제공자를 통해 최초 로그인 한 경우, 로그인한 계정의 이메일로 "용기낸 식당" 계정이 생성된다.
 
 [[user-create]]
-=== 사용자 정보생성(가입)
+=== 토큰으로 사용자 정보생성
 `POST /api/user`
 
 operation::user-create[snippets='curl-request,request-fields,http-response,response-headers']
