@@ -37,13 +37,15 @@ public class CommentService {
         User user = userService.findById(userId);
 
         Comment upperReply = ofNullable(commentCreateDto.getUpperReplyId())
-                .map(id -> this.findById(id).setIsHaveReply())
+                .map(this::findById)
                 .orElse(null);
-        Comment comment = commentCreateDto.toEntityWith(user, feed, upperReply);
-        feed.commentCountUp();
 
+        Comment comment = commentRepository.save(commentCreateDto.toEntityWith(user, feed, upperReply));
+
+        feed.commentCountUp();
         publisher.publishEvent(new FeedCommentedEvent(comment));
-        return CommentInfoDto.from(commentRepository.save(comment));
+
+        return CommentInfoDto.from(comment);
     }
 
     @Transactional(readOnly = true)
@@ -75,17 +77,17 @@ public class CommentService {
         if (!comment.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("삭제 할 수 있는 유저가 아닙니다.");
 
-        // 대댓글 있다면(isHaveReply) 댓글 isDeleted 처리
-        if (comment.getIsHaveReply()) {
+        // 대댓글 있다면(hasReply) 댓글 isDeleted 처리
+        if (comment.getHasReply()) {
             comment.setIsDeleted();
             return;
         }
         Comment upperReply = comment.getUpperReply();
-        // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
+        // 만약 답글이 삭제 되는 것이라면 상위 댓글의 hasReply = false 처리
         List<Comment> upperReplies = commentRepository.findAllByUpperReplyId(upperReply.getId());
         if (upperReplies.size() == 1) {
-            upperReply.unSetIsHaveReply();
-            // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
+            upperReply.unsetHasReply();
+            // 답글 삭제 시 상위 댓글의 isDeleted 가 true 라면 상위댓글도 삭제
             if (upperReply.getIsDeleted())
                 commentRepository.deleteById(upperReply.getId());
         }
