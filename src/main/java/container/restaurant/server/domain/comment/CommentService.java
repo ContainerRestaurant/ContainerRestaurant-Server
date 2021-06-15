@@ -1,12 +1,11 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.exception.FailedAuthorizationException;
-import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
@@ -75,24 +73,24 @@ public class CommentService {
         Comment comment = findById(id);
 
         if (!comment.getOwner().getId().equals(userId))
-            throw new FailedAuthorizationException("삭제 할 수 있는 유저가 아닙니다.");
+            throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
 
         // 대댓글 있다면(hasReply) 댓글 isDeleted 처리
         if (comment.getHasReply()) {
             comment.setIsDeleted();
-            return;
+        } else {
+            ofNullable(comment.getUpperReply())
+                    .filter(upperReply ->
+                            commentRepository.findAllByUpperReplyId(upperReply.getId()).size() == 1)
+                    .ifPresent(upperReply -> {
+                        if (upperReply.getIsDeleted()) {
+                            commentRepository.delete(upperReply);
+                        } else {
+                            upperReply.unsetHasReply();
+                        }
+                    });
+            commentRepository.delete(comment);
         }
-        Comment upperReply = comment.getUpperReply();
-        // 만약 답글이 삭제 되는 것이라면 상위 댓글의 hasReply = false 처리
-        List<Comment> upperReplies = commentRepository.findAllByUpperReplyId(upperReply.getId());
-        if (upperReplies.size() == 1) {
-            upperReply.unsetHasReply();
-            // 답글 삭제 시 상위 댓글의 isDeleted 가 true 라면 상위댓글도 삭제
-            if (upperReply.getIsDeleted())
-                commentRepository.deleteById(upperReply.getId());
-        }
-        // delete
-        commentRepository.deleteById(id);
         comment.getFeed().commentCountDown();
     }
 

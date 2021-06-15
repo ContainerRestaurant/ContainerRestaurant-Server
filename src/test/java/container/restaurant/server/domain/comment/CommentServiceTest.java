@@ -162,32 +162,32 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글 삭제")
     void deleteComment(){
-        // 대댓글 작성
+        // given 대댓글 작성
         CommentCreateDto commentCreateDto = new CommentCreateDto("test", comments.get(0).getId());
         CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
         assertThat(commentRepository.findAll().size()).isEqualTo(11);
+        long count = commentRepository.count();
 
-
-        // 대댓글이 있는 (상위)댓글 삭제
+        // when-1 대댓글이 있는 (상위)댓글 삭제
         commentService.deleteById(
                 comments.get(0).getId(),
                 users.get(0).getId()
         );
-        // then : 총 댓글 개수에 영향을 주지 않고, 상위 댓글의 isDeleted 값이 true 로 변경
-        assertThat(commentRepository.findAll().size()).isEqualTo(11);
+        // then-1 총 댓글 개수에 영향을 주지 않고, 상위 댓글의 isDeleted 값이 true 로 변경
+        assertThat(commentRepository.count()).isEqualTo(count);
         assertThat(commentRepository.findById(comments.get(0).getId())
                 .orElseThrow(()->new ResourceNotFoundException("없음")).getIsDeleted() )
                 .isEqualTo(true);
 
-        // 대댓글 삭제
+        // when-2 대댓글 삭제
         commentService.deleteById(
                 commentRepository.findById(dto.getId())
                         .orElseThrow(()-> new ResourceNotFoundException("대댓글 없음")).getId(),
                 users.get(0).getId()
         );
-        // then-1 : 상위 댓글까지 없어짐 -> 총 댓글 개수 -2
-        assertThat(commentRepository.findAll().size()).isEqualTo(9);
-        // then-2 : 상위 댓글이 없어짐(상위 댓글을 찾으면 예외 반환)
+        // then-2-1 : 상위 댓글까지 없어짐 -> 총 댓글 개수 -2
+        assertThat(commentRepository.count()).isEqualTo(count - 2);
+        // then-2-2 : 상위 댓글이 없어짐(상위 댓글을 찾으면 예외 반환)
         Assertions.assertThatThrownBy(()->
             commentRepository.findById(comments.get(0).getId())
                     .orElseThrow(()->new ResourceNotFoundException("댓글 없음"))
