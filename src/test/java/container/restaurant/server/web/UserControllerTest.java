@@ -146,7 +146,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
                 .andExpect(jsonPath("profile").value(containsString(image.getUrl())))
-                .andExpect(jsonPath("level").value(myself.getLevel()))
+                .andExpect(jsonPath("levelTitle").value(myself.getLevelTitle()))
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
@@ -173,7 +173,7 @@ class UserControllerTest extends BaseUserControllerTest {
                                 fieldWithPath("email").description("본 사용자의 이메일 주소"),
                                 fieldWithPath("nickname").description("본 사용자의 닉네임"),
                                 fieldWithPath("profile").description("본 사용자의 프로필 경로"),
-                                fieldWithPath("level").description("본 사용자의 레벨"),
+                                fieldWithPath("levelTitle").description("본 사용자의 레벨 타이틀"),
                                 fieldWithPath("feedCount").description("본 사용자의 피드 개수"),
                                 fieldWithPath("scrapCount").description("본 사용자의 스크랩한 피드 개수"),
                                 fieldWithPath("bookmarkedCount").description("본 사용자의 즐겨찾는 식당 개수"),
@@ -192,7 +192,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("email").value(other.getEmail()))
                 .andExpect(jsonPath("nickname").value(other.getNickname()))
                 .andExpect(jsonPath("profile").value(containsString(image.getUrl())))
-                .andExpect(jsonPath("level").value(other.getLevel()))
+                .andExpect(jsonPath("levelTitle").value(myself.getLevelTitle()))
                 .andExpect(jsonPath("feedCount").value(other.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(other.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(other.getBookmarkedCount()))
@@ -238,7 +238,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(nickname))
                 .andExpect(jsonPath("profile").value(containsString(newImage.getUrl())))
-                .andExpect(jsonPath("level").value(myself.getLevel()))
+                .andExpect(jsonPath("levelTitle").value(myself.getLevelTitle()))
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))
@@ -392,7 +392,7 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("email").value(myself.getEmail()))
                 .andExpect(jsonPath("nickname").value(myself.getNickname()))
                 .andExpect(jsonPath("profile").value(containsString(image.getUrl())))
-                .andExpect(jsonPath("level").value(myself.getLevel()))
+                .andExpect(jsonPath("levelTitle").value(myself.getLevelTitle()))
                 .andExpect(jsonPath("feedCount").value(myself.getFeedCount()))
                 .andExpect(jsonPath("scrapCount").value(myself.getScrapCount()))
                 .andExpect(jsonPath("bookmarkedCount").value(myself.getBookmarkedCount()))

@@ -1,5 +1,6 @@
 package container.restaurant.server.web.dto;
 
+import container.restaurant.server.domain.user.ContainerLevel;
 import container.restaurant.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.function.Function;
 
+import static container.restaurant.server.domain.user.ContainerLevel.LEVEL_1;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -17,7 +19,7 @@ public class IndexDto extends RepresentationModel<IndexDto> {
     private final Long loginId;
     private final Integer myContainer;
     private final Long totalContainer;
-    private final Integer myLevel;
+    private final String myLevelTitle;
     private final String phrase;
 
     @Builder
@@ -26,7 +28,7 @@ public class IndexDto extends RepresentationModel<IndexDto> {
                 from(user, User::getId, null),
                 from(user, User::getFeedCount, 0),
                 totalContainer,
-                from(user, User::getLevel, 0),
+                from(user, User::getLevelTitle, LEVEL_1.getTitle()),
                 phrase);
     }
 

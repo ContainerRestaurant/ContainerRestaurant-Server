@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
+import static container.restaurant.server.domain.user.ContainerLevel.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -44,7 +45,7 @@ class UserTest {
         assertThat(user.getEmail()).isEqualTo(email);
         assertThat(user.getNickname()).isEqualTo(nickname);
         assertThat(user.getProfile().getUrl()).isEqualTo(profile.getUrl());
-        assertThat(user.getLevel()).isEqualTo(0);
+        assertThat(user.getLevelTitle()).isEqualTo(LEVEL_1.getTitle());
         assertThat(user.getLevelFeedCount()).isEqualTo(0);
         assertThat(user.getFeedCount()).isEqualTo(0);
         assertThat(user.getBanned()).isFalse();
@@ -54,7 +55,7 @@ class UserTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("레벨링 테스트")
-    void testLeveling(int before, int count, boolean up, int expectedLevel) throws NoSuchFieldException, IllegalAccessException {
+    void testLeveling(int before, int count, boolean up, ContainerLevel expectedLevel) throws NoSuchFieldException, IllegalAccessException {
         //given
         User user = new User();
         Field f = User.class.getDeclaredField("levelFeedCount");
@@ -66,15 +67,15 @@ class UserTest {
         else user.levelFeedDown(count);
 
         //then
-        assertThat(user.getLevel()).isEqualTo(expectedLevel);
+        assertThat(user.getContainerLevel()).isEqualTo(expectedLevel);
     }
 
     static Stream<Arguments> testLeveling() {
         return Stream.of(
-                arguments(3, 3, false, 0),
-                arguments(3, 7, true, 3),
-                arguments(25, 6, false, 3),
-                arguments(0, 5, true, 2)
+                arguments(3, 3, false, LEVEL_1),
+                arguments(3, 7, true, LEVEL_4),
+                arguments(25, 6, false, LEVEL_4),
+                arguments(0, 5, true, LEVEL_3)
         );
     }
 

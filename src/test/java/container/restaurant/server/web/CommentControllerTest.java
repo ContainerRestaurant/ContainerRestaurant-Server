@@ -58,7 +58,7 @@ class CommentControllerTest extends BaseFeedAndCommentControllerTest {
                                 fieldWithPath("ownerId").description("본 댓글 작성자 식별 ID"),
                                 fieldWithPath("ownerNickName").description("본 댓글 작성자의 닉네임"),
                                 fieldWithPath("ownerProfile").description("본 댓글 작성자 프로필 링크"),
-                                fieldWithPath("ownerLevel").description("본 댓글 작성자 레벨"),
+                                fieldWithPath("ownerLevelTitle").description("본 댓글 작성자 레벨 타이틀"),
                                 fieldWithPath("createdDate").description("본 댓글 작성 일시"),
                                 subsectionWithPath("commentReply").description("본 댓글의 답댓글 목록"),
                                 subsectionWithPath("_links").description("본 댓글에서 전이 가능한 링크 목록")
