@@ -40,7 +40,7 @@ public interface UserDto {
         private final String email;
         private final String nickname;
         private final String profile;
-        private final Integer level;
+        private final String levelTitle;
         private final Integer feedCount;
         private final Integer scrapCount;
         private final Integer bookmarkedCount;
@@ -54,7 +54,7 @@ public interface UserDto {
             this.email = user.getEmail();
             this.nickname = user.getNickname();
             this.profile = ImageService.getUrlFromImage(user.getProfile());
-            this.level = user.getLevel();
+            this.levelTitle = user.getLevelTitle();
             this.feedCount = user.getFeedCount();
             this.scrapCount = user.getScrapCount();
             this.bookmarkedCount = user.getBookmarkedCount();

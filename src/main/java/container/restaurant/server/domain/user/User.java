@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static container.restaurant.server.domain.user.ContainerLevel.*;
+
 @Getter
 @NoArgsConstructor
 @Entity(name = "TB_USERS")
@@ -31,7 +33,8 @@ public class User extends BaseCreatedTimeEntity {
     @OneToOne
     private Image profile;
 
-    private Integer level;
+    @Enumerated(EnumType.STRING)
+    private ContainerLevel containerLevel;
 
     private Integer levelFeedCount;
 
@@ -54,13 +57,17 @@ public class User extends BaseCreatedTimeEntity {
         this.email = email;
         this.nickname = nickname;
         this.profile = profile;
-        this.level = 0;
+        this.containerLevel = LEVEL_1;
         this.levelFeedCount = 0;
         this.feedCount = 0;
         this.scrapCount = 0;
         this.bookmarkedCount = 0;
         this.banned = false;
         this.pushToken = pushToken;
+    }
+
+    public String getLevelTitle() {
+        return this.containerLevel.getTitle();
     }
 
     public void setNickname(String nickname) {
@@ -106,15 +113,15 @@ public class User extends BaseCreatedTimeEntity {
 
     private void updateLevel() {
         if (this.levelFeedCount <= 0) {
-            this.level = 0;
+            this.containerLevel = LEVEL_1;
         } else if (this.levelFeedCount < 5) {
-            this.level = 1;
+            this.containerLevel = LEVEL_2;
         } else if (this.levelFeedCount < 10) {
-            this.level = 2;
+            this.containerLevel = LEVEL_3;
         } else if (this.levelFeedCount < 20) {
-            this.level = 3;
+            this.containerLevel = LEVEL_4;
         } else {
-            this.level = 4;
+            this.containerLevel = LEVEL_5;
         }
     }
 }

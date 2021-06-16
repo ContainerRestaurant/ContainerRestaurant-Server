@@ -19,7 +19,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     private final Long ownerId;
     private final String ownerNickName;
     private final String ownerProfile;
-    private final Integer ownerLevel;
+    private final String ownerLevelTitle;
     private final String createdDate;
     private final List<CommentInfoDto> commentReply = new ArrayList<>();
 
@@ -37,7 +37,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.ownerId = comment.getOwner().getId();
         this.ownerNickName = comment.getOwner().getNickname();
         this.ownerProfile = ImageService.getUrlFromImage(comment.getOwner().getProfile());
-        this.ownerLevel = comment.getOwner().getLevel();
+        this.ownerLevelTitle = comment.getOwner().getLevelTitle();
         this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("MM.dd"));
     }
 
@@ -49,7 +49,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.ownerId = null;
         this.ownerNickName = null;
         this.ownerProfile = null;
-        this.ownerLevel = null;
+        this.ownerLevelTitle = null;
         this.createdDate = null;
     }
 

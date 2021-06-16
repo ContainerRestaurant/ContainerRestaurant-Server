@@ -70,7 +70,7 @@ class IndexControllerTest extends BaseUserControllerTest {
                                 fieldWithPath("loginId").description("로그인한 사용자 ID 비로그인인 경우 null"),
                                 fieldWithPath("myContainer").description("로그인한 사용자가 작성한 용기내 피드 개수"),
                                 fieldWithPath("totalContainer").description("어제까지 작성된 전체 용기내 피드 개수"),
-                                fieldWithPath("myLevel").description("로그인한 사용자의 레벨"),
+                                fieldWithPath("myLevelTitle").description("로그인한 사용자의 레벨 타이틀"),
                                 fieldWithPath("phrase").description("메인 문구"),
                                 subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세")
                         )
