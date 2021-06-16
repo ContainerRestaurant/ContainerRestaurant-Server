@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.comment;
 
+import container.restaurant.server.domain.comment.like.CommentLikeRepository;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -28,6 +31,7 @@ public class CommentService {
     private final FeedService feedService;
 
     private final ApplicationEventPublisher publisher;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public CommentInfoDto createComment(CommentCreateDto commentCreateDto, Long feedId, Long userId) {
@@ -53,16 +57,23 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public CollectionModel<CommentInfoDto> findAllByFeed(Long feedId) throws ResourceNotFoundException {
+    public CollectionModel<CommentInfoDto> findAllByFeed(Long userId, Long feedId) throws ResourceNotFoundException {
         Feed feed = feedService.findById(feedId);
 
         LinkedHashMap<Long, CommentInfoDto> commentDtoMap = new LinkedHashMap<>();
 
-        commentRepository.findAllByFeed(feed).forEach(comment ->
+        List<Comment> commentList = commentRepository.findAllByFeed(feed);
+
+        Set<Long> likeIds = ofNullable(userId)
+                .map(id -> commentLikeRepository.test(id, commentList))
+                .orElseGet(Set::of);
+
+        commentList.forEach(comment ->
                 ofNullable(comment.getUpperReply()).ifPresentOrElse(
                         upperReply -> commentDtoMap.get(upperReply.getId())
-                                .addCommentReply(CommentInfoDto.from(comment)),
-                        () -> commentDtoMap.put(comment.getId(), CommentInfoDto.from(comment))
+                                .addCommentReply(CommentInfoDto.from(comment, likeIds.contains(comment.getId()))),
+                        () -> commentDtoMap.put(comment.getId(),
+                                CommentInfoDto.from(comment, likeIds.contains(comment.getId())))
                 ));
 
         return CollectionModel.of(commentDtoMap.values());

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.lang.Boolean.FALSE;
+
 @Getter
 public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     private final Long id;
@@ -21,15 +23,20 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     private final String ownerProfile;
     private final Integer ownerLevel;
     private final String createdDate;
+    private final Boolean isLike;
     private final List<CommentInfoDto> commentReply = new ArrayList<>();
 
     public static CommentInfoDto from(Comment comment){
-        if(comment.getIsDeleted())
-            return new CommentInfoDto(comment.getId());
-        return new CommentInfoDto(comment);
+        return from(comment, FALSE);
     }
 
-    protected CommentInfoDto(Comment comment){
+    public static CommentInfoDto from(Comment comment, Boolean isLike){
+        if(comment.getIsDeleted())
+            return new CommentInfoDto(comment.getId());
+        return new CommentInfoDto(comment, isLike);
+    }
+
+    protected CommentInfoDto(Comment comment, Boolean isLike){
         this.id = comment.getId();
         this.content = comment.getContent();
         this.isDeleted = false;
@@ -39,6 +46,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.ownerProfile = ImageService.getUrlFromImage(comment.getOwner().getProfile());
         this.ownerLevel = comment.getOwner().getLevel();
         this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("MM.dd"));
+        this.isLike = isLike;
     }
 
     protected CommentInfoDto(Long id){
@@ -51,6 +59,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.ownerProfile = null;
         this.ownerLevel = null;
         this.createdDate = null;
+        this.isLike = null;
     }
 
     public void addCommentReply(CommentInfoDto commentInfoDto){

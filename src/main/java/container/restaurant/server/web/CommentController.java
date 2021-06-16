@@ -6,6 +6,7 @@ import container.restaurant.server.domain.comment.CommentService;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
+import container.restaurant.server.web.linker.CommentLikeLinker;
 import container.restaurant.server.web.linker.CommentLinker;
 import container.restaurant.server.web.linker.ReportLinker;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CommentController {
 
     private final CommentLinker commentLinker;
     private final ReportLinker reportLinker;
+    private final CommentLikeLinker commentLikeLinker;
 
     @PostMapping("feed/{feedId}")
     public ResponseEntity<?> createComment(
@@ -44,10 +46,10 @@ public class CommentController {
             @PathVariable Long feedId,
             @LoginUser SessionUser sessionUser
     ){
-        Long userID = sessionUser != null ? sessionUser.getId() : null;
+        Long userId = sessionUser != null ? sessionUser.getId() : null;
 
         return ResponseEntity.ok(
-                setLinks(commentService.findAllByFeed(feedId), userID)
+                setLinks(commentService.findAllByFeed(userId, feedId), userId)
                         .add(commentLinker.getCommentByFeed(feedId).withSelfRel())
         );
     }
@@ -85,6 +87,11 @@ public class CommentController {
         if(dto.getOwnerId() == null) return;
         boolean isOwner = dto.getOwnerId().equals(userId);
         dto
+                .add(
+                        dto.getIsLike() ?
+                                commentLikeLinker.userCancelLikeComment(dto.getId()).withRel("cancel-like") :
+                                commentLikeLinker.userLikeComment(dto.getId()).withRel("like")
+                )
                 .addAllIf(isOwner, () -> List.of(
                         commentLinker.updateComment(dto.getId()).withRel("patch"),
                         commentLinker.deleteComment(dto.getId()).withRel("delete")))
