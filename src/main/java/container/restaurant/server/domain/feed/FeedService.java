@@ -163,26 +163,23 @@ public class FeedService {
     private void updateRelationalAttrs(Feed feed, FeedInfoDto dto) {
         if (feed.getThumbnail() != null && !feed.getThumbnail().getId().equals(dto.getThumbnailImageId()))
             feed.setThumbnail(imageService.findById(dto.getThumbnailImageId()));
-        // 업데이트할 리스트와 삭제할 리스트
-        List<Container> newMenus = dto.toContainerListWith(feed, feed.getRestaurant());
 
-        Restaurant restaurant = restaurantService.findById(dto.getRestaurantCreateDto().getId());
-        if (!feed.getRestaurant().getId().equals(restaurant.getId())) {
-            // 식당이 바뀐 경우 식당을 업데이트하고, 기존 모든 메뉴 삭제
-            feed.setRestaurant(restaurant);
-        } else {
-            Map<String, Container> menuMap = feed.getContainerList().stream()
-                    .collect(HashMap::new, (m, c) -> m.put(c.getMenu().getName(), c), Map::putAll);
-            // 식당이 그대로인 경우 이름이 동일한 메뉴는 새 리스트에 대체
-            newMenus.replaceAll(container -> {
-                Container replace = menuMap.get(container.getMenu().getName());
-                if (replace != null) {
-                    replace.setDescription(container.getDescription());
-                    return replace;
-                }
-                return container;
-            });
-        }
+        List<Container> newMenus = dto.toContainerListWith(feed, feed.getRestaurant());
+        ofNullable(dto.getRestaurantCreateDto()).ifPresentOrElse(
+                restaurantDto -> feed.setRestaurant(restaurantService.findByDto(restaurantDto)),
+                () -> {
+                    Map<String, Container> menuMap = feed.getContainerList().stream()
+                            .collect(HashMap::new, (m, c) -> m.put(c.getMenu().getName(), c), Map::putAll);
+                    // 식당이 그대로인 경우 이름이 동일한 메뉴는 새 리스트에 대체
+                    newMenus.replaceAll(container -> {
+                        Container replace = menuMap.get(container.getMenu().getName());
+                        if (replace != null) {
+                            replace.setDescription(container.getDescription());
+                            return replace;
+                        }
+                        return container;
+                    });
+                });
         feed.updateContainers(newMenus);
     }
 
