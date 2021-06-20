@@ -125,14 +125,13 @@ public class FeedService {
             throw new FailedAuthorizationException("해당 피드를 삭제할 수 없습니다.");
 
         statisticsService.removeRecentUser(feed.getOwner());
-        feed.getOwner().feedCountDown();
-        feed.getRestaurant().feedCountDown();
-        feed.getRestaurant().subDifficultySum(feed.getDifficulty());
-        feed.getRestaurant().welcomeCountDown(feed.getWelcome());
 
+        feed.getOwner().feedCountDown();
+        feed.getRestaurant().feedCountDown(feed);
         containerService.deleteAll(feed.getContainerList());
         feedHitRepository.deleteAllByFeed(feed);
         userLevelFeedCountService.levelFeedDown(feed);
+
         feedRepository.delete(feed);
     }
 
@@ -142,13 +141,12 @@ public class FeedService {
         Restaurant restaurant = restaurantService.findByDto(dto.getRestaurantCreateDto());
         Image thumbnail = imageService.findById(dto.getThumbnailImageId());
 
-        statisticsService.addRecentUser(user);
-        user.feedCountUp();
-        restaurant.feedCountUp();
-        restaurant.addDifficultySum(dto.getDifficulty());
-        restaurant.welcomeCountUp(dto.getWelcome());
-
         Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant, thumbnail));
+
+        statisticsService.addRecentUser(user);
+
+        feed.getOwner().feedCountUp();
+        feed.getRestaurant().feedCountUp(feed);
         containerService.save(dto.toContainerListWith(feed, restaurant));
         userLevelFeedCountService.levelFeedUp(feed);
         return feed.getId();
