@@ -33,9 +33,22 @@ class FeedInfoDtoTest {
         Image thumbnail = mock(Image.class);
         when(thumbnail.getId()).thenReturn(imageId = 6L);
 
+        String mainContainer = "main container";
+        String subContainer = "sub container";
+        String mainMenu = "main menu";
+        String subMenu = "sub menu";
+
         FeedInfoDto feedInfoDto = FeedInfoDto.builder()
                 .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.NIGHT_MEAL)
+                .mainMenu(List.of(FeedMenuDto.builder()
+                        .container(mainContainer)
+                        .menuName(mainMenu)
+                        .build()))
+                .subMenu(List.of(FeedMenuDto.builder()
+                        .container(subContainer)
+                        .menuName(subMenu)
+                        .build()))
                 .difficulty(4)
                 .thumbnailImageId(imageId)
                 .content("test content")
@@ -53,6 +66,11 @@ class FeedInfoDtoTest {
         assertThat(feed.getThumbnail().getId()).isEqualTo(feedInfoDto.getThumbnailImageId());
         assertThat(feed.getContent()).isEqualTo(feedInfoDto.getContent());
         assertThat(feed.getWelcome()).isEqualTo(feedInfoDto.getWelcome());
+        assertThat(feed.getContainerList())
+                .anyMatch(container -> container.getMenu().getName().equals(mainMenu))
+                .anyMatch(container -> container.getMenu().getName().equals(subMenu))
+                .anyMatch(container -> container.getDescription().equals(mainContainer))
+                .anyMatch(container -> container.getDescription().equals(subContainer));
 
     }
 

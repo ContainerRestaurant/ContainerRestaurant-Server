@@ -14,6 +14,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Builder
 @Getter
@@ -37,7 +38,7 @@ public class FeedInfoDto {
     private final String content;
 
     public Feed toFeedWith(User owner, Restaurant restaurant, Image thumbnail) {
-        return Feed.builder()
+        Feed newFeed = Feed.builder()
                 .owner(owner)
                 .restaurant(restaurant)
                 .category(category)
@@ -46,18 +47,19 @@ public class FeedInfoDto {
                 .welcome(welcome)
                 .difficulty(difficulty)
                 .build();
+        newFeed.updateContainers(toContainerListWith(newFeed, restaurant));
+
+        return newFeed;
     }
 
     public List<Container> toContainerListWith(Feed feed, Restaurant restaurant) {
-        List<Container> list = new ArrayList<>(mainMenu.size() + subMenu.size());
+        int initialCapacity = mainMenu.size() + (subMenu != null ? subMenu.size() : 0);
+        List<Container> list = new ArrayList<>(initialCapacity);
 
-        mainMenu.stream()
-                .map(feedMenuDto -> feedMenuDto.toEntity(feed, restaurant, true))
-                .forEachOrdered(list::add);
+        mainMenu.forEach(feedMenuDto -> list.add(feedMenuDto.toEntity(feed, restaurant, true)));
 
-        subMenu.stream()
-                .map(feedMenuDto -> feedMenuDto.toEntity(feed, restaurant, false))
-                .forEachOrdered(list::add);
+        Optional.ofNullable(subMenu).ifPresent(l ->
+                l.forEach(feedMenuDto -> list.add(feedMenuDto.toEntity(feed, restaurant, false))));
 
         return list;
     }

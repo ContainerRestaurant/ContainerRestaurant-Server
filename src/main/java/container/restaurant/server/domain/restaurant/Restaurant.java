@@ -2,6 +2,7 @@ package container.restaurant.server.domain.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import container.restaurant.server.domain.base.BaseEntity;
+import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import lombok.Builder;
@@ -80,38 +81,30 @@ public class Restaurant extends BaseEntity {
         this.favoriteCount--;
     }
 
-    public void feedCountUp() {
+    public void feedCountUp(Feed feed) {
         this.feedCount++;
+        this.difficultySum += feed.getDifficulty();
+        if (feed.getWelcome()) welcomeCount++;
+        feed.getContainerList().forEach(container ->
+                container.getMenu().countUp());
     }
 
-    public void feedCountDown() {
+    public void feedCountDown(Feed feed) {
         this.feedCount--;
+        this.difficultySum -= feed.getDifficulty();
+        if (feed.getWelcome()) welcomeCount--;
+        feed.getContainerList().forEach(container ->
+                container.getMenu().countDown());
     }
 
     public void VanishCountUp() {
         this.vanishCount++;
     }
 
-    public void addDifficultySum(int difficulty) {
-        this.difficultySum += difficulty;
-    }
-
-    public void subDifficultySum(int difficulty) {
-        this.difficultySum -= difficulty;
-    }
-
     public float getDifficultyAvg() {
         if (this.difficultySum == 0)
             return 0.0f;
         return this.difficultySum / this.feedCount;
-    }
-
-    public void welcomeCountUp(boolean welcome) {
-        if (welcome) welcomeCount++;
-    }
-
-    public void welcomeCountDown(boolean welcome) {
-        if (welcome) welcomeCount--;
     }
 
     public boolean isContainerFriendly() {

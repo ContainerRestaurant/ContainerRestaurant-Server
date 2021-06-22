@@ -4,10 +4,6 @@ import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.container.Container;
-import container.restaurant.server.domain.feed.container.ContainerRepository;
-import container.restaurant.server.domain.feed.container.ContainerService;
-import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.restaurant.menu.Menu;
@@ -28,13 +24,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
     protected RestaurantRepository restaurantRepository;
 
     @Autowired
-    private ContainerRepository containerRepository;
-
-    @Autowired
     private MenuRepository menuRepository;
-
-    @Autowired
-    private ContainerService containerService;
 
     @Autowired
     protected UserLevelFeedCountRepository userLevelFeedCountRepository;
@@ -55,7 +45,7 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .lat(0f)
                 .thumbnail(image)
                 .build());
-        myFeed = feedRepository.save(Feed.builder()
+        myFeed = Feed.builder()
                 .owner(myself)
                 .restaurant(restaurant)
                 .difficulty(4)
@@ -63,35 +53,37 @@ public abstract class BaseUserAndFeedControllerTest extends BaseUserControllerTe
                 .welcome(true)
                 .thumbnail(image)
                 .content("Feed Content")
-                .build());
-        othersFeed = feedRepository.save(Feed.builder()
+                .build();
+        myFeed.updateContainers(List.of(
+                Container.of(myFeed, Menu.mainOf(restaurant, "나의 메인 메뉴1"), "나의 메인 용기1"),
+                Container.of(myFeed, Menu.mainOf(restaurant, "나의 메인 메뉴2"), "나의 메인 용기2"),
+                Container.of(myFeed, Menu.subOf(restaurant, "나의 반찬 메뉴1"), "나의 반찬 용기1"),
+                Container.of(myFeed, Menu.subOf(restaurant, "나의 반찬 메뉴2"), "나의 반찬 용기2")
+        ));
+        feedRepository.save(myFeed);
+
+        othersFeed = Feed.builder()
                 .owner(other)
                 .restaurant(restaurant)
                 .difficulty(3)
                 .category(Category.KOREAN)
                 .welcome(false)
                 .thumbnail(image)
-                .build());
-        myFeed.setContainerList(containerService.save(List.of(
-                Container.of(myFeed, Menu.mainOf(restaurant, "나의 메인 메뉴1"), "나의 메인 용기1"),
-                Container.of(myFeed, Menu.mainOf(restaurant, "나의 메인 메뉴2"), "나의 메인 용기2"),
-                Container.of(myFeed, Menu.subOf(restaurant, "나의 반찬 메뉴1"), "나의 반찬 용기1"),
-                Container.of(myFeed, Menu.subOf(restaurant, "나의 반찬 메뉴2"), "나의 반찬 용기2")
-        )));
-        othersFeed.setContainerList(containerService.save(List.of(
+                .build();
+        othersFeed.updateContainers(List.of(
                 Container.of(othersFeed, Menu.mainOf(restaurant, "남의 메인 메뉴1"), "남의 메인 용기1"),
                 Container.of(othersFeed, Menu.mainOf(restaurant, "남의 메인 메뉴2"), "남의 메인 용기2"),
                 Container.of(othersFeed, Menu.subOf(restaurant, "남의 반찬 메뉴1"), "남의 반찬 용기1"),
                 Container.of(othersFeed, Menu.subOf(restaurant, "남의 반찬 메뉴2"), "남의 반찬 용기2")
-        )));
+        ));
+        feedRepository.save(othersFeed);
     }
 
     @Override
     @AfterEach
     public void afterEach() {
-        containerRepository.deleteAll();
-        menuRepository.deleteAll();
         feedRepository.deleteAll();
+        menuRepository.deleteAll();
         restaurantRepository.deleteAll();
         userLevelFeedCountRepository.deleteAll();
         super.afterEach();

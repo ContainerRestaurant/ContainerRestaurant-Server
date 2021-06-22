@@ -37,8 +37,8 @@ public class Feed extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed")
-    private List<Container> containerList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "feed", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Container> containerList = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     private Image thumbnail;
@@ -87,7 +87,6 @@ public class Feed extends BaseTimeEntity {
         this.isBlind = false;
         this.isDeleted = false;
 
-        this.containerList = new ArrayList<>();
         if (menus != null) {
             this.containerList.addAll(menus);
         }
@@ -145,8 +144,9 @@ public class Feed extends BaseTimeEntity {
         this.difficulty = difficulty;
     }
 
-    public void setContainerList(List<Container> containerList) {
-        this.containerList = containerList;
+    public void updateContainers(List<Container> containerList) {
+        this.containerList.clear();
+        this.containerList.addAll(containerList);
     }
 
     public Integer getRecommendScore() {
