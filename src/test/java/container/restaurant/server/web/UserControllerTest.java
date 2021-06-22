@@ -252,9 +252,9 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andDo(document("patch-user",
                         requestFields(
-                                fieldWithPath("nickname").description("변경할 닉네임"),
-                                fieldWithPath("profileId").description("변경할 프로필 사진 식별자"),
-                                fieldWithPath("pushToken").description("변경할 푸시 토큰 아이디")
+                                fieldWithPath("nickname").description("(Optional) 변경할 닉네임"),
+                                fieldWithPath("profileId").description("(Optional) 변경할 프로필 사진 식별자"),
+                                fieldWithPath("pushToken").description("(Optional) 변경할 푸시 토큰 아이디")
                         )));
     }
 

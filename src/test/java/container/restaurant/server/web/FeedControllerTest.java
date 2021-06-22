@@ -443,11 +443,11 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 subsectionWithPath("restaurantCreateDto").description("등록할 식당의 식별값"),
                                 fieldWithPath("category").description("음식의 카테고리"),
                                 subsectionWithPath("mainMenu").description("메인 음식 리스트"),
-                                subsectionWithPath("subMenu").description("반찬 리스트"),
+                                subsectionWithPath("subMenu").description("(Optional) 반찬 리스트"),
                                 fieldWithPath("difficulty").description("포장 난이도"),
-                                fieldWithPath("welcome").description("사장님 환영 여부"),
-                                fieldWithPath("thumbnailImageId").description("썸네일 이미지 식별값"),
-                                fieldWithPath("content").description("피드 콘텐트")
+                                fieldWithPath("welcome").description("(Optional) 사장님 환영 여부"),
+                                fieldWithPath("thumbnailImageId").description("(Optional) 썸네일 이미지 식별값"),
+                                fieldWithPath("content").description("(Optional) 피드 콘텐트")
                         )));
     }
 
@@ -501,14 +501,14 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                 .andExpect(status().isOk())
                 .andDo(document("feed-update",
                         requestFields(
-                                subsectionWithPath("restaurantCreateDto").description("등록할 식당의 식별값"),
-                                fieldWithPath("category").description("음식의 카테고리"),
-                                subsectionWithPath("mainMenu").description("메인 음식 리스트"),
-                                subsectionWithPath("subMenu").description("반찬 리스트"),
-                                fieldWithPath("difficulty").description("포장 난이도"),
-                                fieldWithPath("welcome").description("사장님 환영 여부"),
-                                fieldWithPath("thumbnailImageId").description("썸네일 이미지 식별값"),
-                                fieldWithPath("content").description("피드 콘텐트")
+                                subsectionWithPath("restaurantCreateDto").description("(Optional) 등록할 식당의 식별값"),
+                                fieldWithPath("category").description("(Optional) 음식의 카테고리"),
+                                subsectionWithPath("mainMenu").description("(Optional) 메인 음식 리스트"),
+                                subsectionWithPath("subMenu").description("(Optional) 반찬 리스트"),
+                                fieldWithPath("difficulty").description("(Optional) 포장 난이도"),
+                                fieldWithPath("welcome").description("(Optional) 사장님 환영 여부"),
+                                fieldWithPath("thumbnailImageId").description("(Optional) 썸네일 이미지 식별값"),
+                                fieldWithPath("content").description("(Optional) 피드 콘텐트")
                         )));
 
         //then

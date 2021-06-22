@@ -31,8 +31,8 @@ class CommentControllerTest extends BaseFeedAndCommentControllerTest {
                 .andDo(document("comment-create",
                         requestFields(
                                 fieldWithPath("content").description("댓글 내용"),
-                                fieldWithPath("upperReplyId").description("대댓글을 쓰는 경우, 상위 댓글 ID +\n" +
-                                        "(대댓글이 아니라면 생략 가능)")
+                                fieldWithPath("upperReplyId").description("(Optional) 대댓글을 쓰는 경우, 상위 댓글 ID +\n" +
+                                        "대댓글이 아니라면 null or 생략 가능")
                         )));
     }
 
