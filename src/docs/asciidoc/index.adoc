@@ -201,6 +201,13 @@ operation::feed-options[snippets='request-parameters']
 
 카테고리는 <<feed-category>> 참조
 
+[[feed-preview]]
+=== 피드 리스트 리소스
+
+피드 리스트 조회 시 각 피드가 표현되는 형식 입니다.
+
+include::{snippets}/feed-preview/response-fields-beneath-_embedded.feedPreviewDtoList.adoc[]
+
 [[feed-list-advanced]]
 === 피드 리스트 - 조건부
 
@@ -314,6 +321,13 @@ include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDt
 `GET /api/restaurant/[식당_ID]`
 
 operation::restaurant-get[snippets='curl-request,http-response,response-fields,links']
+
+[[restaurant-register]]
+=== 식당 등록 정보
+
+<<feed-create>>를 하는 경우, 등록할 식당에 대한 정보 필드입니다.
+
+include::{snippets}/restaurant-register/request-fields-beneath-restaurantCreateDto.adoc[]
 
 [[user-restaurant-favorite]]
 === 즐겨찾기 한 식당 목록
