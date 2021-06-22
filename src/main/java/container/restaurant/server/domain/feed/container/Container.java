@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -24,7 +25,7 @@ public class Container extends BaseEntity {
     private Feed feed;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Menu menu;
 
     private String description;
@@ -38,4 +39,7 @@ public class Container extends BaseEntity {
         return this;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

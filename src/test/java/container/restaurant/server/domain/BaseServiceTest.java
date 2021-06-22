@@ -7,8 +7,6 @@ import container.restaurant.server.domain.comment.like.CommentLikeService;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.FeedService;
-import container.restaurant.server.domain.feed.container.ContainerRepository;
-import container.restaurant.server.domain.feed.container.ContainerService;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeService;
@@ -53,10 +51,6 @@ public class BaseServiceTest {
     protected CommentService commentService;
 
     // --------------------FEED DOMAIN--------------------
-    @Mock
-    protected ContainerRepository containerRepository;
-    @Mock
-    protected ContainerService containerService;
     @Mock
     protected FeedHitRepository feedHitRepository;
     @Mock

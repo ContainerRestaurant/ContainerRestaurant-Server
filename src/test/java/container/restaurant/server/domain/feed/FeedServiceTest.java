@@ -15,12 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Optional.of;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class FeedServiceTest extends BaseServiceTest {
@@ -46,8 +45,6 @@ class FeedServiceTest extends BaseServiceTest {
 
     @Captor
     ArgumentCaptor<Feed> feedCaptor;
-    @Captor
-    ArgumentCaptor<Collection<Container>> containersCaptor;
 
     @Test
     @DisplayName("Container 를 포함해 단일 Feed 찾기 테스트")
@@ -125,8 +122,7 @@ class FeedServiceTest extends BaseServiceTest {
         assertThat(saved.getThumbnail().getId()).isEqualTo(dto.getThumbnailImageId());
         assertThat(saved.getContent()).isEqualTo(dto.getContent());
 
-        verify(containerService).save(containersCaptor.capture());
-        assertThat(containersCaptor.getValue())
+        assertThat(saved.getContainerList())
                 .hasSize(2)
                 .anyMatch(container -> equalsMenuAndDto(container, mainMenuDto))
                 .anyMatch(container -> equalsMenuAndDto(container, subMenuDto));
@@ -142,9 +138,8 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.delete(feed.getId(), user.getId());
 
         //then
-        InOrder order = inOrder(containerService, feedHitRepository, feedRepository);
+        InOrder order = inOrder(feedHitRepository, feedRepository);
         verify(userLevelFeedCountService).levelFeedDown(feed);
-        order.verify(containerService).deleteAll(feed.getContainerList());
         order.verify(feedHitRepository).deleteAllByFeed(feed);
         order.verify(feedRepository).delete(feed);
     }
@@ -199,17 +194,6 @@ class FeedServiceTest extends BaseServiceTest {
                 .hasSize(2)
                 .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
                 .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
-
-        verify(containerService).save(containersCaptor.capture());
-        assertThat(containersCaptor.getValue())
-                .hasSize(2)
-                .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
-                .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
-
-        verify(containerService).deleteAll(containersCaptor.capture());
-        assertThat(containersCaptor.getValue())
-                .hasSize(1)
-                .anyMatch(container -> container.equals(deleteMenu));
     }
 
 
@@ -263,18 +247,6 @@ class FeedServiceTest extends BaseServiceTest {
                 .hasSize(2)
                 .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
                 .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
-
-        verify(containerService).save(containersCaptor.capture());
-        assertThat(containersCaptor.getValue())
-                .hasSize(2)
-                .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
-                .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
-
-        verify(containerService).deleteAll(containersCaptor.capture());
-        assertThat(containersCaptor.getValue())
-                .hasSize(2)
-                .anyMatch(container -> container.equals(deleteMenu))
-                .anyMatch(container -> container.equals(updateMenu));
     }
 
     void mockFindFeedByIdWithContainers() {

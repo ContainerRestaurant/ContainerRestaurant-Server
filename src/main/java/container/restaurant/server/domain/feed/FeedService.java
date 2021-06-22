@@ -1,8 +1,6 @@
 package container.restaurant.server.domain.feed;
 
-import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.container.Container;
-import container.restaurant.server.domain.feed.container.ContainerService;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
@@ -17,6 +15,7 @@ import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.level.UserLevelFeedCountService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.exception.FailedAuthorizationException;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
@@ -30,9 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 
@@ -45,7 +44,6 @@ public class FeedService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final StatisticsService statisticsService;
-    private final ContainerService containerService;
     private final UserLevelFeedCountService userLevelFeedCountService;
     private final ImageService imageService;
 
@@ -128,7 +126,6 @@ public class FeedService {
 
         feed.getOwner().feedCountDown();
         feed.getRestaurant().feedCountDown(feed);
-        containerService.deleteAll(feed.getContainerList());
         feedHitRepository.deleteAllByFeed(feed);
         userLevelFeedCountService.levelFeedDown(feed);
 
@@ -147,7 +144,6 @@ public class FeedService {
 
         feed.getOwner().feedCountUp();
         feed.getRestaurant().feedCountUp(feed);
-        containerService.save(dto.toContainerListWith(feed, restaurant));
         userLevelFeedCountService.levelFeedUp(feed);
         return feed.getId();
     }
@@ -158,33 +154,36 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
 
+        feed.getRestaurant().feedCountDown(feed);
         dto.updateSimpleAttrs(feed);
         updateRelationalAttrs(feed, dto);
+        feed.getRestaurant().feedCountUp(feed);
     }
 
     private void updateRelationalAttrs(Feed feed, FeedInfoDto dto) {
         if (feed.getThumbnail() != null && !feed.getThumbnail().getId().equals(dto.getThumbnailImageId()))
             feed.setThumbnail(imageService.findById(dto.getThumbnailImageId()));
-
         // 업데이트할 리스트와 삭제할 리스트
         List<Container> newMenus = dto.toContainerListWith(feed, feed.getRestaurant());
-        List<Container> toDelete = feed.getContainerList();
 
         Restaurant restaurant = restaurantService.findById(dto.getRestaurantCreateDto().getId());
         if (!feed.getRestaurant().getId().equals(restaurant.getId())) {
             // 식당이 바뀐 경우 식당을 업데이트하고, 기존 모든 메뉴 삭제
             feed.setRestaurant(restaurant);
         } else {
-            // 식당이 그대로인 경우 동일한 이름의 메뉴를 삭제하지 않음
-            Set<String> menuNames = newMenus.stream()
-                    .map(c -> c.getMenu().getName())
-                    .collect(Collectors.toSet());
-            toDelete.removeIf(c -> menuNames.contains(c.getMenu().getName()));
+            Map<String, Container> menuMap = feed.getContainerList().stream()
+                    .collect(HashMap::new, (m, c) -> m.put(c.getMenu().getName(), c), Map::putAll);
+            // 식당이 그대로인 경우 이름이 동일한 메뉴는 새 리스트에 대체
+            newMenus.replaceAll(container -> {
+                Container replace = menuMap.get(container.getMenu().getName());
+                if (replace != null) {
+                    replace.setDescription(container.getDescription());
+                    return replace;
+                }
+                return container;
+            });
         }
-        containerService.deleteAll(toDelete);
-
-        feed.setContainerList(newMenus);
-        containerService.save(feed.getContainerList());
+        feed.updateContainers(newMenus);
     }
 
     @Transactional

@@ -85,12 +85,16 @@ public class Restaurant extends BaseEntity {
         this.feedCount++;
         this.difficultySum += feed.getDifficulty();
         if (feed.getWelcome()) welcomeCount++;
+        feed.getContainerList().forEach(container ->
+                container.getMenu().countUp());
     }
 
     public void feedCountDown(Feed feed) {
         this.feedCount--;
         this.difficultySum -= feed.getDifficulty();
         if (feed.getWelcome()) welcomeCount--;
+        feed.getContainerList().forEach(container ->
+                container.getMenu().countDown());
     }
 
     public void VanishCountUp() {
