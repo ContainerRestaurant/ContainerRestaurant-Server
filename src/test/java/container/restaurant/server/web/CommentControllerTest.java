@@ -60,6 +60,7 @@ class CommentControllerTest extends BaseFeedAndCommentControllerTest {
                                 fieldWithPath("ownerProfile").description("본 댓글 작성자 프로필 링크"),
                                 fieldWithPath("ownerLevelTitle").description("본 댓글 작성자 레벨 타이틀"),
                                 fieldWithPath("createdDate").description("본 댓글 작성 일시"),
+                                fieldWithPath("isLike").description("현재 사용자가 본 댓글을 좋아요 했는지 여부"),
                                 subsectionWithPath("commentReply").description("본 댓글의 답댓글 목록"),
                                 subsectionWithPath("_links").description("본 댓글에서 전이 가능한 링크 목록")
                         )

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -30,7 +31,9 @@ public class Comment extends BaseCreatedTimeEntity {
     @ManyToOne
     private Comment upperReply;
     private Boolean isDeleted;
-    private Boolean isHaveReply;
+
+    @Column(name = "is_have_reply")
+    private Boolean hasReply;
     private Boolean isBlind;
 
     @Builder
@@ -40,8 +43,11 @@ public class Comment extends BaseCreatedTimeEntity {
         this.content = content;
         this.likeCount = 0;
         this.upperReply = upperReply;
+        if (upperReply != null) {
+            upperReply.setHasReply();
+        }
         this.isDeleted = false;
-        this.isHaveReply = false;
+        this.hasReply = false;
         this.isBlind = false;
     }
 
@@ -50,12 +56,11 @@ public class Comment extends BaseCreatedTimeEntity {
         return this;
     }
 
-    public Comment setIsHaveReply() {
-        this.isHaveReply = true;
-        return this;
+    public void setHasReply() {
+        this.hasReply = true;
     }
 
-    public void unSetIsHaveReply() { this.isHaveReply = false; }
+    public void unsetHasReply() { this.hasReply = false; }
 
     public void setIsDeleted() { this.isDeleted = true; }
 

@@ -1,11 +1,12 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.domain.comment.like.CommentLikeRepository;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 
@@ -29,6 +31,7 @@ public class CommentService {
     private final FeedService feedService;
 
     private final ApplicationEventPublisher publisher;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public CommentInfoDto createComment(CommentCreateDto commentCreateDto, Long feedId, Long userId) {
@@ -36,13 +39,15 @@ public class CommentService {
         User user = userService.findById(userId);
 
         Comment upperReply = ofNullable(commentCreateDto.getUpperReplyId())
-                .map(id -> this.findById(id).setIsHaveReply())
+                .map(this::findById)
                 .orElse(null);
-        Comment comment = commentCreateDto.toEntityWith(user, feed, upperReply);
-        feed.commentCountUp();
 
+        Comment comment = commentRepository.save(commentCreateDto.toEntityWith(user, feed, upperReply));
+
+        feed.commentCountUp();
         publisher.publishEvent(new FeedCommentedEvent(comment));
-        return CommentInfoDto.from(commentRepository.save(comment));
+
+        return CommentInfoDto.from(comment);
     }
 
     @Transactional(readOnly = true)
@@ -52,16 +57,23 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public CollectionModel<CommentInfoDto> findAllByFeed(Long feedId) throws ResourceNotFoundException {
+    public CollectionModel<CommentInfoDto> findAllByFeed(Long userId, Long feedId) throws ResourceNotFoundException {
         Feed feed = feedService.findById(feedId);
 
         LinkedHashMap<Long, CommentInfoDto> commentDtoMap = new LinkedHashMap<>();
 
-        commentRepository.findAllByFeed(feed).forEach(comment ->
+        List<Comment> commentList = commentRepository.findAllByFeed(feed);
+
+        Set<Long> likeIds = ofNullable(userId)
+                .map(id -> commentLikeRepository.test(id, commentList))
+                .orElseGet(Set::of);
+
+        commentList.forEach(comment ->
                 ofNullable(comment.getUpperReply()).ifPresentOrElse(
                         upperReply -> commentDtoMap.get(upperReply.getId())
-                                .addCommentReply(CommentInfoDto.from(comment)),
-                        () -> commentDtoMap.put(comment.getId(), CommentInfoDto.from(comment))
+                                .addCommentReply(CommentInfoDto.from(comment, likeIds.contains(comment.getId()))),
+                        () -> commentDtoMap.put(comment.getId(),
+                                CommentInfoDto.from(comment, likeIds.contains(comment.getId())))
                 ));
 
         return CollectionModel.of(commentDtoMap.values());
@@ -74,22 +86,22 @@ public class CommentService {
         if (!comment.getOwner().getId().equals(userId))
             throw new ResourceNotFoundException("삭제 할 수 있는 유저가 아닙니다.");
 
-        // 대댓글 있다면(isHaveReply) 댓글 isDeleted 처리
-        if (comment.getIsHaveReply()) {
+        // 대댓글 있다면(hasReply) 댓글 isDeleted 처리
+        if (comment.getHasReply()) {
             comment.setIsDeleted();
-            return;
+        } else {
+            ofNullable(comment.getUpperReply())
+                    .filter(upperReply ->
+                            commentRepository.findAllByUpperReplyId(upperReply.getId()).size() == 1)
+                    .ifPresent(upperReply -> {
+                        if (upperReply.getIsDeleted()) {
+                            commentRepository.delete(upperReply);
+                        } else {
+                            upperReply.unsetHasReply();
+                        }
+                    });
+            commentRepository.delete(comment);
         }
-        Comment upperReply = comment.getUpperReply();
-        // 만약 답글이 삭제 되는 것이라면 상위 댓글의 IsHaveReply = false 처리
-        List<Comment> UpperReplies = commentRepository.findCommentsByUpperReplyId(upperReply.getId());
-        if (UpperReplies.size() == 1) {
-            upperReply.unSetIsHaveReply();
-            // 답글 삭제 시 상위 댓글의 isDeleted가 true라면 상위댓글도 삭제
-            if (upperReply.getIsDeleted())
-                commentRepository.deleteById(upperReply.getId());
-        }
-        // delete
-        commentRepository.deleteById(id);
         comment.getFeed().commentCountDown();
     }
 
