@@ -307,6 +307,12 @@ operation::comment-update[snippets='curl-request,http-response']
 
 응답 필드는 <<comment-info>> 참조
 
+[[comment-delete]]
+=== 댓글 삭제
+`DELETE /api/comment/[삭제할_댓글_ID]`
+
+operation::comment-delete[snippets='curl-request,http-response']
+
 [[comment-info]]
 === 댓글 정보
 <<comment-create>>, <<feed-comments>>, <<comment-update>> 의 응답 필드에 관한 추가 설명입니다.

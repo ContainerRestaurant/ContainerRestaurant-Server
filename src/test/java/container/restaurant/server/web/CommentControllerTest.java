@@ -83,16 +83,15 @@ class CommentControllerTest extends BaseFeedAndCommentControllerTest {
                 .andDo(document("comment-update"));
     }
 
-    //TODO 댓글 삭제 버그 #98 해결되면 추가 구현
-//    @Test
-//    @DisplayName("댓글 삭제")
-//    void deleteCommentById() throws Exception {
-//
-//        mvc.perform(
-//                delete("/api/comment/{commentId}", myFeedCommentReply.getId())
-//                        .session(myselfSession))
-//                .andExpect(status().isNoContent())
-//                .andDo(document("comment-delete"));
-//    }
+    @Test
+    @DisplayName("댓글 삭제")
+    void deleteCommentById() throws Exception {
+
+        mvc.perform(
+                delete("/api/comment/{commentId}", myFeedCommentReply.getId())
+                        .session(myselfSession))
+                .andExpect(status().isNoContent())
+                .andDo(document("comment-delete"));
+    }
 
 }
