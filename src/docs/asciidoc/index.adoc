@@ -102,6 +102,14 @@ operation::index-user[snippets='curl-request,http-response,response-fields,links
 
 operation::index-guest[snippets='curl-request,http-response,links']
 
+=== 홈 화면 배너
+
+operation::banners[snippets='curl-request,http-response']
+
+==== 배너 응답
+
+include::{snippets}/banner/response-fields-beneath-_embedded.bannerInfoDtoList.adoc[]
+
 [[login]]
 == 로그인
 
