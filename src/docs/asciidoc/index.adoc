@@ -429,3 +429,11 @@ operation::push-token-register[snippets='curl-request,http-response']
 `DELETE /api/push/[푸시_토큰_ID]`
 
 operation::push-token-delete[snippets='curl-request,http-response']
+
+[[contract]]
+== 이용 약관
+
+=== 이용 약관 리스트
+
+operation::contracts[snippets='curl-request,http-response']
+include::{snippets}/contract/response-fields-beneath-_embedded.contractInfoDtoList.adoc[]
