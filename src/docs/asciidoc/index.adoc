@@ -319,6 +319,16 @@ operation::comment-delete[snippets='curl-request,http-response']
 
 include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDtoList.adoc[]
 
+[[comment-like]]
+=== 댓글 좋아요
+
+operation::comment-like[snippets='curl-request,http-response']
+
+[[comment-like-cancel]]
+=== 댓글 좋아요 취소
+
+operation::comment-like-cancel[snippets='curl-request,http-response']
+
 [[restaurant]]
 == 식당
 
