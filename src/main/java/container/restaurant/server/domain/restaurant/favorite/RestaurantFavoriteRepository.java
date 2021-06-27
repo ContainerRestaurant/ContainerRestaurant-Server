@@ -15,4 +15,5 @@ public interface RestaurantFavoriteRepository extends JpaRepository<RestaurantFa
     @EntityGraph(attributePaths = { "restaurant", "restaurant.thumbnail" })
     List<RestaurantFavorite> findAllByUser(User user);
 
+    Boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId);
 }

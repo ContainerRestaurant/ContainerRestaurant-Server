@@ -32,9 +32,9 @@ public class RecommendFeedService {
     private Pageable pageable = null;
 
 
-    public CollectionModel<FeedPreviewDto> getRecommendFeeds() {
+    public CollectionModel<FeedPreviewDto> getRecommendFeeds(Long loginId) {
         return CollectionModel.of(recommendFeeds.stream()
-                .map(FeedPreviewDto::from)
+                .map(feed -> feedService.createFeedPreviewDto(feed, loginId))
                 .collect(Collectors.toList()));
     }
 
