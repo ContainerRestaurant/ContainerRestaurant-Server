@@ -28,7 +28,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectFeed(Pageable pageable) {
-        return linkTo(proxy.selectFeed(pageable, null));
+        return linkTo(proxy.selectFeed(pageable, null, u));
     }
 
     public LinkBuilder selectFeed() {
@@ -36,7 +36,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectUserFeed(Long userId, Pageable pageable) {
-        return linkTo(proxy.selectUserFeed(userId, pageable, null));
+        return linkTo(proxy.selectUserFeed(userId, pageable, null, u));
     }
 
     public LinkBuilder selectUserFeed(Long userId) {
@@ -44,7 +44,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectUserScrapFeed(Long userId, Pageable pageable) {
-        return linkTo(proxy.selectUserScrapFeed(userId, pageable, null));
+        return linkTo(proxy.selectUserScrapFeed(userId, pageable, null, u));
     }
 
     public LinkBuilder selectUserScrapFeed(Long userId) {
@@ -52,7 +52,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectRestaurantFeed(Long restaurantId, Pageable pageable) {
-        return linkTo(proxy.selectRestaurantFeed(restaurantId, pageable, null));
+        return linkTo(proxy.selectRestaurantFeed(restaurantId, pageable, null, u));
     }
 
     public LinkBuilder selectRestaurantFeed(Long restaurantId) {
@@ -76,7 +76,7 @@ public class FeedLinker {
     }
 
     public LinkBuilder selectRecommend() {
-        return linkTo(proxy.selectRecommend());
+        return linkTo(proxy.selectRecommend(u));
     }
 
 }
