@@ -16,12 +16,13 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
     private final Integer feedCount;
     private final Float difficultyAvg;
     private final Boolean isContainerFriendly;
+    private final Boolean isFavorite;
 
-    public static RestaurantDetailDto from(Restaurant restaurant) {
-        return new RestaurantDetailDto(restaurant);
+    public static RestaurantDetailDto from(Restaurant restaurant, Boolean isFavorite) {
+        return new RestaurantDetailDto(restaurant, isFavorite);
     }
 
-    protected RestaurantDetailDto(Restaurant restaurant) {
+    protected RestaurantDetailDto(Restaurant restaurant, Boolean isFavorite) {
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();
@@ -30,6 +31,7 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
         this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
         this.isContainerFriendly = restaurant.isContainerFriendly();
+        this.isFavorite = isFavorite;
     }
 
 }
