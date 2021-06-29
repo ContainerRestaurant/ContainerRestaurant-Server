@@ -2,6 +2,7 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginUser;
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.constant.Header;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exception.FailedAuthorizationException;
@@ -45,6 +46,7 @@ public class UserController {
 
         return ResponseEntity
                 .created(userLinker.getUserById(newSession.getId()).toUri())
+                .header(Header.USER_ID, newSession.getId().toString())
                 .build();
     }
 
@@ -57,8 +59,11 @@ public class UserController {
 
         return userService.tokenLogin(dto)
                 .map(info -> {
-                    setLoginUser(SessionUser.from(info));
-                    return ResponseEntity.ok(setLinks(info, info.getId()));
+                    SessionUser user = SessionUser.from(info);
+                    setLoginUser(user);
+                    return ResponseEntity.ok()
+                            .header(Header.USER_ID, user.getId().toString())
+                            .body(setLinks(info, info.getId()));
                 })
                 .orElseThrow(() -> new UnauthorizedException("로그인 실패 - 해당 사용자를 찾을 수 없습니다."));
     }
