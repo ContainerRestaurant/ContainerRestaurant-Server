@@ -1,10 +1,15 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.domain.home.banner.Banner;
+import container.restaurant.server.domain.home.banner.BannerRepository;
+import container.restaurant.server.domain.home.banner.BannerService;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -16,6 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 class IndexControllerTest extends BaseUserControllerTest {
+
+    @Autowired
+    BannerRepository bannerRepository;
+
+    @Autowired
+    BannerService bannerService;
 
     @Test
     @DisplayName("비로그인 index 링크 테스트")
@@ -75,6 +86,36 @@ class IndexControllerTest extends BaseUserControllerTest {
                                 subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세")
                         )
                 ));
+    }
+
+    @Test
+    @DisplayName("배너 테스트")
+    public void getBanners() throws Exception {
+        for (int i = 0; i < 4; i++) {
+            bannerRepository.save(Banner.builder()
+                    .bannerURL("bannerURL" + i)
+                    .additionalURL("additionalURL" + i)
+                    .contentURL("contentURL" + i)
+                    .title("title" + i)
+                    .build());
+        }
+        bannerService.putBanners();
+
+
+        ResultActions perform = mvc.perform(
+                get("/banners")
+        );
+
+        perform
+                .andExpect(status().isOk())
+                .andDo(document("banners"))
+                .andDo(document("banner",
+                        responseFields(beneathPath("_embedded.bannerInfoDtoList"),
+                                fieldWithPath("title").description("배너 컨텐츠 이름"),
+                                fieldWithPath("bannerURL").description("배너  URL"),
+                                fieldWithPath("contentURL").description("컨텐츠 URL"),
+                                fieldWithPath("additionalURL").description("추가 URL")
+                        )));
     }
 
 }

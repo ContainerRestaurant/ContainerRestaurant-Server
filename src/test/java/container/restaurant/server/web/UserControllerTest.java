@@ -71,6 +71,9 @@ class UserControllerTest extends BaseUserControllerTest {
                     .content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andDo(document("login-token",
+                        responseHeaders(
+                                headerWithName("Container-Restaurant-User-Id").description("로그인 된 사용자의 식별 ID")
+                        ),
                         requestFields(
                                 fieldWithPath("provider").description("로그인할 사용자의 OAuth 제공자 +\n(KAKAO)"),
                                 fieldWithPath("accessToken").description("로그인 인증할 액세스 토큰")
@@ -114,7 +117,8 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(status().isCreated())
                 .andDo(document("user-create",
                         responseHeaders(
-                                headerWithName(HttpHeaders.LOCATION).description("생성된 사용자의 리소스 경로")
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 사용자의 리소스 경로"),
+                                headerWithName("Container-Restaurant-User-Id").description("로그인 된 사용자의 식별 ID")
                         ),
                         requestFields(
                                 fieldWithPath("provider").description("가입 시 사용자 정보를 가져올 OAuth 제공자 +\n(KAKAO)"),
@@ -248,9 +252,9 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(jsonPath("_links.nickname-exists.href").exists())
                 .andDo(document("patch-user",
                         requestFields(
-                                fieldWithPath("nickname").description("변경할 닉네임"),
-                                fieldWithPath("profileId").description("변경할 프로필 사진 식별자"),
-                                fieldWithPath("pushToken").description("변경할 푸시 토큰 아이디")
+                                fieldWithPath("nickname").description("(Optional) 변경할 닉네임"),
+                                fieldWithPath("profileId").description("(Optional) 변경할 프로필 사진 식별자"),
+                                fieldWithPath("pushToken").description("(Optional) 변경할 푸시 토큰 아이디")
                         )));
     }
 

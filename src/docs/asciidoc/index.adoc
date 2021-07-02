@@ -102,6 +102,14 @@ operation::index-user[snippets='curl-request,http-response,response-fields,links
 
 operation::index-guest[snippets='curl-request,http-response,links']
 
+=== 홈 화면 배너
+
+operation::banners[snippets='curl-request,http-response']
+
+==== 배너 응답
+
+include::{snippets}/banner/response-fields-beneath-_embedded.bannerInfoDtoList.adoc[]
+
 [[login]]
 == 로그인
 
@@ -200,6 +208,13 @@ operation::feed-list[snippets='curl-request,http-response,response-fields,links'
 operation::feed-options[snippets='request-parameters']
 
 카테고리는 <<feed-category>> 참조
+
+[[feed-preview]]
+=== 피드 리스트 리소스
+
+피드 리스트 조회 시 각 피드가 표현되는 형식 입니다.
+
+include::{snippets}/feed-preview/response-fields-beneath-_embedded.feedPreviewDtoList.adoc[]
 
 [[feed-list-advanced]]
 === 피드 리스트 - 조건부
@@ -300,11 +315,27 @@ operation::comment-update[snippets='curl-request,http-response']
 
 응답 필드는 <<comment-info>> 참조
 
+[[comment-delete]]
+=== 댓글 삭제
+`DELETE /api/comment/[삭제할_댓글_ID]`
+
+operation::comment-delete[snippets='curl-request,http-response']
+
 [[comment-info]]
 === 댓글 정보
 <<comment-create>>, <<feed-comments>>, <<comment-update>> 의 응답 필드에 관한 추가 설명입니다.
 
 include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDtoList.adoc[]
+
+[[comment-like]]
+=== 댓글 좋아요
+
+operation::comment-like[snippets='curl-request,http-response']
+
+[[comment-like-cancel]]
+=== 댓글 좋아요 취소
+
+operation::comment-like-cancel[snippets='curl-request,http-response']
 
 [[restaurant]]
 == 식당
@@ -314,6 +345,13 @@ include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDt
 `GET /api/restaurant/[식당_ID]`
 
 operation::restaurant-get[snippets='curl-request,http-response,response-fields,links']
+
+[[restaurant-register]]
+=== 식당 등록 정보
+
+<<feed-create>>를 하는 경우, 등록할 식당에 대한 정보 필드입니다.
+
+include::{snippets}/restaurant-register/request-fields-beneath-restaurantCreateDto.adoc[]
 
 [[user-restaurant-favorite]]
 === 즐겨찾기 한 식당 목록
@@ -391,3 +429,11 @@ operation::push-token-register[snippets='curl-request,http-response']
 `DELETE /api/push/[푸시_토큰_ID]`
 
 operation::push-token-delete[snippets='curl-request,http-response']
+
+[[contract]]
+== 이용 약관
+
+=== 이용 약관 리스트
+
+operation::contracts[snippets='curl-request,http-response']
+include::{snippets}/contract/response-fields-beneath-_embedded.contractInfoDtoList.adoc[]

@@ -8,7 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RestaurantInfoDto {
 
-    private final Long id;
     private final String name;
     private final String address;
     private final double latitude;
@@ -19,7 +18,6 @@ public class RestaurantInfoDto {
     }
 
     protected RestaurantInfoDto(Restaurant restaurant) {
-        this.id = restaurant.getId();
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
         this.latitude = restaurant.getLatitude();

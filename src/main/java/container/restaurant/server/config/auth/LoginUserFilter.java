@@ -1,6 +1,7 @@
 package container.restaurant.server.config.auth;
 
 import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.constant.Header;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class LoginUserFilter implements Filter {
                 .ifPresent(object -> {
                     SessionUser user = (SessionUser) object;
                     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-                    httpServletResponse.setHeader("Container-Restaurant-User-Id", user.getId().toString());
+                    httpServletResponse.setHeader(Header.USER_ID, user.getId().toString());
                 });
         chain.doFilter(request, response);
     }

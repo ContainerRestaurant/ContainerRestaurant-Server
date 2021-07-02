@@ -169,7 +169,6 @@ class FeedServiceTest extends BaseServiceTest {
                 .build();
 
         FeedInfoDto dto = FeedInfoDto.builder()
-                .restaurantCreateDto(RestaurantInfoDto.from(restaurant))
                 .category(Category.FAST_FOOD)
                 .mainMenu(List.of(updateMenuDto, createMenuDto))
                 .subMenu(List.of())
@@ -183,7 +182,6 @@ class FeedServiceTest extends BaseServiceTest {
         feedService.updateFeed(feed.getId(), dto, user.getId());
 
         //then
-        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantCreateDto().getId());
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
@@ -231,12 +229,13 @@ class FeedServiceTest extends BaseServiceTest {
                 .thumbnailImageId(thumbnail.getId())
                 .content("this is new Feed")
                 .build();
+        when(restaurantService.findByDto(dto.getRestaurantCreateDto())).thenReturn(newRestaurant);
 
         //when 함수를 콜하면
         feedService.updateFeed(feed.getId(), dto, user.getId());
 
         //then
-        assertThat(feed.getRestaurant().getId()).isEqualTo(dto.getRestaurantCreateDto().getId());
+        assertThat(feed.getRestaurant().getName()).isEqualTo(dto.getRestaurantCreateDto().getName());
         assertThat(feed.getCategory()).isEqualTo(dto.getCategory());
         assertThat(feed.getDifficulty()).isEqualTo(dto.getDifficulty());
         assertThat(feed.getWelcome()).isEqualTo(dto.getWelcome());
