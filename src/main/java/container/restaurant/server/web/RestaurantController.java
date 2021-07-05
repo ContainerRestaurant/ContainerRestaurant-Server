@@ -24,7 +24,7 @@ public class RestaurantController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long restaurantId, @LoginUser SessionUser sessionUser) {
-        Long loginId = sessionUser != null ? sessionUser.getId() : null;
+        Long loginId = getUserId(sessionUser);
         RestaurantDetailDto dto = restaurantService.getRestaurantInfoById(restaurantId, loginId);
         return ResponseEntity.ok(EntityModel.of(dto)
                 .add(restaurantLinker.findById(restaurantId).withSelfRel())
@@ -44,7 +44,7 @@ public class RestaurantController {
         if (lat == null || lon == null || radius == null)
             return ResponseEntity.badRequest().body("위도, 경도, 반경 값이 필요합니다.");
 
-        Long loginId = sessionUser != null ? sessionUser.getId() : null;
+        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(CollectionModel.of(restaurantService.findNearByRestaurants(lat, lon, radius, loginId)
                 .stream().map(restaurant -> EntityModel.of(restaurant)
                         .add(restaurantLinker.findById(restaurant.getId()).withRel("restaurant-info"))
@@ -59,4 +59,7 @@ public class RestaurantController {
         return ResponseEntity.noContent().build();
     }
 
+    private Long getUserId(SessionUser sessionUser) {
+        return sessionUser != null ? sessionUser.getId() : null;
+    }
 }
