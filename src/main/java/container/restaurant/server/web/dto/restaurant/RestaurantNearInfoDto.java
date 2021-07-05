@@ -2,7 +2,6 @@ package container.restaurant.server.web.dto.restaurant;
 
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.restaurant.Restaurant;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -24,7 +23,6 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
         return new RestaurantNearInfoDto(restaurant, isFavorite);
     }
 
-    @Builder
     protected RestaurantNearInfoDto(Restaurant restaurant, Boolean isFavorite) {
         this.id = restaurant.getId();
         this.name = restaurant.getName();
