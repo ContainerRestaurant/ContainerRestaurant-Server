@@ -30,11 +30,8 @@ public class RestaurantService {
     public List<RestaurantNearInfoDto> findNearByRestaurants(double lat, double lon, long radius, Long loginId) {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
-                .map(restaurant -> RestaurantNearInfoDto.builder()
-                        .restaurant(restaurant)
-                        .isFavorite(restaurantFavoriteRepository.existsByUserIdAndRestaurantId(loginId, restaurant.getId()))
-                        .build()
-                )
+                .map(restaurant -> RestaurantNearInfoDto.from(restaurant,
+                        restaurantFavoriteRepository.existsByUserIdAndRestaurantId(loginId, restaurant.getId())))
                 .collect(Collectors.toList());
     }
 
