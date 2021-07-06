@@ -43,7 +43,7 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @Query("select f from TB_FEED f join f.scrapedBy s join f.owner left join f.thumbnail where s.user.id = ?1 and f.category = ?2")
     Page<Feed> findAllByScraperIdAndCategory(Long userId, Pageable pageable, Category category);
 
-    @EntityGraph(attributePaths = { "owner", "thumbnail" })
+    @EntityGraph(attributePaths = { "owner", "thumbnail", "restaurant" })
     Page<Feed> findAllByCreatedDateBetweenOrderByCreatedDateDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
 }

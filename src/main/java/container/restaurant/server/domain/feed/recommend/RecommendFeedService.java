@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class RecommendFeedService {
 
     private final FeedService feedService;
 
-    private List<Feed> recommendFeeds = List.of();
+    private CollectionModel<FeedPreviewDto> recommends;
 
     private final static int DEFAULT_PAGE_SIZE = 1000;
     private final static Pageable DEFAULT_PAGEABLE = PageRequest.of(0, DEFAULT_PAGE_SIZE);
@@ -33,9 +32,7 @@ public class RecommendFeedService {
 
 
     public CollectionModel<FeedPreviewDto> getRecommendFeeds() {
-        return CollectionModel.of(recommendFeeds.stream()
-                .map(FeedPreviewDto::from)
-                .collect(Collectors.toList()));
+        return recommends;
     }
 
     @PostConstruct
@@ -54,8 +51,9 @@ public class RecommendFeedService {
             p = p.next();
             page = feedService.findForUpdatingRecommend(from, to, p);
         }
-
-        recommendFeeds = queue.getList();
+        recommends = CollectionModel.of(queue.getList().stream()
+                .map(FeedPreviewDto::from)
+                .collect(Collectors.toList()));
     }
 
     public void setPageSize(int pageSize) {
