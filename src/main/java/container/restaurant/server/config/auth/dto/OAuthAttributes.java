@@ -47,8 +47,8 @@ public class OAuthAttributes {
 
     @SuppressWarnings("unchecked")
     public static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
-        Map<String, String> properties = (Map<String, String>) attributes.get("properties");
-        Map<String, String> kakaoAccount = (Map<String, String>) attributes.get("kakao_account");
+        Map<String, String> properties = (Map<String, String>) attributes.getOrDefault("properties", Map.of());
+        Map<String, String> kakaoAccount = (Map<String, String>) attributes.getOrDefault("kakao_account", Map.of());
 
         return OAuthAttributes.builder()
                 .provider(AuthProvider.KAKAO)
