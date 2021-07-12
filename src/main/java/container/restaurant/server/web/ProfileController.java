@@ -22,6 +22,6 @@ public class ProfileController {
         return profiles.stream()
                 .filter(deployProfiles::contains)
                 .findAny()
-                .orElseGet(() -> profiles.isEmpty() ? "deploy" : profiles.get(0));
+                .orElseGet(() -> profiles.isEmpty() ? "default" : profiles.get(0));
     }
 }
