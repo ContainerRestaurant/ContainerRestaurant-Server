@@ -17,7 +17,7 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profile() {
         List<String> profiles = Arrays.asList(env.getActiveProfiles());
-        List<String> deployProfiles = Arrays.asList("deploy", "deploy1", "deploy2");
+        List<String> deployProfiles = Arrays.asList("deploy1", "deploy2");
 
         return profiles.stream()
                 .filter(deployProfiles::contains)
