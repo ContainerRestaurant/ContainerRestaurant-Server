@@ -21,6 +21,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final Long restaurantId;
 
     private final String ownerNickname;
+    private final String ownerContainerLevel;
+    private final String ownerProfile;
+
     private final String restaurantName;
     private final Category category;
     private final String thumbnailUrl;
@@ -45,6 +48,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.restaurantId = feed.getRestaurant().getId();
 
         this.ownerNickname = feed.getOwner().getNickname();
+        this.ownerContainerLevel = feed.getOwner().getLevelTitle();
+        this.ownerProfile = ImageService.getUrlFromImage(feed.getOwner().getProfile());
+
         this.restaurantName = feed.getRestaurant().getName();
         this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
         this.category = feed.getCategory();
