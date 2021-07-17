@@ -112,9 +112,9 @@ class IndexControllerTest extends BaseUserControllerTest {
                 .andDo(document("banner",
                         responseFields(beneathPath("_embedded.bannerInfoDtoList"),
                                 fieldWithPath("title").description("배너 컨텐츠 이름"),
-                                fieldWithPath("bannerURL").description("배너  URL"),
-                                fieldWithPath("contentURL").description("컨텐츠 URL"),
-                                fieldWithPath("additionalURL").description("추가 URL")
+                                fieldWithPath("bannerURL").description("메인 화면에서 보여질 이미지 URL"),
+                                fieldWithPath("contentURL").description("메인 화면에서 배너를 터치한 경우 보여질 이미지 URL"),
+                                fieldWithPath("additionalURL").description("배너 이미지 외에 추가로 제공해야할 URL 이 있는 경우 포함되는 URL")
                         )));
     }
 
