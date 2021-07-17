@@ -442,3 +442,10 @@ operation::push-token-delete[snippets='curl-request,http-response']
 
 operation::contracts[snippets='curl-request,http-response']
 include::{snippets}/contract/response-fields-beneath-_embedded.contractInfoDtoList.adoc[]
+
+[[image]]
+== 이미지
+
+=== 이미지 업로드
+
+operation::image-upload[snippets='curl-request,http-response,response-fields']
