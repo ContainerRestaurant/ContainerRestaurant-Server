@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.report.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +18,17 @@ public class ReportController {
 
     @PostMapping("feed/{feedId}")
     public ResponseEntity<?> reportFeed(
-            @PathVariable Long feedId, @LoginUser SessionUser sessionUser
+            @PathVariable Long feedId, @LoginId Long loginId
     ) {
-        reportService.reportFeed(sessionUser.getId(), feedId);
+        reportService.reportFeed(loginId, feedId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("comment/{commentId}")
     public ResponseEntity<?> reportComment(
-            @PathVariable Long commentId, @LoginUser SessionUser sessionUser
+            @PathVariable Long commentId, @LoginId Long loginId
     ) {
-        reportService.reportComment(sessionUser.getId(), commentId);
+        reportService.reportComment(loginId, commentId);
         return ResponseEntity.noContent().build();
     }
 }

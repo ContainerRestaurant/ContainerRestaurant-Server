@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.user.AuthProvider;
 import container.restaurant.server.domain.user.User;
@@ -81,8 +80,8 @@ class UserControllerTest extends BaseUserControllerTest {
                 ));
 
         //then myself 로 로그인 되어있다.
-        assertThat(httpSession.getAttribute("user")).isNotNull();
-        assertThat(((SessionUser) httpSession.getAttribute("user")).getId()).isEqualTo(myself.getId());
+        assertThat(httpSession.getAttribute("userId")).isNotNull();
+        assertThat(((Long) httpSession.getAttribute("userId"))).isEqualTo(myself.getId());
     }
 
     @Test

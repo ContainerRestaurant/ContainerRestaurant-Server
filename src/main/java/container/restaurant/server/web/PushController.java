@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.push.PushTokenService;
 import container.restaurant.server.utils.FirebaseCloudMessageUtils;
@@ -53,9 +52,8 @@ public class PushController {
      */
     @PostMapping("{token}")
     public ResponseEntity<?> registerClientPushToken(
-            @LoginUser SessionUser sessionUser,
+            @LoginId Long loginId,
             @PathVariable String token) {
-        Long loginId = sessionUser != null ? sessionUser.getId() : null;
         PushToken pushToken = pushTokenService.registerUserPushToken(loginId, token);
         return ResponseEntity.ok(EntityModel.of(pushToken)
                 .add(pushTokenLinker.registerClientPushToken(token).withSelfRel())
@@ -75,9 +73,8 @@ public class PushController {
      */
     @DeleteMapping("{tokenId}")
     public ResponseEntity<?> deleteClientPushToken(
-            @LoginUser SessionUser sessionUser,
+            @LoginId Long loginId,
             @PathVariable Long tokenId) {
-        Long loginId = sessionUser != null ? sessionUser.getId() : null;
         pushTokenService.deleteUserPushToken(loginId, tokenId);
         return ResponseEntity.noContent().build();
     }

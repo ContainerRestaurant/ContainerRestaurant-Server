@@ -1,6 +1,5 @@
 package container.restaurant.server.web.linker;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.CommentController;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentUpdateDto;
@@ -22,18 +21,15 @@ public class CommentLinker {
     CommentCreateDto commentCreateDto=
             DummyInvocationUtils.methodOn(CommentCreateDto.class);
 
-    SessionUser u =
-            DummyInvocationUtils.methodOn(SessionUser.class);
-
-    public LinkBuilder getCommentByFeed(Long id){ return linkTo(proxy.getCommentByFeed(id, u)); }
+    public LinkBuilder getCommentByFeed(Long id){ return linkTo(proxy.getCommentByFeed(id, -1L)); }
 
     public LinkBuilder updateComment(Long id){
-        return linkTo(proxy.updateCommentById(id, commentUpdateDto, u));
+        return linkTo(proxy.updateCommentById(id, commentUpdateDto, -1L));
     }
 
     public LinkBuilder deleteComment(Long id){
-        return linkTo(proxy.deleteCommentById(id, u));
+        return linkTo(proxy.deleteCommentById(id, -1L));
     }
 
-    public LinkBuilder createComment(Long id) { return linkTo(proxy.createComment(commentCreateDto,id,u)); }
+    public LinkBuilder createComment(Long id) { return linkTo(proxy.createComment(commentCreateDto,id, -1L)); }
 }

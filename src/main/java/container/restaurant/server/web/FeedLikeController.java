@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.feed.like.FeedLikeService;
 import container.restaurant.server.web.linker.FeedLikeLinker;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,9 @@ public class FeedLikeController {
 
     @PostMapping("{feedId}")
     public ResponseEntity<?> userLikeFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
+            @LoginId Long loginId, @PathVariable Long feedId
     ) {
-        feedLikeService.userLikeFeed(sessionUser.getId(), feedId);
+        feedLikeService.userLikeFeed(loginId, feedId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(feedLikeLinker.userLikeFeed(feedId).withSelfRel())
@@ -32,9 +31,9 @@ public class FeedLikeController {
 
     @DeleteMapping("{feedId}")
     public ResponseEntity<?> userCancelLikeFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
+            @LoginId Long loginId, @PathVariable Long feedId
     ) {
-        feedLikeService.userCancelLikeFeed(sessionUser.getId(), feedId);
+        feedLikeService.userCancelLikeFeed(loginId, feedId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(feedLikeLinker.userLikeFeed(feedId).withSelfRel())

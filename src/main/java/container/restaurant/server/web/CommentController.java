@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.comment.CommentService;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
@@ -33,9 +32,9 @@ public class CommentController {
     public ResponseEntity<?> createComment(
             @RequestBody CommentCreateDto commentCreateDto,
             @PathVariable Long feedId,
-            @LoginUser SessionUser sessionUser
+            @LoginId Long loginId
     ){
-        CommentInfoDto commentInfoDto = commentService.createComment(commentCreateDto, feedId, sessionUser.getId());
+        CommentInfoDto commentInfoDto = commentService.createComment(commentCreateDto, feedId, loginId);
         return ResponseEntity.ok(
                 setLinks(commentInfoDto)
         );
@@ -44,12 +43,10 @@ public class CommentController {
     @GetMapping("feed/{feedId}")
     public ResponseEntity<?> getCommentByFeed(
             @PathVariable Long feedId,
-            @LoginUser SessionUser sessionUser
+            @LoginId Long loginId
     ){
-        Long userId = sessionUser != null ? sessionUser.getId() : null;
-
         return ResponseEntity.ok(
-                setLinks(commentService.findAllByFeed(userId, feedId), userId)
+                setLinks(commentService.findAllByFeed(loginId, feedId), loginId)
                         .add(commentLinker.getCommentByFeed(feedId).withSelfRel())
         );
     }
@@ -58,19 +55,18 @@ public class CommentController {
     public ResponseEntity<?> updateCommentById(
             @PathVariable Long commentId,
             @RequestBody CommentUpdateDto updateDto,
-            @LoginUser SessionUser sessionUser
+            @LoginId Long loginId
     ){
         return ResponseEntity.ok(
-                setLinks(commentService.update(commentId, updateDto, sessionUser.getId()))
-        );
+                setLinks(commentService.update(commentId, updateDto, loginId)));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteCommentById(
             @PathVariable Long id,
-            @LoginUser SessionUser sessionUser
+            @LoginId Long loginId
     ){
-        commentService.deleteById(id, sessionUser.getId());
+        commentService.deleteById(id, loginId);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,7 +1,5 @@
 package container.restaurant.server.web.linker;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
-import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.web.FeedController;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +18,8 @@ public class FeedLinker {
     FeedInfoDto dto =
             DummyInvocationUtils.methodOn(FeedInfoDto.class);
 
-    SessionUser u =
-            DummyInvocationUtils.methodOn(SessionUser.class);
-
     public LinkBuilder getFeedDetail(Long feedId) {
-        return linkTo(proxy.getFeedDetail(feedId, u));
+        return linkTo(proxy.getFeedDetail(feedId, -1L));
     }
 
     public LinkBuilder selectFeed(Pageable pageable) {
@@ -60,15 +55,15 @@ public class FeedLinker {
     }
 
     public LinkBuilder createFeed() {
-        return linkTo(proxy.createFeed(dto, u));
+        return linkTo(proxy.createFeed(dto, -1L));
     }
 
     public LinkBuilder deleteFeed(Long feedId) {
-        return linkTo(proxy.deleteFeed(u, feedId));
+        return linkTo(proxy.deleteFeed(-1L, feedId));
     }
 
     public LinkBuilder updateFeed(Long feedId) {
-        return linkTo(proxy.updateFeed(dto, u, feedId));
+        return linkTo(proxy.updateFeed(dto, -1L, feedId));
     }
 
     public LinkBuilder getCategoryList() {

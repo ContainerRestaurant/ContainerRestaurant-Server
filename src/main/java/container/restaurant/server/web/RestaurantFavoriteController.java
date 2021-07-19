@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteService;
 import container.restaurant.server.web.linker.RestaurantFavoriteLinker;
 import container.restaurant.server.web.linker.RestaurantLinker;
@@ -26,9 +25,9 @@ public class RestaurantFavoriteController {
 
     @PostMapping("{restaurantId}")
     public ResponseEntity<?> userFavoriteRestaurant(
-            @LoginUser SessionUser sessionUser, @PathVariable Long restaurantId
+            @LoginId Long loginId, @PathVariable Long restaurantId
     ) {
-        restaurantFavoriteService.userFavoriteRestaurant(sessionUser.getId(), restaurantId);
+        restaurantFavoriteService.userFavoriteRestaurant(loginId, restaurantId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(restaurantFavoriteLinker.userFavoriteRestaurant(restaurantId).withSelfRel())
@@ -38,9 +37,9 @@ public class RestaurantFavoriteController {
 
     @DeleteMapping("{restaurantId}")
     public ResponseEntity<?> userCancelFavoriteRestaurant(
-            @LoginUser SessionUser sessionUser, @PathVariable Long restaurantId
+            @LoginId Long loginId, @PathVariable Long restaurantId
     ) {
-        restaurantFavoriteService.userCancelFavoriteRestaurant(sessionUser.getId(), restaurantId);
+        restaurantFavoriteService.userCancelFavoriteRestaurant(loginId, restaurantId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(restaurantFavoriteLinker.userCancelFavoriteRestaurant(restaurantId).withSelfRel())
@@ -49,8 +48,8 @@ public class RestaurantFavoriteController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<?>> findAllByUser(@LoginUser SessionUser sessionUser) {
-        return ResponseEntity.ok(CollectionModel.of(restaurantFavoriteService.findAllByUserId(sessionUser.getId())
+    public ResponseEntity<CollectionModel<?>> findAllByUser(@LoginId Long loginId) {
+        return ResponseEntity.ok(CollectionModel.of(restaurantFavoriteService.findAllByUserId(loginId)
                 .stream().map(dto -> EntityModel.of(dto)
                         .add(restaurantFavoriteLinker.userCancelFavoriteRestaurant(dto.getId()).withRel("cancel-favorite"))
                         .add(restaurantLinker.findById(dto.getId()).withRel("restaurant-info"))

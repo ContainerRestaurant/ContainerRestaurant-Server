@@ -1,6 +1,5 @@
 package container.restaurant.server.config.auth;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.constant.Header;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,11 +19,11 @@ public class LoginUserFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        ofNullable(httpSession.getAttribute("user"))
+        ofNullable(httpSession.getAttribute("userId"))
                 .ifPresent(object -> {
-                    SessionUser user = (SessionUser) object;
+                    Long loginId = (Long) object;
                     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-                    httpServletResponse.setHeader(Header.USER_ID, user.getId().toString());
+                    httpServletResponse.setHeader(Header.USER_ID, loginId.toString());
                 });
         chain.doFilter(request, response);
     }

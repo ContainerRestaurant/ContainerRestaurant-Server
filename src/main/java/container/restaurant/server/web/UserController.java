@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.constant.Header;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
@@ -36,51 +35,47 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createWithToken(
-            @LoginUser SessionUser sessionUser, @RequestBody @Valid UserDto.Create dto
+            @LoginId Long loginId, @RequestBody @Valid UserDto.Create dto
     ) {
-        if (sessionUser != null)
+        if (loginId != null)
             return ResponseEntity.noContent().build();
 
-        SessionUser newSession = SessionUser.from(userService.createFrom(dto));
-        setLoginUser(newSession);
+        UserDto.Info newUser = userService.createFrom(dto);
+        setLoginUser(newUser.getId());
 
         return ResponseEntity
-                .created(userLinker.getUserById(newSession.getId()).toUri())
-                .header(Header.USER_ID, newSession.getId().toString())
+                .created(userLinker.getUserById(newUser.getId()).toUri())
+                .header(Header.USER_ID, newUser.getId().toString())
                 .build();
     }
 
     @PostMapping("login")
     public ResponseEntity<?> tokenLogin(
-            @LoginUser SessionUser sessionUser, @RequestBody UserDto.TokenLogin dto
+            @LoginId Long loginId, @RequestBody UserDto.TokenLogin dto
     ) {
-        if (sessionUser != null)
+        if (loginId != null)
             return ResponseEntity.noContent().build();
 
         return userService.tokenLogin(dto)
                 .map(info -> {
-                    SessionUser user = SessionUser.from(info);
-                    setLoginUser(user);
+                    setLoginUser(info.getId());
                     return ResponseEntity.ok()
-                            .header(Header.USER_ID, user.getId().toString())
+                            .header(Header.USER_ID, info.getId().toString())
                             .body(setLinks(info, info.getId()));
                 })
                 .orElseThrow(() -> new UnauthorizedException("로그인 실패 - 해당 사용자를 찾을 수 없습니다."));
     }
 
     @GetMapping
-    public ResponseEntity<?> getCurrentUser(@LoginUser SessionUser sessionUser) {
-        return ResponseEntity.of(ofNullable(sessionUser)
-                .map(SessionUser::getId)
+    public ResponseEntity<?> getCurrentUser(@LoginId Long loginId) {
+        return ResponseEntity.of(ofNullable(loginId)
                 .map(id -> setLinks(userService.getUserInfoById(id), id)));
     }
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(
-            @PathVariable Long id, @LoginUser SessionUser sessionUser
+            @PathVariable Long id, @LoginId Long loginId
     ) {
-        Long loginId = sessionUser != null ? sessionUser.getId() : -1;
-
         return ResponseEntity.ok(
                 setLinks(userService.getUserInfoById(id), loginId)
         );
@@ -88,22 +83,22 @@ public class UserController {
 
     @PatchMapping("{id}")
     public ResponseEntity<?> updateUserById(
-            @PathVariable Long id, @LoginUser SessionUser sessionUser,
+            @PathVariable Long id, @LoginId Long loginId,
             @RequestBody UserDto.Update updateDto
     ) {
-        if (!id.equals(sessionUser.getId()))
+        if (!id.equals(loginId))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         return ResponseEntity.ok(
-                setLinks(userService.update(id, updateDto), sessionUser.getId())
+                setLinks(userService.update(id, updateDto), id)
         );
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteById(
-            @PathVariable Long id, @LoginUser SessionUser sessionUser
+            @PathVariable Long id, @LoginId Long loginId
     ) {
-        if (!id.equals(sessionUser.getId()))
+        if (!id.equals(loginId))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         userService.deleteById(id);
@@ -144,12 +139,12 @@ public class UserController {
     private final HttpSession httpSession;
     @GetMapping("temp-login")
     public ResponseEntity<?> tempLogin() {
-        setLoginUser(SessionUser.from(userService.findById(1L)));
+        setLoginUser(1L);
         return ResponseEntity.noContent().build();
     }
 
-    private void setLoginUser(SessionUser newSession) {
-        httpSession.setAttribute("user", newSession);
+    private void setLoginUser(Long loginId) {
+        httpSession.setAttribute("userId", loginId);
     }
 
     private void logout() {

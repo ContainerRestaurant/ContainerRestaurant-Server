@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.user.scrap.ScrapFeedService;
 import container.restaurant.server.web.linker.ScrapFeedLinker;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +21,9 @@ public class ScrapFeedController {
 
     @PostMapping("{feedId}")
     public ResponseEntity<?> scrapFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
+            @LoginId Long loginId, @PathVariable Long feedId
     ) {
-        scrapFeedService.userScrapFeed(sessionUser.getId(), feedId);
+        scrapFeedService.userScrapFeed(loginId, feedId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(scrapFeedLinker.scrapFeed(feedId).withSelfRel())
@@ -34,9 +33,9 @@ public class ScrapFeedController {
 
     @DeleteMapping("{feedId}")
     public ResponseEntity<?> cancelScrapFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
+            @LoginId Long loginId, @PathVariable Long feedId
     ) {
-        scrapFeedService.userCancelScrapFeed(sessionUser.getId(), feedId);
+        scrapFeedService.userCancelScrapFeed(loginId, feedId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                         .add(scrapFeedLinker.cancelScrapFeed(feedId).withSelfRel())
