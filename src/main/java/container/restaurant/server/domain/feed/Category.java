@@ -13,7 +13,7 @@ public enum Category {
     FAST_FOOD("패스트푸드"),
     ASIAN_AND_WESTERN("아시안/양식"),
     COFFEE_AND_DESSERT("카페/디저트"),
-    JAPANESE("일식"),
+    JAPANESE("돈까스/회/일식"),
     CHICKEN_AND_PIZZA("치킨/피자");
 
     private final String korean;
