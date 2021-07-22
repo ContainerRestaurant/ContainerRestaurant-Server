@@ -126,7 +126,7 @@ public class UserController {
                         userLinker.getUserById(dto.getId()).withSelfRel(),
                         feedLinker.selectUserFeed(dto.getId()).withRel("feeds")
                 )
-                .addAllIf(loginId.equals(dto.getId()), () -> List.of(
+                .addAllIf(dto.getId().equals(loginId), () -> List.of(
                         userLinker.updateUserById(dto.getId()).withRel("patch"),
                         userLinker.deleteById(dto.getId()).withRel("delete"),
                         userLinker.existsNickname().withRel("nickname-exists"),
