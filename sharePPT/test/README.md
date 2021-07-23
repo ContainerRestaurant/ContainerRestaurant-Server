@@ -156,3 +156,36 @@ void findByIdTest_noResult() {
 ```
 
 ## 슬라이스 테스트
+
+```java
+@DataJpaTest
+class UserRepositoryTest {
+
+  @Autowired
+  TestEntityManager em;
+
+  @Autowired
+  UserRepository userRepository;
+
+  @Test
+  @DisplayName("AuthId 와 Provider 로 조회 테스트")
+  void findByAuthProviderAndAuthIdTest() {
+    //given
+    String authId = "authId";
+    AuthProvider provider = AuthProvider.KAKAO;
+    User newUser = User.builder()
+            .authId(authId).authProvider(provider)
+            .nickname("testNickname").email("test@test").build();
+    em.persist(newUser);
+
+    //when
+    User found = userRepository.findByAuthProviderAndAuthId(provider, authId)
+            .orElse(null);
+
+    //then
+    assertThat(found).isNotNull();
+    assertThat(found.getId()).isEqualTo(newUser.getId());
+  }
+  // ...
+}
+```

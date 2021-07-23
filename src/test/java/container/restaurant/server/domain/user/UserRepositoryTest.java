@@ -1,39 +1,34 @@
 package container.restaurant.server.domain.user;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@DataJpaTest
 class UserRepositoryTest {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired TestEntityManager em;
 
-    @AfterEach
-    void afterEach() {
-        userRepository.deleteAll();
-    }
+    @Autowired UserRepository userRepository;
+
+    //TODO 추가 수정 필요
 
     @Test
-    @DisplayName("AuthId 와 Provider 로 찾을 수 있다.")
-    void testFindByEmail() {
+    @DisplayName("AuthId 와 Provider 로 조회 테스트")
+    void findByAuthProviderAndAuthIdTest() {
         //given
-        String email = "test@test";
         String authId = "authId";
         AuthProvider provider = AuthProvider.KAKAO;
-        User newUser = userRepository.save(User.builder()
-                .authId(authId)
-                .authProvider(provider)
-                .nickname("testNickname")
-                .email(email)
-                .build());
+        User newUser = User.builder()
+                .authId(authId).authProvider(provider)
+                .nickname("testNickname").email("test@test").build();
+        em.persist(newUser);
 
         //when
         User found = userRepository.findByAuthProviderAndAuthId(provider, authId)
@@ -42,7 +37,6 @@ class UserRepositoryTest {
         //then
         assertThat(found).isNotNull();
         assertThat(found.getId()).isEqualTo(newUser.getId());
-        assertThat(found.getEmail()).isEqualTo(email);
     }
 
     @Test
