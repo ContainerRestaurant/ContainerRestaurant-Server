@@ -118,6 +118,41 @@ targetMethodTest[_optional_info]*
   
 # 예시
 
-## 단위 테스트 
+## 단위 테스트
+
+### `given-when-then`
+
+```java
+@Test
+@DisplayName("단일 댓글 엔티티 조회 테스트")
+void findByIdTest() {
+    //given 댓글 리포의 조회 입출력이 주어졌을 때
+    Long targetId = 1L;
+    Comment mockedComment = mock(Comment.class);
+    when(commentRepository.findById(targetId)).thenReturn(of(mockedComment));
+
+    //when 주어진 입력을 통해 댓글을 조회하면
+    Comment result = commentService.findById(targetId);
+
+    //then 출력으로 주어진 댓글이 반환된다.
+    assertThat(result).isEqualTo(mockedComment);
+}
+```
+
+### `given-expect`
+
+```java
+@Test
+@DisplayName("단일 댓글 엔티티 조회 테스트 - 조회 결과 없음")
+void findByIdTest_noResult() {
+    //given 조회 결과가 빈 입력이 주어졌을 때
+    Long targetId = 1L;
+    when(commentRepository.findById(targetId)).thenReturn(empty());
+
+    //expect 주어진 입력을 통해 댓글을 조회하면 404 예외가 발생한다.
+    assertThatThrownBy(() -> commentService.findById(targetId))
+            .isExactlyInstanceOf(ResourceNotFoundException.class);
+}
+```
 
 ## 슬라이스 테스트
