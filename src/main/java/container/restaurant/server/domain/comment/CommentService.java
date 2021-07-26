@@ -34,7 +34,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
-    public CommentInfoDto createComment(CommentCreateDto commentCreateDto, Long feedId, Long userId) {
+    public Long createComment(CommentCreateDto commentCreateDto, Long feedId, Long userId) {
         Feed feed = feedService.findById(feedId);
         User user = userService.findById(userId);
 
@@ -47,13 +47,18 @@ public class CommentService {
         feed.commentCountUp();
         publisher.publishEvent(new FeedCommentedEvent(comment));
 
-        return CommentInfoDto.from(comment);
+        return comment.getId();
     }
 
     @Transactional(readOnly = true)
     public Comment findById(Long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 댓글입니다.(id:" + id + ")"));
+    }
+
+    @Transactional(readOnly = true)
+    public CommentInfoDto get(Long id) {
+        return CommentInfoDto.from(findById(id));
     }
 
     @Transactional(readOnly = true)

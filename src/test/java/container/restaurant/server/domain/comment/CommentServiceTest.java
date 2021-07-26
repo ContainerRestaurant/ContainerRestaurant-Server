@@ -128,7 +128,8 @@ class CommentServiceTest {
         int orgCommentCount = feeds.get(0).getReplyCount();
         CommentCreateDto commentCreateDto = new CommentCreateDto("test");
 
-        CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+        Long newId = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+        CommentInfoDto dto = commentService.get(newId);
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
@@ -142,7 +143,8 @@ class CommentServiceTest {
         int orgCommentCount = feeds.get(0).getReplyCount();
         CommentCreateDto commentCreateDto = new CommentCreateDto("test", comments.get(0).getId());
 
-        CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+        Long newId = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+        CommentInfoDto dto = commentService.get(newId);
 
         assertThat(dto.getContent()).isEqualTo("test");
         assertThat(dto.getOwnerId()).isEqualTo(users.get(0).getId());
@@ -164,7 +166,10 @@ class CommentServiceTest {
     void deleteComment(){
         // given 대댓글 작성
         CommentCreateDto commentCreateDto = new CommentCreateDto("test", comments.get(0).getId());
-        CommentInfoDto dto = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+
+        Long newId = commentService.createComment(commentCreateDto, feeds.get(0).getId(), users.get(0).getId());
+        CommentInfoDto dto = commentService.get(newId);
+
         assertThat(commentRepository.findAll().size()).isEqualTo(11);
         long count = commentRepository.count();
 

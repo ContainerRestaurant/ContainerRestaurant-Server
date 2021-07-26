@@ -34,7 +34,8 @@ public class CommentController {
             @PathVariable Long feedId,
             @LoginId Long loginId
     ){
-        CommentInfoDto commentInfoDto = commentService.createComment(commentCreateDto, feedId, loginId);
+        Long newCommentId = commentService.createComment(commentCreateDto, feedId, loginId);
+        CommentInfoDto commentInfoDto = commentService.get(newCommentId);
         return ResponseEntity.ok(
                 setLinks(commentInfoDto)
         );
