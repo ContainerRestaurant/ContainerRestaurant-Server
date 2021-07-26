@@ -28,12 +28,13 @@ public abstract class BaseFeedAndCommentControllerTest extends BaseUserAndFeedCo
                 .content("내 피드에 대댓글이 있는 댓글")
                 .build());
 
-        myFeedCommentReply = commentRepository.save(Comment.builder()
+        myFeedCommentReply = Comment.builder()
                 .owner(myself)
                 .feed(myFeed)
                 .content("내 피드 댓글의 대댓글")
-                .upperReply(myFeedComment)
-                .build());
+                .build();
+        myFeedCommentReply.isBelongTo(myFeedComment);
+        commentRepository.save(myFeedCommentReply);
     }
 
     @Override

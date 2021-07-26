@@ -38,11 +38,9 @@ public class CommentService {
         Feed feed = feedService.findById(feedId);
         User user = userService.findById(userId);
 
-        Comment upperReply = ofNullable(commentCreateDto.getUpperReplyId())
-                .map(this::findById)
-                .orElse(null);
-
-        Comment comment = commentRepository.save(commentCreateDto.toEntityWith(user, feed, upperReply));
+        Comment comment = commentRepository.save(commentCreateDto.toEntityWith(user, feed));
+        ofNullable(commentCreateDto.getUpperReplyId())
+                .ifPresent(upperReplyId -> comment.isBelongTo(findById(upperReplyId)));
 
         feed.commentCountUp();
         publisher.publishEvent(new FeedCommentedEvent(comment));

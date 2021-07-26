@@ -52,13 +52,14 @@ class CommentServiceTest2 extends BaseMockTest {
 
         CommentCreateDto dto = mock(CommentCreateDto.class);
         when(dto.getUpperReplyId()).thenReturn(null);
-        when(dto.toEntityWith(user, feed, null)).thenReturn(newComment);
+        when(dto.toEntityWith(user, feed)).thenReturn(newComment);
 
         //when 댓글 생성 서비스를 실행하면
         Long result = commentService.createComment(dto, feedId, userId);
 
         //then 주어진 댓글 ID 가 반환 / 피드 카운트 오름 / 이벤트 발행 / 주어진 새 댓글이 저장
         assertThat(result).isEqualTo(newCommentId);
+        verify(newComment, never()).isBelongTo(any(Comment.class));
         verify(feed).commentCountUp();
         verify(publisher).publishEvent(any(Object.class));
         verify(commentRepository).save(newComment);
@@ -83,13 +84,14 @@ class CommentServiceTest2 extends BaseMockTest {
 
         CommentCreateDto dto = mock(CommentCreateDto.class);
         when(dto.getUpperReplyId()).thenReturn(upperCommentId);
-        when(dto.toEntityWith(user, feed, upperComment)).thenReturn(newReplyComment);
+        when(dto.toEntityWith(user, feed)).thenReturn(newReplyComment);
 
         //when 댓글 생성 서비스를 실행하면
         Long result = commentService.createComment(dto, feedId, userId);
 
-        //then 주어진 답댓글 ID 가 반환 / 피드 카운트 오름 / 이벤트 발행 / 주어진 새 답댓글이 저장
+        //then 주어진 답댓글 ID 가 반환 / 상위 댓글 지정 / 피드 카운트 오름 / 이벤트 발행 / 주어진 새 답댓글이 저장
         assertThat(result).isEqualTo(newReplyCommentId);
+        verify(newReplyComment).isBelongTo(upperComment);
         verify(feed).commentCountUp();
         verify(publisher).publishEvent(any(Object.class));
         verify(commentRepository).save(newReplyComment);

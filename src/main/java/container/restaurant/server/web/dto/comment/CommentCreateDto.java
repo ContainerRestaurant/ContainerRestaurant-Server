@@ -21,12 +21,11 @@ public class CommentCreateDto {
         this.content = content;
     }
 
-    public Comment toEntityWith(User owner, Feed feed, Comment upperReply) {
+    public Comment toEntityWith(User owner, Feed feed) {
         return Comment.builder()
                 .owner(owner)
                 .feed(feed)
                 .content(this.content)
-                .upperReply(upperReply)
                 .build();
     }
 }

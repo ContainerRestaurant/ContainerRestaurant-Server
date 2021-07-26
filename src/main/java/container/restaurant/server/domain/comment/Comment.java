@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor
@@ -28,8 +33,12 @@ public class Comment extends BaseCreatedTimeEntity {
     private String content;
     private Integer likeCount;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Comment upperReply;
+
+    @OneToMany(fetch = LAZY, mappedBy = "upperReply")
+    private List<Comment> replies = new ArrayList<>();
+
     private Boolean isDeleted;
 
     @Column(name = "is_have_reply")
@@ -37,15 +46,11 @@ public class Comment extends BaseCreatedTimeEntity {
     private Boolean isBlind;
 
     @Builder
-    protected Comment(User owner, Feed feed, String content, Comment upperReply) {
+    protected Comment(User owner, Feed feed, String content) {
         this.owner = owner;
         this.feed = feed;
         this.content = content;
         this.likeCount = 0;
-        this.upperReply = upperReply;
-        if (upperReply != null) {
-            upperReply.setHasReply();
-        }
         this.isDeleted = false;
         this.hasReply = false;
         this.isBlind = false;
@@ -56,10 +61,6 @@ public class Comment extends BaseCreatedTimeEntity {
         return this;
     }
 
-    public void setHasReply() {
-        this.hasReply = true;
-    }
-
     public void unsetHasReply() { this.hasReply = false; }
 
     public void setIsDeleted() { this.isDeleted = true; }
@@ -67,4 +68,11 @@ public class Comment extends BaseCreatedTimeEntity {
     public void likeCountUp() { this.likeCount++; }
 
     public void likeCountDown() { this.likeCount--; }
+
+    public void isBelongTo(Comment upperReply) {
+        this.upperReply = upperReply;
+
+        upperReply.replies.add(this);
+        upperReply.hasReply = true;
+    }
 }
