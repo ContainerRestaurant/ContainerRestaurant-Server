@@ -16,9 +16,9 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
@@ -61,25 +61,14 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public CollectionModel<CommentInfoDto> findAllByFeed(Long userId, Long feedId) throws ResourceNotFoundException {
-        Feed feed = feedService.findById(feedId);
+        List<Comment> commentList = commentRepository.findFeedComments(feedId);
+        Set<Long> likeIds = commentLikeRepository.findCommentIdsByFeedIdAndUserId(userId, feedId);
 
-        LinkedHashMap<Long, CommentInfoDto> commentDtoMap = new LinkedHashMap<>();
+        List<CommentInfoDto> result = commentList.stream()
+                .map(c -> CommentInfoDto.from(c, likeIds))
+                .collect(Collectors.toList());
 
-        List<Comment> commentList = commentRepository.findAllByFeed(feed);
-
-        Set<Long> likeIds = ofNullable(userId)
-                .map(id -> commentLikeRepository.test(id, commentList))
-                .orElseGet(Set::of);
-
-        commentList.forEach(comment ->
-                ofNullable(comment.getUpperReply()).ifPresentOrElse(
-                        upperReply -> commentDtoMap.get(upperReply.getId())
-                                .addCommentReply(CommentInfoDto.from(comment, likeIds.contains(comment.getId()))),
-                        () -> commentDtoMap.put(comment.getId(),
-                                CommentInfoDto.from(comment, likeIds.contains(comment.getId())))
-                ));
-
-        return CollectionModel.of(commentDtoMap.values());
+        return CollectionModel.of(result);
     }
 
     @Transactional

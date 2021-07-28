@@ -115,11 +115,4 @@ class CommentRepositoryTest {
                 .orElseThrow(() -> {throw new RuntimeException();});
     }
 
-    @Test
-    @DisplayName("하나 이상의 댓글이 조회된다.")
-    void findCommentTest(){
-        List<Comment> list = commentRepository.findAllByFeed(feeds.get(0));
-        assertThat(list.size()).isGreaterThan(0);
-    }
-
 }

@@ -74,10 +74,6 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.isLike = null;
     }
 
-    public void addCommentReply(CommentInfoDto commentInfoDto){
-        commentReply.add(commentInfoDto);
-    }
-
     public void ifHasReply(Consumer<CommentInfoDto> consumer) {
         if (commentReply.size() == 0) return;
         commentReply.forEach(consumer);

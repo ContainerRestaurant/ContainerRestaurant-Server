@@ -39,42 +39,6 @@ class CommentLikeRepositoryTest {
     }
 
     @Test
-    void test() {
-        //given
-        Feed feed1 = em.persist(Feed.builder().owner(user).restaurant(restaurant)
-                .category(Category.KOREAN).difficulty(1).welcome(false).build());
-
-        Comment comment1_1 = em.persist(Comment.builder().content("cmt1-1").feed(feed1).owner(user).build());
-        Comment comment1_2 = em.persist(Comment.builder().content("cmt1-2").feed(feed1).owner(user).build());
-        Comment comment1_3 = em.persist(Comment.builder().content("cmt1-3").feed(feed1).owner(user).build());
-        em.persist(CommentLike.of(user, comment1_1));
-        em.persist(CommentLike.of(user, comment1_3));
-
-        Feed feed2 = em.persist(Feed.builder().owner(user).restaurant(restaurant)
-                .category(Category.KOREAN).difficulty(1).welcome(false).build());
-
-        Comment comment2_1 = em.persist(Comment.builder().content("cmt2-1").feed(feed2).owner(user).build());
-        Comment comment2_2 = em.persist(Comment.builder().content("cmt2-2").feed(feed2).owner(user).build());
-        Comment comment2_3 = em.persist(Comment.builder().content("cmt2-3").feed(feed2).owner(user).build());
-        em.persist(CommentLike.of(user, comment2_2));
-        em.persist(CommentLike.of(user, comment2_3));
-
-        //when
-        Set<Long> res = commentLikeRepository.test(user.getId(),
-                List.of(comment1_1, comment1_2, comment2_1, comment2_2));
-
-        //then
-        assertThat(res.size()).isEqualTo(2);
-        assertThat(res)
-                .anyMatch(id -> id.equals(comment1_1.getId()))
-                .anyMatch(id -> id.equals(comment2_2.getId()))
-                .allMatch(id -> !id.equals(comment1_2.getId()))
-                .allMatch(id -> !id.equals(comment2_1.getId()))
-                .allMatch(id -> !id.equals(comment1_3.getId()))
-                .allMatch(id -> !id.equals(comment2_3.getId()));
-    }
-
-    @Test
     @DisplayName("유저, 피드 정보로 좋아요한 댓글 ID 조회하기")
     public void 유저_피드_정보로_좋아요한_댓글_ID_조회하기() {
         //given

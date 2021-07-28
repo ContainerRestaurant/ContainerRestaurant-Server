@@ -3,6 +3,7 @@ package container.restaurant.server.domain.comment;
 import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
 import container.restaurant.server.domain.base.BaseEntity;
 import container.restaurant.server.domain.base.BaseTimeEntity;
+import container.restaurant.server.domain.comment.like.CommentLikeRepository;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.user.User;
@@ -10,6 +11,7 @@ import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.base.BaseMockTest;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
+import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static java.time.LocalDateTime.now;
@@ -33,6 +38,7 @@ class CommentServiceTest2 extends BaseMockTest {
     @Mock UserService userService;
     @Mock FeedService feedService;
     @Mock ApplicationEventPublisher publisher;
+    @Mock CommentLikeRepository commentLikeRepository;
 
     @InjectMocks CommentService commentService;
 
@@ -122,6 +128,49 @@ class CommentServiceTest2 extends BaseMockTest {
         //expect 주어진 입력을 통해 댓글을 조회하면 404 예외가 발생한다.
         assertThatThrownBy(() -> commentService.findById(targetId))
                 .isExactlyInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("피드의 댓글 조회 테스트")
+    void 피드의_댓글_조회_테스트() {
+        //given
+        long userId = 1L;
+        User user = makeEntity(userId,
+                () -> User.builder().build());
+
+        long feedId = 2L;
+        Feed feed = makeEntity(feedId,
+                () -> Feed.builder().build());
+
+        long noReplyId = 3L;
+        Comment noReplyComment = makeEntity(noReplyId,
+                () -> Comment.builder().owner(user).feed(feed).build());
+
+        long hasReplyId = 4L;
+        Comment hasReplyComment = makeEntity(hasReplyId,
+                () -> Comment.builder().owner(user).feed(feed).build());
+
+        long replyId = 5L;
+        Comment replyComment = makeEntity(replyId,
+                () -> Comment.builder().owner(user).feed(feed).build());
+        replyComment.isBelongTo(hasReplyComment);
+
+        when(commentRepository.findFeedComments(feedId))
+                .thenReturn(List.of(noReplyComment, hasReplyComment));
+        when(commentLikeRepository.findCommentIdsByFeedIdAndUserId(userId, feedId))
+                .thenReturn(Set.of(noReplyId, replyId));
+
+        //when
+        Collection<CommentInfoDto> result = commentService.findAllByFeed(userId, feedId).getContent();
+
+        //then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result)
+                .anyMatch(dto -> dto.getId().equals(noReplyComment.getId()) && dto.getIsLike())
+                .anyMatch(dto -> dto.getId().equals(hasReplyComment.getId()) && !dto.getIsLike() && null !=
+                        assertThat(dto.getCommentReply())
+                                .anyMatch(replyDto -> replyDto.getId().equals(replyComment.getId()) &&
+                                        replyDto.getIsLike()));
     }
 
     // TODO 추가 구현이 필요하다.
