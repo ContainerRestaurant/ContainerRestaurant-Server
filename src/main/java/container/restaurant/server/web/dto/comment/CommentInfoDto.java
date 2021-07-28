@@ -8,6 +8,7 @@ import org.springframework.hateoas.RepresentationModel;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.lang.Boolean.FALSE;
@@ -34,6 +35,17 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         if(comment.getIsDeleted())
             return new CommentInfoDto(comment.getId());
         return new CommentInfoDto(comment, isLike);
+    }
+
+    public static CommentInfoDto from(Comment comment, Set<Long> likeIdMap) {
+        return new CommentInfoDto(comment, likeIdMap);
+    }
+
+    public CommentInfoDto(Comment comment, Set<Long> likeIdMap) {
+        this(comment, likeIdMap.contains(comment.getId()));
+        for (Comment reply : comment.getReplies()) {
+            commentReply.add(new CommentInfoDto(reply, likeIdMap));
+        }
     }
 
     protected CommentInfoDto(Comment comment, Boolean isLike){
