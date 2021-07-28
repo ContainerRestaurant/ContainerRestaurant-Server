@@ -23,11 +23,11 @@ import static javax.persistence.FetchType.LAZY;
 public class Comment extends BaseCreatedTimeEntity {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User owner;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Feed feed;
 
     private String content;
