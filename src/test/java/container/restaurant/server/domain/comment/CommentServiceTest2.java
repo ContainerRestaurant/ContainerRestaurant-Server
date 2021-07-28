@@ -13,6 +13,7 @@ import container.restaurant.server.web.base.BaseMockTest;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -42,18 +43,20 @@ class CommentServiceTest2 extends BaseMockTest {
 
     @InjectMocks CommentService commentService;
 
+    User user;
+    Feed feed;
+
+    @BeforeEach
+    void 유저_피드_세팅() {
+        user = makeEntity(100L, () -> User.builder().build());
+        feed = makeEntity(200L, () -> Feed.builder().build());
+    }
+
     @Test
     @DisplayName("댓글 생성 테스트 - 일반 댓글")
-    public void 댓글_생성_테스트__일반_댓글() {
-        //given 유저, 피드, 생성할 일반 댓글 엔티티 그리고 DTO 가 주어졌을 때
-        long userId = 1L;
-        User user = makeEntity(userId, () -> User.builder().build());
-
-        long feedId = 2L;
-        Feed feed = makeEntity(feedId, () -> Feed.builder().build());
-
-        long newCommentId = 3L;
-        Comment newComment = makeEntity(newCommentId, () -> Comment.builder().build());
+    void 댓글_생성_테스트__일반_댓글() {
+        //given 생성할 일반 댓글 엔티티 그리고 DTO 가 주어졌을 때
+        Comment newComment = makeEntity(1L, () -> Comment.builder().build());
         when(commentRepository.save(any(Comment.class))).thenAnswer(returnsFirstArg());
 
         CommentCreateDto dto = mock(CommentCreateDto.class);
@@ -61,10 +64,10 @@ class CommentServiceTest2 extends BaseMockTest {
         when(dto.toEntityWith(user, feed)).thenReturn(newComment);
 
         //when 댓글 생성 서비스를 실행하면
-        Long result = commentService.createComment(dto, feedId, userId);
+        Long result = commentService.createComment(dto, feed.getId(), user.getId());
 
         //then 주어진 댓글 ID 가 반환 / 피드 카운트 오름 / 이벤트 발행 / 주어진 새 댓글이 저장
-        assertThat(result).isEqualTo(newCommentId);
+        assertThat(result).isEqualTo(newComment.getId());
         verify(newComment, never()).isBelongTo(any(Comment.class));
         verify(feed).commentCountUp();
         verify(publisher).publishEvent(any(Object.class));
@@ -74,18 +77,11 @@ class CommentServiceTest2 extends BaseMockTest {
     @Test
     @DisplayName("댓글 생성 테스트 - 답댓글")
     void 댓글_생성_테스트__답댓글() {
-        //given 유저, 피드, 상위 댓글, 생성할 답댓글 엔티티 그리고 DTO 가 주어졌을 때
-        long userId = 1L;
-        User user = makeEntity(userId, () -> User.builder().build());
-
-        long feedId = 2L;
-        Feed feed = makeEntity(feedId, () -> Feed.builder().build());
-
-        long upperCommentId = 3L;
+        //given 상위 댓글, 생성할 답댓글 엔티티 그리고 DTO 가 주어졌을 때
+        long upperCommentId = 1L;
         Comment upperComment = makeEntity(upperCommentId, () -> Comment.builder().build());
 
-        long newReplyCommentId = 4L;
-        Comment newReplyComment = makeEntity(newReplyCommentId, () -> Comment.builder().build());
+        Comment newReplyComment = makeEntity(2L, () -> Comment.builder().build());
         when(commentRepository.save(any(Comment.class))).thenAnswer(returnsFirstArg());
 
         CommentCreateDto dto = mock(CommentCreateDto.class);
@@ -93,10 +89,10 @@ class CommentServiceTest2 extends BaseMockTest {
         when(dto.toEntityWith(user, feed)).thenReturn(newReplyComment);
 
         //when 댓글 생성 서비스를 실행하면
-        Long result = commentService.createComment(dto, feedId, userId);
+        Long result = commentService.createComment(dto, feed.getId(), user.getId());
 
         //then 주어진 답댓글 ID 가 반환 / 상위 댓글 지정 / 피드 카운트 오름 / 이벤트 발행 / 주어진 새 답댓글이 저장
-        assertThat(result).isEqualTo(newReplyCommentId);
+        assertThat(result).isEqualTo(newReplyComment.getId());
         verify(newReplyComment).isBelongTo(upperComment);
         verify(feed).commentCountUp();
         verify(publisher).publishEvent(any(Object.class));
@@ -107,12 +103,11 @@ class CommentServiceTest2 extends BaseMockTest {
     @DisplayName("단일 댓글 엔티티 조회 테스트")
     void 단일_댓글_엔티티_조회_테스트() {
         //given 댓글 리포의 조회 입출력이 주어졌을 때
-        Long targetId = 1L;
-        Comment mockedComment = mock(Comment.class);
-        when(commentRepository.findById(targetId)).thenReturn(of(mockedComment));
+        Comment mockedComment = makeEntity(1L, () -> Comment.builder().build());
+        when(commentRepository.findById(mockedComment.getId())).thenReturn(of(mockedComment));
 
         //when 주어진 입력을 통해 댓글을 조회하면
-        Comment result = commentService.findById(targetId);
+        Comment result = commentService.findById(mockedComment.getId());
 
         //then 출력으로 주어진 댓글이 반환된다.
         assertThat(result).isEqualTo(mockedComment);
@@ -133,37 +128,28 @@ class CommentServiceTest2 extends BaseMockTest {
     @Test
     @DisplayName("피드의 댓글 조회 테스트")
     void 피드의_댓글_조회_테스트() {
-        //given
-        long userId = 1L;
-        User user = makeEntity(userId,
-                () -> User.builder().build());
-
-        long feedId = 2L;
-        Feed feed = makeEntity(feedId,
-                () -> Feed.builder().build());
-
-        long noReplyId = 3L;
-        Comment noReplyComment = makeEntity(noReplyId,
+        //given 댓글, 답글이 있는 댓글과 그 답글과 좋아요 여부가 주어졌을 때
+        long noReplyCommentId = 1L;
+        Comment noReplyComment = makeEntity(noReplyCommentId,
                 () -> Comment.builder().owner(user).feed(feed).build());
 
-        long hasReplyId = 4L;
-        Comment hasReplyComment = makeEntity(hasReplyId,
+        Comment hasReplyComment = makeEntity(2L,
                 () -> Comment.builder().owner(user).feed(feed).build());
 
-        long replyId = 5L;
-        Comment replyComment = makeEntity(replyId,
+        long replyCommentId = 3L;
+        Comment replyComment = makeEntity(replyCommentId,
                 () -> Comment.builder().owner(user).feed(feed).build());
         replyComment.isBelongTo(hasReplyComment);
 
-        when(commentRepository.findFeedComments(feedId))
+        when(commentRepository.findFeedComments(feed.getId()))
                 .thenReturn(List.of(noReplyComment, hasReplyComment));
-        when(commentLikeRepository.findCommentIdsByFeedIdAndUserId(userId, feedId))
-                .thenReturn(Set.of(noReplyId, replyId));
+        when(commentLikeRepository.findCommentIdsByFeedIdAndUserId(user.getId(), feed.getId()))
+                .thenReturn(Set.of(noReplyCommentId, replyCommentId));
 
-        //when
-        Collection<CommentInfoDto> result = commentService.findAllByFeed(userId, feedId).getContent();
+        //when 주어진 피드와 유저로 댓글을 조회하면
+        Collection<CommentInfoDto> result = commentService.findAllByFeed(user.getId(), feed.getId()).getContent();
 
-        //then
+        //then 댓글 개수 만큼 조회되고, 답글이 확인되며, 좋아요 여부가 DTO 에 잘 적용되어있다.
         assertThat(result.size()).isEqualTo(2);
         assertThat(result)
                 .anyMatch(dto -> dto.getId().equals(noReplyComment.getId()) && dto.getIsLike())
