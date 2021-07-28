@@ -18,4 +18,12 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
                 "left join cl.comment c " +
             "where u.id = ?1 and c in ?2")
     Set<Long> test(Long userId, Collection<Comment> comments);
+
+    @Query("select c.id " +
+                "from TB_COMMENT_LIKE cl " +
+                "join cl.user u " +
+                "join cl.comment c " +
+            "where u.id = :userId and c.feed.id = :feedId ")
+    Set<Long> findCommentIdsByFeedIdAndUserId(Long userId, Long feedId);
+
 }
