@@ -9,8 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor
@@ -19,11 +22,11 @@ import javax.validation.constraints.NotNull;
 public class CommentLike extends BaseEntity {
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User user;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Comment comment;
 
     public static CommentLike of(User user, Comment comment) {
