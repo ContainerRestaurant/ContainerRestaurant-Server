@@ -1,8 +1,6 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
 import container.restaurant.server.domain.base.BaseEntity;
-import container.restaurant.server.domain.base.BaseTimeEntity;
 import container.restaurant.server.domain.comment.like.CommentLikeRepository;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -334,17 +331,10 @@ class CommentServiceTest extends BaseMockTest {
         verify(toCountDown).likeCountDown();
     }
 
+    @Override
     @NotNull
-    private <T extends BaseEntity> T makeEntity(long id, Supplier<T> supplier) {
-        T entity = spy(supplier.get());
-
-        // Base 클래스의 속성을 세팅
-        when(entity.getId()).thenReturn(id);
-        if (entity instanceof BaseCreatedTimeEntity)
-            when(((BaseCreatedTimeEntity) entity).getCreatedDate()).thenReturn(now());
-        if (entity instanceof BaseTimeEntity) {
-            when(((BaseTimeEntity) entity).getModifiedDate()).thenReturn(now());
-        }
+    protected <T extends BaseEntity> T makeEntity(long id, Supplier<T> supplier) {
+        T entity = super.makeEntity(id, supplier);
 
         // 리포지토리 모킹
         if (entity instanceof  User) {
