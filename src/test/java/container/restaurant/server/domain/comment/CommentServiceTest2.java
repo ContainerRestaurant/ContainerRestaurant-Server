@@ -8,6 +8,7 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.base.BaseMockTest;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
@@ -157,6 +158,117 @@ class CommentServiceTest2 extends BaseMockTest {
                         assertThat(dto.getCommentReply())
                                 .anyMatch(replyDto -> replyDto.getId().equals(replyComment.getId()) &&
                                         replyDto.getIsLike()));
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트 - 답글 없는 댓글")
+    void 댓글_삭제_테스트__답글_없는_댓글() {
+        //given 삭제할 답글 없는 댓글이 주어졌을 때
+        Comment toDelete = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+        Comment otherComment = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
+
+        //when 주어진 유저로 댓글을 삭제하면
+        commentService.deleteById(toDelete.getId(), user.getId());
+
+        //then 삭제한 댓글만 삭제되고, 댓글이 달린 피드의 댓글 수가 1 감소한다.
+        verify(commentRepository).delete(toDelete);
+        verify(feed, only()).commentCountDown();
+        verify(commentRepository, never()).delete(otherComment);
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트 - 답글이 있는 댓글")
+    void 댓글_삭제_테스트__답글이_있는_댓글() {
+        //given 삭제할 댓글과 그 댓글의 답글이 주어졌을 때
+        Comment toDelete = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+        Comment reply = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
+        reply.isBelongTo(toDelete);
+
+        Comment otherComment = makeEntity(3L, () -> Comment.builder().owner(user).feed(feed).build());
+
+        //when 주어진 유저로 댓글을 삭제하면
+        commentService.deleteById(toDelete.getId(), user.getId());
+
+        //then 삭제한 댓글이 삭제되지 않고 삭제마킹만 되며, 피드의 댓글 개수가 1 감소한다.
+        verify(commentRepository, never()).delete(toDelete);
+        verify(toDelete).setIsDeleted();
+        verify(feed, only()).commentCountDown();
+        verify(commentRepository, never()).delete(otherComment);
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트 - 댓글의 답글 중 하나")
+    void 댓글_삭제_테스트__삭제된_댓글의_답글_중_하나() {
+        //given 댓글과 삭제할 답글, 또 다른 답글이 주어졌을 때
+        Comment comment = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+        Comment toDelete = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
+        toDelete.isBelongTo(comment);
+        Comment otherReply = makeEntity(3L, () -> Comment.builder().owner(user).feed(feed).build());
+        otherReply.isBelongTo(comment);
+
+        when(commentRepository.findAllByUpperReplyId(comment.getId()))
+                .thenReturn(List.of(toDelete, otherReply));
+
+        //when 주어진 유저로 삭제할 답글을 삭제하면
+        commentService.deleteById(toDelete.getId(), user.getId());
+
+        //then 삭제할 답글만 삭제되고, 피드의 댓글 개수가 1 감소한다.
+        verify(commentRepository, never()).delete(comment);
+        verify(commentRepository, never()).delete(otherReply);
+        verify(commentRepository).delete(toDelete);
+        verify(feed, only()).commentCountDown();
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트 - 삭제되지 않은 댓글의 유일 답글")
+    void 댓글_삭제_테스트__댓글이_삭제되지_않은_답글() {
+        //given 댓글과 삭제할 답글이 주어졌을 때
+        Comment comment = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+        Comment toDelete = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
+        toDelete.isBelongTo(comment);
+
+        when(commentRepository.findAllByUpperReplyId(comment.getId()))
+                .thenReturn(List.of(toDelete));
+
+        //when 주어진 유저로 답글을 삭제하면
+        commentService.deleteById(toDelete.getId(), user.getId());
+
+        //then 답글이 삭제되고 댓글은 삭제되지 않으며, 피드 개수가 1 감소한다.
+        verify(commentRepository, never()).delete(comment);
+        verify(commentRepository).delete(toDelete);
+        verify(feed, only()).commentCountDown();
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트 - 삭제된 댓글의 유일 답글")
+    void 댓글_삭제_테스트__삭제된_댓글의_유일_답글() {
+        //given 삭제된 댓글과 삭제할 답글이 주어졌을 때
+        Comment comment = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+        comment.setIsDeleted();
+        Comment toDelete = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
+        toDelete.isBelongTo(comment);
+
+        when(commentRepository.findAllByUpperReplyId(comment.getId()))
+                .thenReturn(List.of(toDelete));
+
+        //when 주어진 유저로 답글을 삭제하면
+        commentService.deleteById(toDelete.getId(), user.getId());
+
+        //then 삭제된 댓글과 답글 모두 삭제되고, 피드 개수가 1 감소한다.
+        verify(commentRepository).delete(comment);
+        verify(commentRepository).delete(toDelete);
+        verify(feed, only()).commentCountDown();
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트 - 댓글 작성자가 아닌 경우")
+    void 댓글_삭제_테스트__댓글_작성자가_아닌_경우() {
+        //given 삭제할 답글 없는 댓글이 주어졌을 때
+        Comment toDelete = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+
+        //expect 다른 유저로 댓글을 삭제하면 403 예외가 발생한다.
+        assertThatThrownBy(() -> commentService.deleteById(toDelete.getId(), null))
+                .isInstanceOf(FailedAuthorizationException.class);
     }
 
     // TODO 추가 구현이 필요하다.
