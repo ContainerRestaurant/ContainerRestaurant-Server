@@ -191,7 +191,7 @@ class CommentServiceTest2 extends BaseMockTest {
 
         //then 삭제한 댓글이 삭제되지 않고 삭제마킹만 되며, 피드의 댓글 개수가 1 감소한다.
         verify(commentRepository, never()).delete(toDelete);
-        verify(toDelete).setIsDeleted();
+        verify(toDelete).delete();
         verify(feed, only()).commentCountDown();
         verify(commentRepository, never()).delete(otherComment);
     }
@@ -205,9 +205,6 @@ class CommentServiceTest2 extends BaseMockTest {
         toDelete.isBelongTo(comment);
         Comment otherReply = makeEntity(3L, () -> Comment.builder().owner(user).feed(feed).build());
         otherReply.isBelongTo(comment);
-
-        when(commentRepository.findAllByUpperReplyId(comment.getId()))
-                .thenReturn(List.of(toDelete, otherReply));
 
         //when 주어진 유저로 삭제할 답글을 삭제하면
         commentService.deleteById(toDelete.getId(), user.getId());
@@ -227,9 +224,6 @@ class CommentServiceTest2 extends BaseMockTest {
         Comment toDelete = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
         toDelete.isBelongTo(comment);
 
-        when(commentRepository.findAllByUpperReplyId(comment.getId()))
-                .thenReturn(List.of(toDelete));
-
         //when 주어진 유저로 답글을 삭제하면
         commentService.deleteById(toDelete.getId(), user.getId());
 
@@ -244,12 +238,9 @@ class CommentServiceTest2 extends BaseMockTest {
     void 댓글_삭제_테스트__삭제된_댓글의_유일_답글() {
         //given 삭제된 댓글과 삭제할 답글이 주어졌을 때
         Comment comment = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
-        comment.setIsDeleted();
+        comment.delete();
         Comment toDelete = makeEntity(2L, () -> Comment.builder().owner(user).feed(feed).build());
         toDelete.isBelongTo(comment);
-
-        when(commentRepository.findAllByUpperReplyId(comment.getId()))
-                .thenReturn(List.of(toDelete));
 
         //when 주어진 유저로 답글을 삭제하면
         commentService.deleteById(toDelete.getId(), user.getId());

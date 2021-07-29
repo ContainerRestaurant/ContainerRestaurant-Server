@@ -181,7 +181,7 @@ class CommentServiceTest {
         // then-1 총 댓글 개수에 영향을 주지 않고, 상위 댓글의 isDeleted 값이 true 로 변경
         assertThat(commentRepository.count()).isEqualTo(count);
         assertThat(commentRepository.findById(comments.get(0).getId())
-                .orElseThrow(()->new ResourceNotFoundException("없음")).getIsDeleted() )
+                .orElseThrow(()->new ResourceNotFoundException("없음")).isDeleted() )
                 .isEqualTo(true);
 
         // when-2 대댓글 삭제

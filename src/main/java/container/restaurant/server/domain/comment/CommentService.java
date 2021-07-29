@@ -79,19 +79,16 @@ public class CommentService {
         if (!comment.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("삭제 할 수 있는 유저가 아닙니다.");
 
-        // 대댓글 있다면(hasReply) 댓글 isDeleted 처리
-        if (comment.getHasReply()) {
-            comment.setIsDeleted();
+        if (comment.hasReply()) {
+            comment.delete();
         } else {
             ofNullable(comment.getUpperReply())
-                    .filter(upperReply ->
-                            commentRepository.findAllByUpperReplyId(upperReply.getId()).size() == 1)
-                    .ifPresent(upperReply -> {
-                        if (upperReply.getIsDeleted()) {
-                            commentRepository.delete(upperReply);
-                        } else {
-                            upperReply.unsetHasReply();
-                        }
+                    .filter(upperComment -> upperComment.getReplies().size() == 1)
+                    .ifPresent(upperComment -> {
+                        if (upperComment.isDeleted())
+                            commentRepository.delete(upperComment);
+                        else
+                            upperComment.removeReply(comment);
                     });
             commentRepository.delete(comment);
         }

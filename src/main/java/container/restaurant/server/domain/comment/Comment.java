@@ -6,6 +6,7 @@ import container.restaurant.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,11 +40,13 @@ public class Comment extends BaseCreatedTimeEntity {
     @OneToMany(fetch = LAZY, mappedBy = "upperReply")
     private List<Comment> replies = new ArrayList<>();
 
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
+    @Accessors(fluent = true)
     @Column(name = "is_have_reply")
-    private Boolean hasReply;
-    private Boolean isBlind;
+    private boolean hasReply;
+
+    private boolean isBlind;
 
     @Builder
     protected Comment(User owner, Feed feed, String content) {
@@ -61,9 +64,7 @@ public class Comment extends BaseCreatedTimeEntity {
         return this;
     }
 
-    public void unsetHasReply() { this.hasReply = false; }
-
-    public void setIsDeleted() { this.isDeleted = true; }
+    public void delete() { this.isDeleted = true; }
 
     public void likeCountUp() { this.likeCount++; }
 
@@ -74,5 +75,14 @@ public class Comment extends BaseCreatedTimeEntity {
 
         upperReply.replies.add(this);
         upperReply.hasReply = true;
+    }
+
+    public void removeReply(Comment reply) {
+        this.replies.remove(reply);
+        reply.upperReply = null;
+
+        if (this.replies.isEmpty()) {
+            this.hasReply = false;
+        }
     }
 }

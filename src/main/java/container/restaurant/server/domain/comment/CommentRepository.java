@@ -15,6 +15,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "where c.feed.id=:feedId and c.upperReply is null ")
     List<Comment> findFeedComments(Long feedId);
 
-    List<Comment> findAllByUpperReplyId(Long id);
-
 }

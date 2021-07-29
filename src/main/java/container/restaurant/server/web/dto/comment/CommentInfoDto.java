@@ -32,7 +32,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
     }
 
     public static CommentInfoDto from(Comment comment, Boolean isLike){
-        if(comment.getIsDeleted())
+        if(comment.isDeleted())
             return new CommentInfoDto(comment.getId());
         return new CommentInfoDto(comment, isLike);
     }
