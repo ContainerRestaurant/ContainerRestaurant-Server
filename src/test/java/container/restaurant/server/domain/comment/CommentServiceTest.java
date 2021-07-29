@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.*;
 
+@DisplayName("CommentService 유닛 테스트")
 class CommentServiceTest extends BaseMockTest {
 
     @Mock CommentRepository commentRepository;
