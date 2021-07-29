@@ -96,13 +96,13 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentInfoDto update(Long commentId, CommentUpdateDto commentUpdateDto, Long userId) {
+    public void update(Long commentId, CommentUpdateDto dto, Long userId) {
         Comment comment = findById(commentId);
 
         if (!comment.getOwner().getId().equals(userId))
-            throw new ResourceNotFoundException("수정 할 수 있는 유저가 아닙니다.");
+            throw new FailedAuthorizationException("수정 할 수 있는 유저가 아닙니다.");
 
-        return CommentInfoDto.from(comment.setContent(commentUpdateDto.getContent()));
+        dto.updateComment(comment);
     }
 
     @Transactional

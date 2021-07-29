@@ -13,6 +13,7 @@ import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.base.BaseMockTest;
 import container.restaurant.server.web.dto.comment.CommentCreateDto;
 import container.restaurant.server.web.dto.comment.CommentInfoDto;
+import container.restaurant.server.web.dto.comment.CommentUpdateDto;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -254,12 +255,57 @@ class CommentServiceTest2 extends BaseMockTest {
     @Test
     @DisplayName("댓글 삭제 테스트 - 댓글 작성자가 아닌 경우")
     void 댓글_삭제_테스트__댓글_작성자가_아닌_경우() {
-        //given 삭제할 답글 없는 댓글이 주어졌을 때
+        //given 삭제할 댓글이 주어졌을 때
         Comment toDelete = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
 
         //expect 다른 유저로 댓글을 삭제하면 403 예외가 발생한다.
         assertThatThrownBy(() -> commentService.deleteById(toDelete.getId(), null))
-                .isInstanceOf(FailedAuthorizationException.class);
+                .isExactlyInstanceOf(FailedAuthorizationException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 수정")
+    void 댓글_수정() {
+        //given 수정할 댓글과 댓글 수정 DTO 가 주어졌을 때
+        Comment toUpdate = makeEntity(1L,
+                () -> Comment.builder().content("origin content").owner(user).feed(feed).build());
+
+        String newContent = "new content";
+        CommentUpdateDto dto = new CommentUpdateDto(newContent);
+
+        //when DTO 로 댓글을 수정하면
+        commentService.update(toUpdate.getId(), dto, user.getId());
+
+        //then DTO 의 값으로 updateContent 함수가 실행된다.
+        verify(toUpdate).updateContent(newContent);
+    }
+
+    @Test
+    @DisplayName("댓글 수정 - content null")
+    void 댓글_수정_content_null() {
+        //given 수정할 댓글과 컨텐트가 null 인 댓글 수정 DTO 가 주어졌을 때
+        Comment toUpdate = makeEntity(1L,
+                () -> Comment.builder().content("origin content").owner(user).feed(feed).build());
+
+        CommentUpdateDto dto = new CommentUpdateDto(null);
+
+        //when DTO 로 댓글을 수정하면
+        commentService.update(toUpdate.getId(), dto, user.getId());
+
+        //then updateContent 함수가 실행되지 않는다.
+        verify(toUpdate, never()).updateContent(any());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 - 댓글 작성자가 아닌 경우")
+    void 댓글_수정__댓글_작성자가_아닌_경우() {
+        //given 수정할 댓글이 주어졌을 때
+        Comment toUpdate = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+        CommentUpdateDto dto = new CommentUpdateDto("new content");
+
+        //expect 다른 유저로 댓글을 수정하면 403 예외가 발생한다.
+        assertThatThrownBy(() -> commentService.update(toUpdate.getId(), dto, null))
+                .isExactlyInstanceOf(FailedAuthorizationException.class);
     }
 
     // TODO 추가 구현이 필요하다.

@@ -58,8 +58,10 @@ public class CommentController {
             @RequestBody CommentUpdateDto updateDto,
             @LoginId Long loginId
     ){
+        commentService.update(commentId, updateDto, loginId);
+
         return ResponseEntity.ok(
-                setLinks(commentService.update(commentId, updateDto, loginId)));
+                setLinks(commentService.get(commentId)));
     }
 
     @DeleteMapping("{id}")

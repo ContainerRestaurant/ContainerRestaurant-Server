@@ -59,9 +59,9 @@ public class Comment extends BaseCreatedTimeEntity {
         this.isBlind = false;
     }
 
-    public Comment setContent(String content){
+    public void updateContent(String content){
+        assert content != null;
         this.content = content;
-        return this;
     }
 
     public void delete() { this.isDeleted = true; }

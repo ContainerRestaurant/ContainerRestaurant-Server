@@ -156,7 +156,8 @@ class CommentServiceTest {
     @DisplayName("댓글 수정")
     void updateComment(){
         CommentUpdateDto commentUpdateDto = new CommentUpdateDto("수정");
-        CommentInfoDto commentInfoDto = commentService.update(comments.get(0).getId(), commentUpdateDto, users.get(0).getId());
+        commentService.update(comments.get(0).getId(), commentUpdateDto, users.get(0).getId());
+        CommentInfoDto commentInfoDto = commentService.get(comments.get(0).getId());
 
         assertThat(commentUpdateDto.getContent()).isEqualTo(commentInfoDto.getContent());
     }

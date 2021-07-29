@@ -17,6 +17,6 @@ public class CommentUpdateDto {
 
     public void updateComment(Comment comment){
         if(content != null)
-            comment.setContent(content);
+            comment.updateContent(content);
     }
 }
