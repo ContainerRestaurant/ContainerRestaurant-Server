@@ -107,13 +107,11 @@ public class CommentService {
 
     @Transactional
     public void likeCountUp(Long commentId) {
-        Comment comment = findById(commentId);
-        comment.likeCountUp();
+        findById(commentId).likeCountUp();
     }
 
     @Transactional
     public void likeCountDown(Long commentId) {
-        Comment comment = findById(commentId);
-        comment.likeCountDown();
+        findById(commentId).likeCountDown();
     }
 }

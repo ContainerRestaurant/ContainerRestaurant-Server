@@ -308,7 +308,31 @@ class CommentServiceTest2 extends BaseMockTest {
                 .isExactlyInstanceOf(FailedAuthorizationException.class);
     }
 
-    // TODO 추가 구현이 필요하다.
+    @Test
+    @DisplayName("댓글 좋아요 카운트업")
+    void 댓글_좋아요_카운트업() {
+        //given 카운트업 할 댓글이 주어졌을 때
+        Comment toCountUp = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+
+        //when 좋아요 카운트업 서비스를 실행하면
+        commentService.likeCountUp(toCountUp.getId());
+
+        //then 댓글의 좋아요 카운트가 올라간다.
+        verify(toCountUp).likeCountUp();
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 카운트다운")
+    void 댓글_좋아요_카운트다운() {
+        //given 카운트다운 할 댓글이 주어졌을 때
+        Comment toCountDown = makeEntity(1L, () -> Comment.builder().owner(user).feed(feed).build());
+
+        //when 좋아요 카운트다운 서비스를 실행하면
+        commentService.likeCountDown(toCountDown.getId());
+
+        //then 댓글의 좋아요 카운트가 내려간다.
+        verify(toCountDown).likeCountDown();
+    }
 
     @NotNull
     private <T extends BaseEntity> T makeEntity(long id, Supplier<T> supplier) {
