@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.restaurant;
 
+import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
@@ -16,18 +17,21 @@ import java.util.stream.Collectors;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
     @Transactional(readOnly = true)
-    public RestaurantDetailDto getRestaurantInfoById(Long id) {
-        Restaurant restaurant = findById(id);
-        return RestaurantDetailDto.from(restaurant);
+    public RestaurantDetailDto getRestaurantInfoById(Long restaurantId, Long loginId) {
+        Restaurant restaurant = findById(restaurantId);
+        return RestaurantDetailDto.from(restaurant,
+                restaurantFavoriteRepository.existsByUserIdAndRestaurantId(loginId, restaurantId));
     }
 
     @Transactional(readOnly = true)
-    public List<RestaurantNearInfoDto> findNearByRestaurants(double lat, double lon, long radius) {
+    public List<RestaurantNearInfoDto> findNearByRestaurants(double lat, double lon, long radius, Long loginId) {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
-                .map(RestaurantNearInfoDto::from)
+                .map(restaurant -> RestaurantNearInfoDto.from(restaurant,
+                        restaurantFavoriteRepository.existsByUserIdAndRestaurantId(loginId, restaurant.getId())))
                 .collect(Collectors.toList());
     }
 

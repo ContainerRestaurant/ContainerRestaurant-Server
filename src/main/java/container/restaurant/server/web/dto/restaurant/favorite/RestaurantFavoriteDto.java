@@ -22,7 +22,8 @@ public class RestaurantFavoriteDto extends RepresentationModel<RestaurantFavorit
         this.id = restaurantFavorite.getId();
         this.createDate = restaurantFavorite.getCreatedDate()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        this.restaurant = RestaurantNearInfoDto.from(restaurantFavorite.getRestaurant());
+        this.restaurant = RestaurantNearInfoDto.from(restaurantFavorite.getRestaurant(), true);
+        // 즐겨찾기한 정보를 불러오는 것이기에 무조건 isFavorite 은 true
     }
 
 }

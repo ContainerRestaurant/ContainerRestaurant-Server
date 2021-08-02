@@ -48,9 +48,14 @@ class RecommendFeedServiceTest extends BaseServiceTest {
                     int to = Math.min(from + p.getPageSize(), input.size());
                     return new PageImpl<>(input.subList(from, to), p, input.size());
                 }));
+
+        when(feedService.createFeedPreviewDto(any(), any()))
+                .then(answer((Feed feed, Long loginId) ->
+                        FeedPreviewDto.from(feed, true, false)));
+
         //when 추천 업데이트 작업을 실행하고 결과 리스트를 ID 로 리스트로 변환
         recommendFeedService.updateRecommendFeed();
-        List<Long> actualRes = recommendFeedService.getRecommendFeeds()
+        List<Long> actualRes = recommendFeedService.getRecommendFeeds(null)
                 .getContent().stream()
                 .map(FeedPreviewDto::getId)
                 .collect(Collectors.toList());

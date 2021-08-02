@@ -44,40 +44,41 @@ public class FeedController {
     }
 
     @GetMapping
-    public ResponseEntity<?> selectFeed(Pageable pageable, Category category) {
-
+    public ResponseEntity<?> selectFeed(
+            Pageable pageable, Category category, @LoginId Long loginId
+    ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAll(pageable, category)));
+                setLinks(feedService.findAll(pageable, category, loginId)));
     }
 
     @GetMapping("recommend")
-    public ResponseEntity<?> selectRecommend() {
+    public ResponseEntity<?> selectRecommend(@LoginId Long loginId) {
         return ResponseEntity.ok(
-                setLinks(recommendFeedService.getRecommendFeeds()));
+                setLinks(recommendFeedService.getRecommendFeeds(loginId)));
     }
 
     @GetMapping("user/{userId}")
     public ResponseEntity<?> selectUserFeed(
-            @PathVariable Long userId, Pageable pageable, Category category
+            @PathVariable Long userId, Pageable pageable, Category category, @LoginId Long loginId
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByUser(userId, pageable, category)));
+                setLinks(feedService.findAllByUser(userId, loginId, pageable, category)));
     }
 
     @GetMapping("user/{userId}/scrap")
     public ResponseEntity<?> selectUserScrapFeed(
-            @PathVariable Long userId, Pageable pageable, Category category
+            @PathVariable Long userId, Pageable pageable, Category category, @LoginId Long loginId
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByUserScrap(userId, pageable, category)));
+                setLinks(feedService.findAllByUserScrap(userId, loginId, pageable, category)));
     }
 
     @GetMapping("restaurant/{restaurantId}")
     public ResponseEntity<?> selectRestaurantFeed(
-            @PathVariable Long restaurantId, Pageable pageable, Category category
+            @PathVariable Long restaurantId, Pageable pageable, Category category, @LoginId Long loginId
     ) {
         return ResponseEntity.ok(
-                setLinks(feedService.findAllByRestaurant(restaurantId, pageable, category)));
+                setLinks(feedService.findAllByRestaurant(restaurantId, loginId, pageable, category)));
     }
 
     @PostMapping

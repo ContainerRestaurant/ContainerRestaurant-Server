@@ -75,45 +75,49 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public PagedModel<FeedPreviewDto> findAll(Pageable pageable, Category categoryFilter) {
+    public PagedModel<FeedPreviewDto> findAll(Pageable pageable, Category categoryFilter, Long loginId) {
         return feedAssembler.toModel(
                 ofNullable(categoryFilter)
                         .map(category -> feedRepository.findAllByCategory(pageable, categoryFilter))
                         .orElseGet(() -> feedRepository.findAll(pageable)),
-                FeedPreviewDto::from);
+                feed -> createFeedPreviewDto(feed, loginId)
+        );
     }
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAllByUser(
-            Long userId, Pageable pageable, Category categoryFilter) {
+            Long userId, Long loginId, Pageable pageable, Category categoryFilter) {
         return feedAssembler.toModel(
                 ofNullable(categoryFilter)
                         .map(category -> feedRepository.findAllByOwnerIdAndCategory(
                                 userId, pageable, categoryFilter))
                         .orElseGet(() -> feedRepository.findAllByOwnerId(userId, pageable)),
-                FeedPreviewDto::from);
+                feed -> createFeedPreviewDto(feed, loginId)
+        );
     }
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAllByRestaurant(
-            Long restaurantId, Pageable pageable, Category categoryFilter) {
+            Long restaurantId, Long loginId, Pageable pageable, Category categoryFilter) {
         return feedAssembler.toModel(
                 ofNullable(categoryFilter)
                         .map(category -> feedRepository.findAllByRestaurantIdAndCategory(
                                 restaurantId, pageable, categoryFilter))
                         .orElseGet(() -> feedRepository.findAllByRestaurantId(restaurantId, pageable)),
-                FeedPreviewDto::from);
+                feed -> createFeedPreviewDto(feed, loginId)
+        );
     }
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAllByUserScrap(
-            Long userId, Pageable pageable, Category categoryFilter) {
+            Long userId, Long loginId, Pageable pageable, Category categoryFilter) {
         return feedAssembler.toModel(
                 ofNullable(categoryFilter)
                         .map(category -> feedRepository.findAllByScraperIdAndCategory(
                                 userId, pageable, categoryFilter))
                         .orElseGet(() -> feedRepository.findAllByScraperId(userId, pageable)),
-                FeedPreviewDto::from);
+                feed -> createFeedPreviewDto(feed, loginId)
+        );
     }
 
     @Transactional
@@ -200,5 +204,14 @@ public class FeedService {
     @Transactional(readOnly = true)
     public Page<Feed> findForUpdatingRecommend(LocalDateTime from, LocalDateTime to, Pageable pageable) {
         return feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public FeedPreviewDto createFeedPreviewDto(Feed feed, Long loginId) {
+        return FeedPreviewDto.builder()
+                .feed(feed)
+                .isLike(feedLikeRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
+                .isScraped(scrapFeedRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
+                .build();
     }
 }

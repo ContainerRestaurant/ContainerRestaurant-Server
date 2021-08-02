@@ -32,6 +32,7 @@ class RestaurantControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("feedCount").description("식당에 대한 피드 개수"),
                                 fieldWithPath("difficultyAvg").description("식당의 난이도 평균"),
                                 fieldWithPath("isContainerFriendly").description("용기 친화 식당 여부"),
+                                fieldWithPath("isFavorite").description("로그인한 사용자의 식당 즐겨찾기 여부"),
                                 subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 목록")
                         ),
                         links(

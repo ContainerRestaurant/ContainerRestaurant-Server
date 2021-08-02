@@ -17,12 +17,13 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
     private final Integer feedCount;
     private final Float difficultyAvg;
     private final Boolean isContainerFriendly;
+    private final Boolean isFavorite;
 
-    public static RestaurantNearInfoDto from(Restaurant restaurant) {
-        return new RestaurantNearInfoDto(restaurant);
+    public static RestaurantNearInfoDto from(Restaurant restaurant, Boolean isFavorite) {
+        return new RestaurantNearInfoDto(restaurant, isFavorite);
     }
 
-    protected RestaurantNearInfoDto(Restaurant restaurant) {
+    protected RestaurantNearInfoDto(Restaurant restaurant, Boolean isFavorite) {
         this.id = restaurant.getId();
         this.name = restaurant.getName();
         this.address = restaurant.getAddress();
@@ -32,6 +33,8 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
         this.difficultyAvg = restaurant.getDifficultyAvg();
         this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
         this.isContainerFriendly = restaurant.isContainerFriendly();
+        this.isFavorite = isFavorite;
+
     }
 
 }
