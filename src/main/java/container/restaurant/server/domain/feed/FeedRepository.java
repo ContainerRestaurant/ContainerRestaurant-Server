@@ -14,7 +14,7 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Override
     @NonNull
-    @EntityGraph(attributePaths = { "owner", "thumbnail", "restaurant", "containerList", "containerList.menu" })
+    @EntityGraph(attributePaths = { "owner.profile", "thumbnail", "restaurant", "containerList", "containerList.menu" })
     Optional<Feed> findById(@NonNull Long id);
 
     @Override

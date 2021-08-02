@@ -211,6 +211,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("본 피드의 식별값"),
                                 fieldWithPath("ownerId").description("본 피드를 작성한 사용자의 식별값"),
+                                fieldWithPath("ownerContainerLevel").description("본 피드를 작성한 사용자의 레벨 정보"),
+                                fieldWithPath("ownerProfile").description("본 피드를 작성한 사용자의 프로필 이미지ㅅ"),
                                 fieldWithPath("restaurantId").description("본 피드에 등록된 식당의 식별값"),
                                 fieldWithPath("ownerNickname").description("본 피드를 작성한 사용자의 닉네임"),
                                 fieldWithPath("restaurantName").description("본 피드에 등록된 삭당의 이름"),
