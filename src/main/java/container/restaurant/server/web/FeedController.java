@@ -45,43 +45,38 @@ public class FeedController {
 
     @GetMapping
     public ResponseEntity<?> selectFeed(
-            Pageable pageable, Category category, @LoginUser SessionUser sessionUser
+            Pageable pageable, Category category, @LoginId Long loginId
     ) {
-        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(
                 setLinks(feedService.findAll(pageable, category, loginId)));
     }
 
     @GetMapping("recommend")
-    public ResponseEntity<?> selectRecommend(@LoginUser SessionUser sessionUser) {
-        Long loginId = getUserId(sessionUser);
+    public ResponseEntity<?> selectRecommend(@LoginId Long loginId) {
         return ResponseEntity.ok(
                 setLinks(recommendFeedService.getRecommendFeeds(loginId)));
     }
 
     @GetMapping("user/{userId}")
     public ResponseEntity<?> selectUserFeed(
-            @PathVariable Long userId, Pageable pageable, Category category, @LoginUser SessionUser sessionUser
+            @PathVariable Long userId, Pageable pageable, Category category, @LoginId Long loginId
     ) {
-        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(
                 setLinks(feedService.findAllByUser(userId, loginId, pageable, category)));
     }
 
     @GetMapping("user/{userId}/scrap")
     public ResponseEntity<?> selectUserScrapFeed(
-            @PathVariable Long userId, Pageable pageable, Category category, @LoginUser SessionUser sessionUser
+            @PathVariable Long userId, Pageable pageable, Category category, @LoginId Long loginId
     ) {
-        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(
                 setLinks(feedService.findAllByUserScrap(userId, loginId, pageable, category)));
     }
 
     @GetMapping("restaurant/{restaurantId}")
     public ResponseEntity<?> selectRestaurantFeed(
-            @PathVariable Long restaurantId, Pageable pageable, Category category, @LoginUser SessionUser sessionUser
+            @PathVariable Long restaurantId, Pageable pageable, Category category, @LoginId Long loginId
     ) {
-        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(
                 setLinks(feedService.findAllByRestaurant(restaurantId, loginId, pageable, category)));
     }
@@ -155,10 +150,6 @@ public class FeedController {
                 feedLinker.createFeed().withRel("create"),
                 feedLinker.getCategoryList().withRel("category-list"));
         return list;
-    }
-
-    private Long getUserId(SessionUser sessionUser) {
-        return sessionUser != null ? sessionUser.getId() : null;
     }
 
 }

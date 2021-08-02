@@ -1,6 +1,5 @@
 package container.restaurant.server.web.linker;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.RestaurantController;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
@@ -14,19 +13,16 @@ public class RestaurantLinker {
     RestaurantController proxy =
             DummyInvocationUtils.methodOn(RestaurantController.class);
 
-    SessionUser u =
-            DummyInvocationUtils.methodOn(SessionUser.class);
-
     public LinkBuilder findById(Long id) {
-        return linkTo(proxy.findById(id, u));
+        return linkTo(proxy.findById(id, -1L));
     }
 
     public LinkBuilder findNearByRestaurants(double latitude, double longitude, long radius) {
-        return linkTo(proxy.findNearByRestaurants(latitude, longitude, radius, u));
+        return linkTo(proxy.findNearByRestaurants(latitude, longitude, radius, -1L));
     }
 
     public LinkBuilder findNearByRestaurants() {
-        return linkTo(proxy.findNearByRestaurants(null, null, null, u));
+        return linkTo(proxy.findNearByRestaurants(null, null, null, -1L));
     }
 
     public LinkBuilder updateVanish(Long id) {

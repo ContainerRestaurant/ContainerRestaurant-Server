@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
 import container.restaurant.server.web.linker.RestaurantLinker;
@@ -23,8 +22,7 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @GetMapping("{id}")
-    public ResponseEntity<?> findById(@PathVariable("id") Long restaurantId, @LoginUser SessionUser sessionUser) {
-        Long loginId = getUserId(sessionUser);
+    public ResponseEntity<?> findById(@PathVariable("id") Long restaurantId, @LoginId Long loginId) {
         RestaurantDetailDto dto = restaurantService.getRestaurantInfoById(restaurantId, loginId);
         return ResponseEntity.ok(EntityModel.of(dto)
                 .add(restaurantLinker.findById(restaurantId).withSelfRel())
@@ -37,14 +35,13 @@ public class RestaurantController {
             @PathVariable("lat") Double lat,
             @PathVariable("lon") Double lon,
             @PathVariable("radius") Long radius,
-            @LoginUser SessionUser sessionUser) {
+            @LoginId Long loginId) {
         /*
             사용자 정보를 PathVariable 형태로 받는 형태로 구현 추후 입력방식 변경 가능
          */
         if (lat == null || lon == null || radius == null)
             return ResponseEntity.badRequest().body("위도, 경도, 반경 값이 필요합니다.");
 
-        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(CollectionModel.of(restaurantService.findNearByRestaurants(lat, lon, radius, loginId)
                 .stream().map(restaurant -> EntityModel.of(restaurant)
                         .add(restaurantLinker.findById(restaurant.getId()).withRel("restaurant-info"))
@@ -59,7 +56,4 @@ public class RestaurantController {
         return ResponseEntity.noContent().build();
     }
 
-    private Long getUserId(SessionUser sessionUser) {
-        return sessionUser != null ? sessionUser.getId() : null;
-    }
 }
