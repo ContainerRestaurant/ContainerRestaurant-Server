@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.comment.like.CommentLikeService;
 import container.restaurant.server.web.linker.CommentLikeLinker;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,10 @@ public class CommentLikeController {
 
     @PostMapping("{commentId}")
     public ResponseEntity<?> userLikeComment(
-            @LoginUser SessionUser sessionUser,
+            @LoginId Long loginId,
             @PathVariable Long commentId
     ){
-        commentLikeService.userLikeComment(sessionUser.getId(), commentId);
+        commentLikeService.userLikeComment(loginId, commentId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                     .add(commentLikeLinker.userLikeComment(commentId).withSelfRel())
@@ -31,10 +30,10 @@ public class CommentLikeController {
 
     @DeleteMapping("{commentId}")
     public ResponseEntity<?> userCancelLikeComment(
-            @LoginUser SessionUser sessionUser,
+            @LoginId Long loginId,
             @PathVariable Long commentId
     ){
-        commentLikeService.userCancelLikeComment(sessionUser.getId(), commentId);
+        commentLikeService.userCancelLikeComment(loginId, commentId);
         return ResponseEntity.ok(
                 HalModelBuilder.emptyHalModel().build()
                     .add(commentLikeLinker.userCancelLikeComment(commentId).withSelfRel())

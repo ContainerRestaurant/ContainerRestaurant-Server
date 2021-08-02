@@ -1,6 +1,5 @@
 package container.restaurant.server.web.linker;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.FeedLikeController;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
@@ -12,14 +11,12 @@ public class FeedLikeLinker {
     private final FeedLikeController proxy =
             DummyInvocationUtils.methodOn(FeedLikeController.class);
 
-    private final SessionUser u = new SessionUser();
-
     public LinkBuilder userLikeFeed(Long feedId) {
-        return linkTo(proxy.userLikeFeed(u, feedId));
+        return linkTo(proxy.userLikeFeed(-1L, feedId));
     }
 
     public LinkBuilder userCancelLikeFeed(Long feedId) {
-        return linkTo(proxy.userCancelLikeFeed(u, feedId));
+        return linkTo(proxy.userCancelLikeFeed(-1L, feedId));
     }
 
 }

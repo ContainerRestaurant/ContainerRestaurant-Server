@@ -1,6 +1,5 @@
 package container.restaurant.server.web.linker;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.UserController;
 import container.restaurant.server.web.dto.user.UserDto;
 import org.springframework.hateoas.server.LinkBuilder;
@@ -15,22 +14,19 @@ public class UserLinker {
     UserController proxy =
             DummyInvocationUtils.methodOn(UserController.class);
 
-    SessionUser u =
-            DummyInvocationUtils.methodOn(SessionUser.class);
-
     UserDto.Update updateDto =
             DummyInvocationUtils.methodOn(UserDto.Update.class);
 
     public LinkBuilder getUserById(Long userId) {
-        return linkTo(proxy.getUserById(userId, u));
+        return linkTo(proxy.getUserById(userId, -1L));
     }
 
     public LinkBuilder updateUserById(Long userId) {
-        return linkTo(proxy.updateUserById(userId, u, updateDto));
+        return linkTo(proxy.updateUserById(userId, -1L, updateDto));
     }
 
     public LinkBuilder deleteById(Long userId) {
-        return linkTo(proxy.deleteById(userId, u));
+        return linkTo(proxy.deleteById(userId, -1L));
     }
 
     public LinkBuilder existsNickname(String nickname) {
@@ -42,6 +38,6 @@ public class UserLinker {
     }
 
     public LinkBuilder getCurrentUser() {
-        return linkTo(proxy.getCurrentUser(u));
+        return linkTo(proxy.getCurrentUser(-1L));
     }
 }

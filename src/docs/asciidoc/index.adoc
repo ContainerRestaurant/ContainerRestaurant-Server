@@ -237,6 +237,11 @@ include::{snippets}/feed-by-restaurant/curl-request.adoc[]
 
 include::{snippets}/feed-by-scrap/curl-request.adoc[]
 
+[[feed-recommendation]]
+==== 추천 피드 리스트 조회
+
+include::{snippets}/feed-recommendation/curl-request.adoc[]
+
 [[feed-category]]
 === 피드 카테고리
 `GET /api/feed/category`
@@ -437,3 +442,10 @@ operation::push-token-delete[snippets='curl-request,http-response']
 
 operation::contracts[snippets='curl-request,http-response']
 include::{snippets}/contract/response-fields-beneath-_embedded.contractInfoDtoList.adoc[]
+
+[[image]]
+== 이미지
+
+=== 이미지 업로드
+
+operation::image-upload[snippets='curl-request,http-response,response-fields']

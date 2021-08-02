@@ -1,7 +1,7 @@
 package container.restaurant.server.config.auth;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -19,17 +19,17 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isUserClass = SessionUser.class.equals(parameter.getParameterType());
+        boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginId.class) != null;
+        boolean isUserClass = Long.class.equals(parameter.getParameterType());
         return isLoginUserAnnotation && isUserClass;
     }
 
     @Override
     public Object resolveArgument(
-            MethodParameter parameter, ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest, WebDataBinderFactory binderFactory
+            @NotNull MethodParameter parameter, ModelAndViewContainer mavContainer,
+            @NotNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory
     ) {
-        return httpSession.getAttribute("user");
+        return httpSession.getAttribute("userId");
     }
 
 }

@@ -1,6 +1,5 @@
 package container.restaurant.server.web.base;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.user.AuthProvider;
@@ -43,7 +42,7 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
                 .nickname("나의닉네임")
                 .build());
 
-        myselfSession.setAttribute("user", SessionUser.from(myself));
+        myselfSession.setAttribute("userId", myself.getId());
         other = userRepository.save(User.builder()
                 .authId(otherAuthId)
                 .authProvider(AuthProvider.KAKAO)

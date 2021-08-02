@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.home.banner.BannerService;
 import container.restaurant.server.domain.home.phrase.PhraseService;
 import container.restaurant.server.domain.statistics.StatisticsService;
@@ -37,8 +36,8 @@ public class IndexController {
     private final PhraseService phraseService;
 
     @GetMapping
-    public ResponseEntity<?> index(@LoginUser SessionUser sessionUser) {
-        User loginUser = sessionUser != null ? userService.findById(sessionUser.getId()) : null;
+    public ResponseEntity<?> index(@LoginId Long loginId) {
+        User loginUser = loginId != null ? userService.findById(loginId) : null;
 
         return ResponseEntity.ok(
                 setLinks(IndexDto.builder()

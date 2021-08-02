@@ -1,7 +1,6 @@
 package container.restaurant.server.config.auth;
 
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = userService.createOrUpdate(
                 attributes.getProvider(), attributes.getAuthId(), attributes::toEntity);
 
-        httpSession.setAttribute("user", SessionUser.from(user));
+        httpSession.setAttribute("userId", user.getId());
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("USER")),

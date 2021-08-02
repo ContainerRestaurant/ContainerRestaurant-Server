@@ -1,6 +1,5 @@
 package container.restaurant.server.web.linker;
 
-import container.restaurant.server.config.auth.dto.SessionUser;
 import container.restaurant.server.web.PushController;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.DummyInvocationUtils;
@@ -13,14 +12,12 @@ public class PushTokenLinker {
     PushController proxy =
             DummyInvocationUtils.methodOn(PushController.class);
 
-    private final SessionUser u = new SessionUser();
-
     public LinkBuilder registerClientPushToken(String token) {
-        return linkTo(proxy.registerClientPushToken(u, token));
+        return linkTo(proxy.registerClientPushToken(-1L, token));
     }
 
     public LinkBuilder deleteClientPushToken(Long tokenId) {
-        return linkTo(proxy.deleteClientPushToken(u, tokenId));
+        return linkTo(proxy.deleteClientPushToken(-1L, tokenId));
     }
 
 

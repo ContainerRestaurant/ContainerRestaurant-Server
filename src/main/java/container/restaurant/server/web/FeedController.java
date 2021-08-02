@@ -1,7 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.LoginUser;
-import container.restaurant.server.config.auth.dto.SessionUser;
+import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
@@ -38,9 +37,8 @@ public class FeedController {
 
     @GetMapping("{feedId}")
     public ResponseEntity<?> getFeedDetail(
-            @PathVariable Long feedId, @LoginUser SessionUser sessionUser
+            @PathVariable Long feedId, @LoginId Long loginId
     ) {
-        Long loginId = getUserId(sessionUser);
         return ResponseEntity.ok(
                 setLinks(feedService.getFeedDetail(feedId, loginId), loginId));
     }
@@ -90,9 +88,9 @@ public class FeedController {
 
     @PostMapping
     public ResponseEntity<?> createFeed(
-            @Valid @RequestBody FeedInfoDto dto, @LoginUser SessionUser sessionUser
+            @Valid @RequestBody FeedInfoDto dto, @LoginId Long loginId
     ) {
-        Long newFeedId = feedService.createFeed(dto, sessionUser.getId());
+        Long newFeedId = feedService.createFeed(dto, loginId);
 
         return ResponseEntity
                 .created(feedLinker.getFeedDetail(newFeedId).toUri())
@@ -101,18 +99,18 @@ public class FeedController {
 
     @PatchMapping("{feedId}")
     public ResponseEntity<?> updateFeed(
-            @Valid @RequestBody FeedInfoDto dto, @LoginUser SessionUser sessionUser,
+            @Valid @RequestBody FeedInfoDto dto, @LoginId Long loginId,
             @PathVariable Long feedId
     ) {
-        feedService.updateFeed(feedId, dto, sessionUser.getId());
+        feedService.updateFeed(feedId, dto, loginId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("{feedId}")
     public ResponseEntity<?> deleteFeed(
-            @LoginUser SessionUser sessionUser, @PathVariable Long feedId
+            @LoginId Long loginId, @PathVariable Long feedId
     ) {
-        feedService.delete(feedId, sessionUser.getId());
+        feedService.delete(feedId, loginId);
         return ResponseEntity.noContent().build();
     }
 
