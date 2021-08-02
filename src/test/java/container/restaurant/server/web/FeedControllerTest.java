@@ -380,6 +380,20 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @DisplayName("추천 피드 가져오기")
+    public void testSelectRecommend() throws Exception {
+        List<Feed> list = saveFeeds();
+        for (int i = 0; i < 10; i += 3) {
+            scrapFeedRepository.save(ScrapFeed.of(myself, list.get(i)));
+        }
+
+        mvc.perform(get("/api/feed/recommend"))
+                .andExpect(status().isOk())
+                .andDo(document("feed-recommendation"));
+
+    }
+
+    @Test
     @DisplayName("카테고리 필터링과 정렬 테스트")
     public void testCategoryFilter() throws Exception {
         //given
