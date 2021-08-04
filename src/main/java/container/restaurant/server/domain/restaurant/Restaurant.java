@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import container.restaurant.server.domain.base.BaseEntity;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.restaurant.menu.Menu;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +13,8 @@ import org.locationtech.jts.geom.Point;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 import static container.restaurant.server.utils.SpatialUtils.createPointType;
 
@@ -40,9 +37,6 @@ public class Restaurant extends BaseEntity {
 
     @NotNull
     private double longitude;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
-    private List<Menu> menu;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Image thumbnail;

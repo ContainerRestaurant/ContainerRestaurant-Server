@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.restaurant;
 
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
+import container.restaurant.server.domain.restaurant.menu.MenuService;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
@@ -18,6 +19,7 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
+    private final MenuService menuService;
 
     @Transactional(readOnly = true)
     public RestaurantDetailDto getRestaurantInfoById(Long restaurantId, Long loginId) {
@@ -31,10 +33,10 @@ public class RestaurantService {
         return restaurantRepository.findNearByRestaurants(lat, lon, radius)
                 .stream()
                 .map(restaurant -> RestaurantNearInfoDto.from(restaurant,
-                        restaurantFavoriteRepository.existsByUserIdAndRestaurantId(loginId, restaurant.getId())))
+                        restaurantFavoriteRepository.existsByUserIdAndRestaurantId(loginId, restaurant.getId()),
+                        menuService.findTop2ByRestaurantAndIsMainTrueMenuNameList(restaurant)))
                 .collect(Collectors.toList());
     }
-
     // 식당 이름 검색 비활성화
 
     @Transactional
