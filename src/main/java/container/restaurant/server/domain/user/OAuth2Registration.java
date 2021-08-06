@@ -1,6 +1,6 @@
 package container.restaurant.server.domain.user;
 
-public enum AuthProvider {
+public enum OAuth2Registration {
 
     KAKAO, APPLE, GOOGLE
 

@@ -2,7 +2,7 @@ package container.restaurant.server.web.dto.user;
 
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.push.PushToken;
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public interface UserDto {
     class Create {
 
         @NotNull
-        private final AuthProvider provider;
+        private final OAuth2Registration provider;
 
         @NotEmpty
         private final String accessToken;
@@ -97,7 +97,7 @@ public interface UserDto {
     class TokenLogin {
 
         private final String accessToken;
-        private final AuthProvider provider;
+        private final OAuth2Registration provider;
 
     }
 

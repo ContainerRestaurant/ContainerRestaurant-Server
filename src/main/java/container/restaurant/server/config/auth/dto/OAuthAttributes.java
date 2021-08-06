@@ -1,6 +1,7 @@
 package container.restaurant.server.config.auth.dto;
 
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +16,9 @@ public class OAuthAttributes {
 
     private final Map<String, Object> attributes;
 
-    private final String authId;
     private final String nickname;
     private final String email;
-    private final AuthProvider provider;
+    private final OAuth2Identifier identifier;
 
     private final String nameAttributeKey;
 
@@ -32,8 +32,7 @@ public class OAuthAttributes {
 
     public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
-                .provider(AuthProvider.GOOGLE)
-                .authId(attributes.get("sub").toString())
+                .identifier(OAuth2Identifier.of(attributes.get("sub").toString(), OAuth2Registration.GOOGLE))
                 .email((String) attributes.get("email"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
@@ -51,8 +50,7 @@ public class OAuthAttributes {
         Map<String, String> kakaoAccount = (Map<String, String>) attributes.getOrDefault("kakao_account", Map.of());
 
         return OAuthAttributes.builder()
-                .provider(AuthProvider.KAKAO)
-                .authId(attributes.get("id").toString())
+                .identifier(OAuth2Identifier.of(attributes.get("id").toString(), OAuth2Registration.KAKAO))
                 .email(kakaoAccount.get("email"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
@@ -62,8 +60,7 @@ public class OAuthAttributes {
 
     public User toEntity() {
         return User.builder()
-                .authProvider(provider)
-                .authId(authId)
+                .identifier(identifier)
                 .email(email)
                 .build();
     }

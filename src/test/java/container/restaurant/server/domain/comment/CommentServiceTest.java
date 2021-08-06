@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.comment;
 
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
@@ -67,8 +68,7 @@ class CommentServiceTest {
         users = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             users.add(User.builder()
-                    .authId("authId" + i)
-                    .authProvider(AuthProvider.KAKAO)
+                    .identifier(OAuth2Identifier.of("authId" + i, OAuth2Registration.KAKAO))
                     .email("me" + i + "@test.com")
                     .profile(image)
                     .nickname("TestNickname" + i)

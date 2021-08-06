@@ -2,7 +2,8 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
@@ -52,15 +53,14 @@ class UserControllerTest extends BaseUserControllerTest {
     void tokenLogin() throws Exception {
         //given-1 테스트용 액세스 토큰과 요청
         String testToken = "[ACCESS_TOKEN]";
-        UserDto.TokenLogin dto = new UserDto.TokenLogin(testToken, myself.getAuthProvider());
+        UserDto.TokenLogin dto = new UserDto.TokenLogin(testToken, myself.getRegistration());
 
         //given-2 OAuth Provider 로 부터 제공받은 사용자 정보 모킹 - myself 정보
         OAuthAgent agent = mock(OAuthAgent.class);
-        when(oAuthAgentFactory.get(myself.getAuthProvider())).thenReturn(agent);
+        when(oAuthAgentFactory.get(myself.getRegistration())).thenReturn(agent);
         when(agent.getAuthAttrFrom(testToken)).thenReturn(of(OAuthAttributes.builder()
-                .provider(myself.getAuthProvider())
+                .identifier(myself.getIdentifier())
                 .nickname("ProviderNickname")
-                .authId(myself.getAuthId())
                 .email(myself.getEmail())
                 .build()));
 
@@ -88,7 +88,7 @@ class UserControllerTest extends BaseUserControllerTest {
     @DisplayName("토큰으로 회원가입")
     void createWithToken() throws Exception {
         //given-1 회원 가입 요청이 주어진다.
-        AuthProvider testProvider = AuthProvider.KAKAO;
+        OAuth2Registration testProvider = OAuth2Registration.KAKAO;
         String testAccessToken = "[ACCESS_TOKEN]";
         Long testProfileId = image.getId();
 
@@ -104,8 +104,7 @@ class UserControllerTest extends BaseUserControllerTest {
         OAuthAgent agent = mock(OAuthAgent.class);
         when(oAuthAgentFactory.get(testProvider)).thenReturn(agent);
         when(agent.getAuthAttrFrom(testAccessToken)).thenReturn(of(OAuthAttributes.builder()
-                .provider(testProvider)
-                .authId(testAuthId)
+                .identifier(OAuth2Identifier.of(testAuthId, testProvider))
                 .email(testEmail)
                 .build()));
 
@@ -128,11 +127,11 @@ class UserControllerTest extends BaseUserControllerTest {
                 ));
 
         //then
-        User newUser = userRepository.findByAuthProviderAndAuthId(testProvider, testAuthId)
+        User newUser = userRepository.findByIdentifier(OAuth2Identifier.of(testAuthId, testProvider))
                 .orElseThrow();
 
         assertThat(newUser.getId()).isNotNull();
-        assertThat(newUser.getAuthId()).isEqualTo(testAuthId);
+        assertThat(newUser.getSubject()).isEqualTo(testAuthId);
         assertThat(newUser.getNickname()).isNull();
         assertThat(newUser.getProfile().getId()).isEqualTo(testProfileId);
         assertThat(newUser.getEmail()).isEqualTo(testEmail);

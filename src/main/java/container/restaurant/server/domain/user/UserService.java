@@ -31,9 +31,9 @@ public class UserService {
 
     @Transactional
     public User createOrUpdate(
-            AuthProvider provider, String authId, Supplier<@Valid ? extends User> supplier
+            OAuth2Identifier identifier, Supplier<@Valid ? extends User> supplier
     ) {
-        User user = userRepository.findByAuthProviderAndAuthId(provider, authId)
+        User user = userRepository.findByIdentifier(identifier)
                 .orElseGet(supplier);
 
         return userRepository.save(user);
@@ -46,7 +46,7 @@ public class UserService {
                 .orElseThrow(() -> new ValidationException("유효하지 않은 액세스토큰입니다."));
 
         User newUser = of(attrs.toEntity())
-                .flatMap(user -> userRepository.findByAuthProviderAndAuthId(user.getAuthProvider(), user.getAuthId()))
+                .flatMap(user -> userRepository.findByIdentifier(user.getIdentifier()))
                 .orElseGet(() -> userRepository.save(attrs.toEntity()));
 
         ofNullable(dto.getProfileId())
@@ -59,8 +59,7 @@ public class UserService {
     public Optional<UserDto.Info> tokenLogin(UserDto.TokenLogin dto) {
         return authAgentFactory.get(dto.getProvider())
                 .getAuthAttrFrom(dto.getAccessToken())
-                .flatMap(attributes -> userRepository
-                        .findByAuthProviderAndAuthId(attributes.getProvider(), attributes.getAuthId())
+                .flatMap(attributes -> userRepository.findByIdentifier(attributes.getIdentifier())
                         .map(UserDto.Info::from));
     }
 

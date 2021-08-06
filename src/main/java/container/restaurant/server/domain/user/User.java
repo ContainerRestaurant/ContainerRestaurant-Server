@@ -17,12 +17,8 @@ import static container.restaurant.server.domain.user.ContainerLevel.*;
 @Entity(name = "TB_USERS")
 public class User extends BaseCreatedTimeEntity {
 
-    @Column(nullable = false)
-    private String authId;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AuthProvider authProvider;
+    @Embedded
+    private OAuth2Identifier identifier;
 
     private String email;
 
@@ -50,10 +46,9 @@ public class User extends BaseCreatedTimeEntity {
     private PushToken pushToken;
 
     @Builder
-    protected User(String authId, AuthProvider authProvider, String email,
+    protected User(OAuth2Identifier identifier, String email,
                    Image profile, String nickname, PushToken pushToken) {
-        this.authId = authId;
-        this.authProvider = authProvider;
+        this.identifier = identifier;
         this.email = email;
         this.nickname = nickname;
         this.profile = profile;
@@ -68,6 +63,14 @@ public class User extends BaseCreatedTimeEntity {
 
     public String getLevelTitle() {
         return this.containerLevel.getTitle();
+    }
+
+    public OAuth2Registration getRegistration() {
+        return this.identifier.getRegistration();
+    }
+
+    public String getSubject() {
+        return this.identifier.getSubject();
     }
 
     public void setNickname(String nickname) {

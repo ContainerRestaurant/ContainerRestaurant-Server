@@ -2,7 +2,8 @@ package container.restaurant.server.web.base;
 
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -35,8 +36,7 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
                 .build());
 
         myself = userRepository.save(User.builder()
-                .authId(myselfAuthId)
-                .authProvider(AuthProvider.KAKAO)
+                .identifier(OAuth2Identifier.of(myselfAuthId, OAuth2Registration.KAKAO))
                 .email("me@test.com")
                 .profile(image)
                 .nickname("나의닉네임")
@@ -44,8 +44,7 @@ public abstract class BaseUserControllerTest extends BaseMvcControllerTest {
 
         myselfSession.setAttribute("userId", myself.getId());
         other = userRepository.save(User.builder()
-                .authId(otherAuthId)
-                .authProvider(AuthProvider.KAKAO)
+                .identifier(OAuth2Identifier.of(otherAuthId, OAuth2Registration.KAKAO))
                 .email("you@test.com")
                 .profile(image)
                 .nickname("남의닉네임")
