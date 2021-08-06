@@ -42,6 +42,11 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:7.3.0'
 	implementation 'com.squareup.okhttp3:okhttp:4.9.1'
 
+	//=== JJWT 의존성 ===//
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2',
+			'io.jsonwebtoken:jjwt-jackson:0.11.2'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
