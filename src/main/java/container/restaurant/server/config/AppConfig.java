@@ -1,5 +1,6 @@
 package container.restaurant.server.config;
 
+import container.restaurant.server.config.auth.JwtTokenFilter;
 import container.restaurant.server.process.oauth.OAuthAgentFactory;
 import container.restaurant.server.utils.jwt.JwtLoginService;
 import container.restaurant.server.utils.jwt.jjwt.JjwtLoginService;
@@ -30,4 +31,8 @@ public class AppConfig {
         return new JjwtLoginService();
     }
 
+    @Bean
+    public JwtTokenFilter jwtTokenFilter(JwtLoginService jwtLoginService) {
+        return new JwtTokenFilter(jwtLoginService);
+    }
 }
