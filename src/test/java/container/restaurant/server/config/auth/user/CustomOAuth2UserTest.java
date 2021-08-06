@@ -38,7 +38,7 @@ class CustomOAuth2UserTest {
         assertThat(result).isNotNull();
         assertThat(result.getAttributes())
                 .containsEntry(SUBJECT, sub)
-                .containsEntry(REGISTRATION, KAKAO)
+                .containsEntry(REGISTRATION, KAKAO.toString())
                 .containsEntry(EMAIL, email)
                 .containsKey(EXPIRATION_TIME)
                 .containsKey(ISSUED_AT);
