@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -66,7 +65,6 @@ public class UserController {
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         userService.deleteById(id);
-        logout();
 
         return ResponseEntity.noContent().build();
     }
@@ -98,21 +96,4 @@ public class UserController {
                         restaurantFavoriteLinker.findAllByUser().withRel("restaurant-favorite")
                 ));
     }
-
-    // FIXME 임시 로그인 방편
-    private final HttpSession httpSession;
-    @GetMapping("temp-login")
-    public ResponseEntity<?> tempLogin() {
-        setLoginUser(1L);
-        return ResponseEntity.noContent().build();
-    }
-
-    private void setLoginUser(Long loginId) {
-        httpSession.setAttribute("userId", loginId);
-    }
-
-    private void logout() {
-        setLoginUser(null);
-    }
-
 }
