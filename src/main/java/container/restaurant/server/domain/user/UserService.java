@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.user;
 
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgentService;
@@ -40,7 +41,13 @@ public class UserService {
 
     @Transactional
     public UserDto.Token newToken(UserDto.ToRequestToken dto) {
-        return null;
+        CustomOAuth2User authUser = oAuthAgentService.getAuthUser(dto);
+         Long userId = userRepository.findByIdentifier(authUser.getIdentifier())
+                 .orElseGet(() -> userRepository.save(
+                         User.builder().identifier(authUser.getIdentifier()).build()))
+                 .getId();
+         String newToken = jwtLoginService.tokenize(authUser);
+        return new UserDto.Token(userId, newToken);
     }
 
     @Transactional(readOnly = true)

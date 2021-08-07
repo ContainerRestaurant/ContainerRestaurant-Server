@@ -31,7 +31,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto.Token> tokenRequest(@RequestBody UserDto.ToRequestToken dto) {
-        return null;
+        return ResponseEntity.ok(userService.newToken(dto));
     }
 
     @GetMapping
