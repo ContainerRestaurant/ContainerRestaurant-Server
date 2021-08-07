@@ -5,10 +5,7 @@ import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.OAuth2Registration;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.constraints.NotEmpty;
@@ -16,10 +13,9 @@ import javax.validation.constraints.NotNull;
 
 public interface UserDto {
 
+    @RequiredArgsConstructor
     @Getter
-    @Builder
-    @AllArgsConstructor
-    class Create {
+    class ToRequestToken {
 
         @NotNull
         private final OAuth2Registration provider;
@@ -27,28 +23,31 @@ public interface UserDto {
         @NotEmpty
         private final String accessToken;
 
-        private final Long profileId;
+    }
 
-        private final PushToken pushToken;
-
+    @RequiredArgsConstructor
+    @Getter
+    class Token {
+        private final Long id;
+        private final String token;
     }
 
     @Getter
     class Info extends RepresentationModel<Info> {
-        private final Long id;
 
+        private final Long id;
         private final String email;
         private final String nickname;
         private final String profile;
         private final String levelTitle;
         private final Integer feedCount;
         private final Integer scrapCount;
+
         private final Integer bookmarkedCount;
 
         public static UserDto.Info from(User user) {
             return new UserDto.Info(user);
         }
-
         protected Info(User user) {
             this.id = user.getId();
             this.email = user.getEmail();
@@ -59,13 +58,14 @@ public interface UserDto {
             this.scrapCount = user.getScrapCount();
             this.bookmarkedCount = user.getBookmarkedCount();
         }
-    }
 
+    }
     @Getter
     @NoArgsConstructor
     @Builder
     @AllArgsConstructor
     class Update {
+
 
         @NicknameConstraint
         private String nickname;
@@ -75,30 +75,29 @@ public interface UserDto {
         private PushToken pushToken;
 
     }
-
     @Getter
     class NicknameExists extends RepresentationModel<NicknameExists> {
 
         private final String nickname;
+
         private final Boolean exists;
 
         protected NicknameExists(String nickname, Boolean exists) {
             this.nickname = nickname;
             this.exists = exists;
         }
-
         public static NicknameExists of(String nickname, Boolean exists) {
             return new NicknameExists(nickname, exists);
         }
-    }
 
+    }
     @Getter
     @AllArgsConstructor
     class TokenLogin {
 
         private final String accessToken;
+
         private final OAuth2Registration provider;
 
     }
-
 }
