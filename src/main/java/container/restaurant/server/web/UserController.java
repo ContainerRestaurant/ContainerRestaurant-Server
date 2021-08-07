@@ -29,6 +29,11 @@ public class UserController {
     private final FeedLinker feedLinker;
     private final RestaurantFavoriteLinker restaurantFavoriteLinker;
 
+    @PostMapping
+    public ResponseEntity<UserDto.Token> tokenRequest(@RequestBody UserDto.ToRequestToken dto) {
+        return null;
+    }
+
     @GetMapping
     public ResponseEntity<?> getCurrentUser(@LoginId Long loginId) {
         return ResponseEntity.of(ofNullable(loginId)

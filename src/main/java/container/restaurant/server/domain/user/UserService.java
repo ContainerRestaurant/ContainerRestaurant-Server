@@ -2,7 +2,8 @@ package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.process.oauth.OAuthAgentFactory;
+import container.restaurant.server.process.oauth.OAuthAgentService;
+import container.restaurant.server.utils.jwt.JwtLoginService;
 import container.restaurant.server.web.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,9 @@ public class UserService {
 
     private final ImageService imageService;
 
-    private final OAuthAgentFactory authAgentFactory;
+    private final OAuthAgentService oAuthAgentService;
+
+    private final JwtLoginService jwtLoginService;
 
     @Transactional
     public User createOrUpdate(
@@ -35,14 +38,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public UserDto.Token newToken(UserDto.ToRequestToken dto) {
+        return null;
+    }
+
     @Transactional(readOnly = true)
     public UserDto.Info getUserInfoById(Long id) throws ResourceNotFoundException {
 
         return UserDto.Info.from(findById(id));
-    }
-
-    public void newToken(UserDto.Create dto) {
-
     }
 
     @Transactional
