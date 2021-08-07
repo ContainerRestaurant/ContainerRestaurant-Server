@@ -1,6 +1,7 @@
 package container.restaurant.server.process.oauth;
 
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,5 +35,19 @@ public class KakaoOAuthAgent implements OAuthAgent {
                     .bodyToMono(Map.class)
                     .block())
                 .map(OAuthAttributes::ofKakao);
+    }
+
+    @Override
+    public CustomOAuth2User getAuthUserFrom(String accessToken) {
+        //noinspection unchecked
+        return CustomOAuth2User.newUser(
+                "kakao", "id",
+                webClient
+                        .get()
+                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .header(HttpHeaders.AUTHORIZATION, String.join("", "Bearer ", accessToken))
+                        .retrieve()
+                        .bodyToMono(Map.class)
+                        .block());
     }
 }
