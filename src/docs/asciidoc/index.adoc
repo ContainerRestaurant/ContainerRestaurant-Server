@@ -113,13 +113,6 @@ include::{snippets}/banner/response-fields-beneath-_embedded.bannerInfoDtoList.a
 [[login]]
 == 로그인
 
-[[login-web]]
-=== 웹에서의 로그인
-`GET /login`
-
-OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및 회원가입을 할 수 있습니다.
-(웹에서 로그인/회원 가입시 사용하는 API 로, 모바일 앱에서는 다른 방식을 이용합니다.)
-
 [[login-token]]
 === 액세스 토큰으로 로그인
 
@@ -130,20 +123,12 @@ operation::login-token[snippets='curl-request,request-fields,http-response']
 
 응답 형식은 <<user-get>> 을 참조합니다. 로그인에 실패한 경우 _401 Unauthorized_ 상태를 응답합니다.
 
-로그인에 실패한 경우 <<user-create>>를 참조합니다.
-
 [[logout]]
 == 로그아웃
 `GET /logout`
 
 [[user]]
 == 사용자
-
-[[user-create]]
-=== 토큰으로 사용자 정보생성
-`POST /api/user`
-
-operation::user-create[snippets='curl-request,request-fields,http-response,response-headers']
 
 [[user-get]]
 === 사용자 정보 조회

@@ -1,6 +1,5 @@
 package container.restaurant.server.domain.user;
 
-import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgentFactory;
@@ -10,13 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -39,34 +35,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @Transactional
-    public UserDto.Info createFrom(UserDto.Create dto) {
-        OAuthAttributes attrs = authAgentFactory.get(dto.getProvider())
-                .getAuthAttrFrom(dto.getAccessToken())
-                .orElseThrow(() -> new ValidationException("유효하지 않은 액세스토큰입니다."));
-
-        User newUser = of(attrs.toEntity())
-                .flatMap(user -> userRepository.findByIdentifier(user.getIdentifier()))
-                .orElseGet(() -> userRepository.save(attrs.toEntity()));
-
-        ofNullable(dto.getProfileId())
-                .ifPresent(profileId -> newUser.setProfile(imageService.findById(profileId)));
-
-        return UserDto.Info.from(newUser);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<UserDto.Info> tokenLogin(UserDto.TokenLogin dto) {
-        return authAgentFactory.get(dto.getProvider())
-                .getAuthAttrFrom(dto.getAccessToken())
-                .flatMap(attributes -> userRepository.findByIdentifier(attributes.getIdentifier())
-                        .map(UserDto.Info::from));
-    }
-
     @Transactional(readOnly = true)
     public UserDto.Info getUserInfoById(Long id) throws ResourceNotFoundException {
 
         return UserDto.Info.from(findById(id));
+    }
+
+    public void newToken(UserDto.Create dto) {
+
     }
 
     @Transactional
