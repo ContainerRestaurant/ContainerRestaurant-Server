@@ -95,4 +95,36 @@ public class UserServiceTest extends BaseMockTest {
                 .isEqualTo(ex);
     }
 
+    @Test
+    @DisplayName("OAuth 식별자로 ID 얻어오기")
+    void OAuth_식별자로_ID_얻어오기() {
+        //given OAuth 식별자와 조회 결과 유저 가 주어졌을 때
+        OAuth2Identifier identifier = mock(OAuth2Identifier.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(1L);
+        when(userRepository.findByIdentifier(identifier)).thenReturn(of(user));
+
+        //when 주어진 OAuth 식별자로 ID 조회하면
+        Long result = userService.getUserIdFromIdentifier(identifier);
+
+        //then 주어진 유저의 ID 가 반환됨
+        assertThat(result).isEqualTo(user.getId());
+    }
+
+    @Test
+    @DisplayName("OAuth 식별자로 ID 얻어오기 - 유저가 없는 경우")
+    void OAuth_식별자로_ID_얻어오기__유저가_없는_경우() {
+        //given 일치하는 유저가 없는 OAuth 식별자가 주어졌을 때
+        OAuth2Identifier identifier = mock(OAuth2Identifier.class);
+
+        when(userRepository.findByIdentifier(identifier)).thenReturn(empty());
+
+        //when 주어진 OAuth 식별자로 ID 조회하면
+        Long result = userService.getUserIdFromIdentifier(identifier);
+
+        //then null 이 반환됨
+        assertThat(result).isNull();
+    }
+
 }
