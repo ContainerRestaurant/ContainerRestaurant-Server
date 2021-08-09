@@ -9,13 +9,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 @Getter
-public class CustomOAuth2User implements OAuth2User {
+public class CustomOAuth2User implements OAuth2User, Serializable {
 
     //=== attributes 속성(일부는 JWT(RFC 7519) 스펙) ===//
 
@@ -38,7 +39,7 @@ public class CustomOAuth2User implements OAuth2User {
                 throw new IllegalArgumentException("인증 정보 생성에 실패했습니다.(해당 속성이 없습니다:" + s + ")" );
         }
 
-        this.attributes = attributes;
+        this.attributes = Map.copyOf(attributes);
         this.authorities = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
@@ -63,7 +64,7 @@ public class CustomOAuth2User implements OAuth2User {
 
    @Override
     public String getName() {
-        return (String) getAttributes().get(SUBJECT);
+        return getAttributes().get(SUBJECT).toString();
     }
 
     public Authentication getAuthentication() {
