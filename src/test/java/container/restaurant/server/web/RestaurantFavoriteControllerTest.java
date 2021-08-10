@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -31,6 +32,7 @@ class RestaurantFavoriteControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void userFavoriteRestaurant() throws Exception {
 
         mvc.perform(post("/api/favorite/restaurant/{restaurantId}",restaurant.getId())
@@ -45,6 +47,7 @@ class RestaurantFavoriteControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void userCancelFavoriteRestaurant() throws Exception {
         restaurantFavoriteService.userFavoriteRestaurant(myself.getId(), restaurant.getId());
 

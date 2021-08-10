@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -38,6 +39,7 @@ class ReportControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("피드 신고")
     void testReportFeed() throws Exception {
         for (int i = 0; i < 2; i++) {
@@ -58,6 +60,7 @@ class ReportControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("댓글 신고")
     void testReportComment() throws Exception {
         //given

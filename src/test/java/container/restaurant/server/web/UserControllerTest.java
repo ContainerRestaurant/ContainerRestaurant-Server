@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolationException;
@@ -120,6 +121,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 닉네임, 프로필 업데이트")
     void testUpdateUser() throws Exception {
         String nickname = "this는nikname이라능a";
@@ -157,6 +159,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 업데이트 실패 (400)")
     void testFailToUpdateUserBy400() throws Exception {
         String nickname = "this는nikname이라능!";
@@ -183,6 +186,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 업데이트 실패 (403)")
     void testFailToUpdateUserBy403() throws Exception {
         String nickname = "this는nikname이라능a";
@@ -206,6 +210,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 탈퇴")
     void testDeleteUser() throws Exception {
         mvc.perform(
@@ -218,6 +223,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 탈퇴 실패 (403)")
     void testFailToDeleteUser() throws Exception {
         mvc.perform(
