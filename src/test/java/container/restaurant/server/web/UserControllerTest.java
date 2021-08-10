@@ -1,24 +1,31 @@
 package container.restaurant.server.web;
 
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.user.OAuth2Registration;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.process.oauth.OAuthAgentFactory;
+import container.restaurant.server.process.oauth.OAuthAgentService;
+import container.restaurant.server.utils.jwt.JwtLoginService;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.ResultActions;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -33,10 +40,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest extends BaseUserControllerTest {
 
     @MockBean
-    private OAuthAgentFactory oAuthAgentFactory;
+    OAuthAgentService oAuthAgentService;
+
+    @MockBean
+    JwtLoginService jwtLoginService;
 
     @Autowired
     HttpSession httpSession;
+
+    @Test
+    @DisplayName("인증 토큰 생성")
+    void 인증_토큰_생성() throws Exception {
+        //given
+        OAuth2Registration reg = OAuth2Registration.KAKAO;
+        String accessToken = "[TEST_ACCESS_TOKEN]";
+        UserDto.ToRequestToken dto = new UserDto.ToRequestToken(reg, accessToken);
+
+        String expectedToken = "[NEW_AUTH_TOKEN]";
+        ArgumentCaptor<UserDto.ToRequestToken> captor = ArgumentCaptor.forClass(UserDto.ToRequestToken.class);
+        CustomOAuth2User authUser = mock(CustomOAuth2User.class);
+
+        when(oAuthAgentService.getAuthUser(any())).thenReturn(authUser);
+        when(authUser.getIdentifier()).thenReturn(myself.getIdentifier());
+        when(jwtLoginService.tokenize(authUser)).thenReturn(expectedToken);
+
+        //when 요청을 수행하면
+        ResultActions perform = mvc.perform(post("/api/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)));
+
+        //then 1 요청에 사용한 dto 로 oAuthAgentService.getAuthUser() 를 호출
+        verify(oAuthAgentService).getAuthUser(captor.capture());
+        assertThat(captor.getValue()).isEqualTo(dto);
+
+        //then 2 아래 명세를 따름
+        perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("token").value(expectedToken))
+                .andExpect(jsonPath("id").value(myself.getId()))
+                .andDo(document("user-new-token",
+                        responseFields(
+                                fieldWithPath("token").description("생성된 인증 토큰"),
+                                fieldWithPath("id").description("생성된 인증 토큰으로 식별되는 유저의 식별 ID"))));
+    }
 
     @Test
     @DisplayName("사용자 정보 조회")

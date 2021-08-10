@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 public interface UserDto {
 
     @RequiredArgsConstructor
+    @EqualsAndHashCode
     @Getter
     class ToRequestToken {
 
