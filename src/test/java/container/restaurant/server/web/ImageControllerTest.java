@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -26,6 +27,7 @@ class ImageControllerTest extends BaseMvcControllerTest {
     @MockBean private ImageService imageService;
 
     @Test
+    @WithMockUser(roles = "USER")
     void testUploadImageFile() throws Exception {
         Image testImage = spy(new Image("IMAGE_URI"));
         when(testImage.getId()).thenReturn(3L);

@@ -23,7 +23,7 @@ class UserTest {
     void testBuilder() {
         //given
         String authId = "testId";
-        AuthProvider provider = AuthProvider.KAKAO;
+        OAuth2Registration provider = OAuth2Registration.KAKAO;
         String email = "test@test.com";
         String nickname = "testNickname";
         Image profile = new Image("profilePath");
@@ -31,8 +31,7 @@ class UserTest {
 
         //when
         User user = User.builder()
-                .authId(authId)
-                .authProvider(provider)
+                .identifier(OAuth2Identifier.of(authId, provider))
                 .email(email)
                 .nickname(nickname)
                 .profile(profile)
@@ -40,8 +39,7 @@ class UserTest {
                 .build();
 
         //then
-        assertThat(user.getAuthId()).isEqualTo(authId);
-        assertThat(user.getAuthProvider()).isEqualTo(provider);
+        assertThat(user.getIdentifier()).isEqualTo(OAuth2Identifier.of(authId, provider));
         assertThat(user.getEmail()).isEqualTo(email);
         assertThat(user.getNickname()).isEqualTo(nickname);
         assertThat(user.getProfile().getUrl()).isEqualTo(profile.getUrl());

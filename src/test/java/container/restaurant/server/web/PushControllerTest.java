@@ -5,6 +5,7 @@ import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -18,6 +19,7 @@ class PushControllerTest extends BaseUserAndFeedControllerTest {
     PushTokenService pushTokenService;
 
     @Test
+    @WithMockUser(roles = "USER")
     void registerClientPushToken() throws Exception {
         String testToken = "ASDFDWAQWERASDFZXCV1";
 
@@ -27,6 +29,7 @@ class PushControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void deleteClientPushToken() throws Exception {
         String testToken = "ASDFDWAQWERASDFZXCV2";
         Long id = pushTokenService.registerPushToken(testToken).getId();

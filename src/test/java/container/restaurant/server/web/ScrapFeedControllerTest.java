@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,6 +47,7 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("피드 스크랩하기")
     void scrapFeed() throws Exception {
         //given other 유저가 작성한 피드가 주어졌을 때
@@ -76,6 +78,7 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("중복되는 피드 스크랩하기")
     void failScrapFeed() throws Exception {
         //given 유저가 이미 스크랩한 피드와 when 동작 전 시간이 주어졌을 때
@@ -117,18 +120,8 @@ class ScrapFeedControllerTest extends BaseUserAndFeedControllerTest {
         assertThat(scrap.getCreatedDate()).isBefore(now);
     }
 
-    // FIXME 임시 로그인 방편
-//    @Test
-//    @DisplayName("인증되지 않은 유저의 스크랩 실패")
-//    void failUnauthenticatedUser() throws Exception {
-//        //given other 유저가 작성한 피드가 주어졌을 때
-//
-//        //then 인증되지 않은 유저가 주어진 피드를 스크랩하면 login 리다이렉트
-//        mvc.perform(post("/api/scrap/{feedId}", othersFeed.getId()))
-//                .andExpect(status().isFound());
-//    }
-
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("스크랩 취소")
     void cancelScrapFeed() throws Exception {
         //given 유저가 이미 스크랩한 피드가 주어졌을 때

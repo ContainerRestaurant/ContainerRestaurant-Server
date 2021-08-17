@@ -27,16 +27,15 @@ class UserRepositoryTest {
         //given
         String email = "test@test";
         String authId = "authId";
-        AuthProvider provider = AuthProvider.KAKAO;
+        OAuth2Registration provider = OAuth2Registration.KAKAO;
         User newUser = userRepository.save(User.builder()
-                .authId(authId)
-                .authProvider(provider)
+                .identifier(OAuth2Identifier.of(authId, provider))
                 .nickname("testNickname")
                 .email(email)
                 .build());
 
         //when
-        User found = userRepository.findByAuthProviderAndAuthId(provider, authId)
+        User found = userRepository.findByIdentifier(newUser.getIdentifier())
                 .orElse(null);
 
         //then
@@ -62,8 +61,7 @@ class UserRepositoryTest {
     void testDuplicatedNickname() {
         //given
         User user1 = User.builder()
-                .authId("authId")
-                .authProvider(AuthProvider.KAKAO)
+                .identifier(OAuth2Identifier.of("authId", OAuth2Registration.KAKAO))
                 .email("test1@test")
                 .build();
         final User user2 = User.builder()
@@ -88,8 +86,7 @@ class UserRepositoryTest {
         //given
         String nickname = "추가된닉네임";
         User user1 = User.builder()
-                .authId("authId")
-                .authProvider(AuthProvider.KAKAO)
+                .identifier(OAuth2Identifier.of("authId", OAuth2Registration.KAKAO))
                 .email("test@test")
                 .nickname(nickname)
                 .build();

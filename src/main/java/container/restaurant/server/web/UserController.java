@@ -1,11 +1,9 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginId;
-import container.restaurant.server.constant.Header;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exception.FailedAuthorizationException;
-import container.restaurant.server.exception.UnauthorizedException;
 import container.restaurant.server.web.dto.user.UserDto;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.RestaurantFavoriteLinker;
@@ -15,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -34,36 +30,8 @@ public class UserController {
     private final RestaurantFavoriteLinker restaurantFavoriteLinker;
 
     @PostMapping
-    public ResponseEntity<?> createWithToken(
-            @LoginId Long loginId, @RequestBody @Valid UserDto.Create dto
-    ) {
-        if (loginId != null)
-            return ResponseEntity.noContent().build();
-
-        UserDto.Info newUser = userService.createFrom(dto);
-        setLoginUser(newUser.getId());
-
-        return ResponseEntity
-                .created(userLinker.getUserById(newUser.getId()).toUri())
-                .header(Header.USER_ID, newUser.getId().toString())
-                .build();
-    }
-
-    @PostMapping("login")
-    public ResponseEntity<?> tokenLogin(
-            @LoginId Long loginId, @RequestBody UserDto.TokenLogin dto
-    ) {
-        if (loginId != null)
-            return ResponseEntity.noContent().build();
-
-        return userService.tokenLogin(dto)
-                .map(info -> {
-                    setLoginUser(info.getId());
-                    return ResponseEntity.ok()
-                            .header(Header.USER_ID, info.getId().toString())
-                            .body(setLinks(info, info.getId()));
-                })
-                .orElseThrow(() -> new UnauthorizedException("로그인 실패 - 해당 사용자를 찾을 수 없습니다."));
+    public ResponseEntity<UserDto.Token> tokenRequest(@RequestBody UserDto.ToRequestToken dto) {
+        return ResponseEntity.ok(userService.newToken(dto));
     }
 
     @GetMapping
@@ -102,7 +70,6 @@ public class UserController {
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
         userService.deleteById(id);
-        logout();
 
         return ResponseEntity.noContent().build();
     }
@@ -134,21 +101,4 @@ public class UserController {
                         restaurantFavoriteLinker.findAllByUser().withRel("restaurant-favorite")
                 ));
     }
-
-    // FIXME 임시 로그인 방편
-    private final HttpSession httpSession;
-    @GetMapping("temp-login")
-    public ResponseEntity<?> tempLogin() {
-        setLoginUser(1L);
-        return ResponseEntity.noContent().build();
-    }
-
-    private void setLoginUser(Long loginId) {
-        httpSession.setAttribute("userId", loginId);
-    }
-
-    private void logout() {
-        setLoginUser(null);
-    }
-
 }

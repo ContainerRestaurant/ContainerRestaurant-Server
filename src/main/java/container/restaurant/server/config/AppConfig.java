@@ -1,6 +1,10 @@
 package container.restaurant.server.config;
 
+import container.restaurant.server.config.auth.JwtTokenFilter;
 import container.restaurant.server.process.oauth.OAuthAgentFactory;
+import container.restaurant.server.process.oauth.OAuthAgentService;
+import container.restaurant.server.utils.jwt.JwtLoginService;
+import container.restaurant.server.utils.jwt.jjwt.JjwtLoginService;
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 import org.springframework.context.annotation.Bean;
@@ -23,4 +27,18 @@ public class AppConfig {
         return new InMemoryHttpTraceRepository();
     }
 
+    @Bean
+    public JwtLoginService jwtParser() {
+        return new JjwtLoginService();
+    }
+
+    @Bean
+    public JwtTokenFilter jwtTokenFilter(JwtLoginService jwtLoginService) {
+        return new JwtTokenFilter(jwtLoginService);
+    }
+
+    @Bean
+    public OAuthAgentService oAuthAgentService() {
+        return new OAuthAgentService(null);
+    }
 }

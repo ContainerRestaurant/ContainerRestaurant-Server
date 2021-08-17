@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class CommentControllerTest extends BaseFeedAndCommentControllerTest {
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("댓글 쓰기 테스트")
     void createComment() throws Exception{
         //given
@@ -69,6 +71,7 @@ class CommentControllerTest extends BaseFeedAndCommentControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("댓글 업데이트")
     void updateCommentById() throws Exception {
         //given
@@ -84,6 +87,7 @@ class CommentControllerTest extends BaseFeedAndCommentControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("댓글 삭제")
     void deleteCommentById() throws Exception {
 

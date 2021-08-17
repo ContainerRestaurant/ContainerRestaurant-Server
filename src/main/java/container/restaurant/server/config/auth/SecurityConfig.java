@@ -1,32 +1,35 @@
 package container.restaurant.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final JwtTokenFilter jwtTokenFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .cors().and().csrf().disable()
                 .headers(h -> h
-                        .frameOptions().disable()
-                )
+                        .frameOptions().disable())
                 .authorizeRequests(a -> a
-                        .anyRequest().permitAll()
-                )
-                .logout(l -> l
-                        .logoutSuccessUrl("/")
-                )
+                        .antMatchers(GET).permitAll()
+                        .antMatchers(POST, "/api/user/login", "/api/user").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtTokenFilter, OAuth2LoginAuthenticationFilter.class)
                 .oauth2Login(o -> o
-                        .userInfoEndpoint().userService(customOAuth2UserService)
-                );
+                        .userInfoEndpoint().userService(customOAuth2UserService))
+                .logout(l -> l
+                        .logoutSuccessUrl("/"));
     }
 }

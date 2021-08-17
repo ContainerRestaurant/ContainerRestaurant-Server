@@ -4,7 +4,8 @@ import container.restaurant.server.domain.comment.Comment;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.restaurant.Restaurant;
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.domain.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,8 @@ class CommentLikeRepositoryTest {
     @Test
     void test() {
         //given
-        User user = em.persist(User.builder().authId("AUTH_ID").authProvider(AuthProvider.KAKAO)
+        User user = em.persist(User.builder()
+                .identifier(OAuth2Identifier.of("AUTH_ID", OAuth2Registration.KAKAO))
                 .nickname("TEST NICKNAME").email("test@test.com").build());
 
         Restaurant restaurant = em.persist(Restaurant.builder().lon(0.0).lat(0.0)

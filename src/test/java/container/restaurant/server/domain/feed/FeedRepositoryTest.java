@@ -5,7 +5,8 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeed;
@@ -70,8 +71,7 @@ public class FeedRepositoryTest {
         users = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             users.add(User.builder()
-                    .authId("authId" + i)
-                    .authProvider(AuthProvider.KAKAO)
+                    .identifier(OAuth2Identifier.of("authId" + i, OAuth2Registration.KAKAO))
                     .email("me" + i + "@test.com")
                     .profile(image)
                     .nickname("TestNickname" + i)

@@ -3,6 +3,7 @@ package container.restaurant.server.web;
 import container.restaurant.server.web.base.BaseUserAndFeedControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -53,6 +54,7 @@ class RestaurantControllerTest extends BaseUserAndFeedControllerTest {
 //    }
 
     @Test
+    @WithMockUser(roles = "USER")
     void updateVanish() throws Exception {
 
         mvc.perform(post("/api/restaurant/vanish/{restaurantId}", restaurant.getId()))

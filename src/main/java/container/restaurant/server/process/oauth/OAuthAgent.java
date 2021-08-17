@@ -1,6 +1,7 @@
 package container.restaurant.server.process.oauth;
 
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 
 import java.util.Optional;
 
@@ -17,5 +18,7 @@ public interface OAuthAgent {
      * @return 사용자 정보가 담긴 {@link OAuthAttributes}에 대한 {@link Optional}
      */
     Optional<OAuthAttributes> getAuthAttrFrom(String accessToken);
+
+    CustomOAuth2User getAuthUserFrom(String accessToken);
 
 }

@@ -1,20 +1,16 @@
 package container.restaurant.server.config.auth;
 
-import container.restaurant.server.config.auth.dto.OAuthAttributes;
-import container.restaurant.server.domain.user.User;
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.util.Collections;
 
 @RequiredArgsConstructor
 @Service
@@ -32,18 +28,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
                 .getUserInfoEndpoint().getUserNameAttributeName();
 
-        OAuthAttributes attributes = OAuthAttributes.of(
+        CustomOAuth2User authUser = CustomOAuth2User.newUser(
                 registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        User user = userService.createOrUpdate(
-                attributes.getProvider(), attributes.getAuthId(), attributes::toEntity);
+        Long userId = userService.getUserIdFromIdentifier(authUser.getIdentifier());
 
-        httpSession.setAttribute("userId", user.getId());
+        httpSession.setAttribute("userId", userId);
 
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("USER")),
-                attributes.getAttributes(),
-                attributes.getNameAttributeKey());
+        return authUser;
     }
 
     private OAuth2User getUserFromRequest(OAuth2UserRequest userRequest) {

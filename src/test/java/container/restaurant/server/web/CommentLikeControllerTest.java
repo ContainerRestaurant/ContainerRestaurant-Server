@@ -7,19 +7,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.hypermedia.HypermediaDocumentation;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,6 +24,7 @@ class CommentLikeControllerTest extends BaseFeedAndCommentControllerTest {
     CommentLikeRepository commentLikeRepository;
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("댓글 좋아요 테스트")
     void userLikeComment() throws Exception {
 
@@ -49,6 +43,7 @@ class CommentLikeControllerTest extends BaseFeedAndCommentControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("댓글 좋아요 취소 테스트")
     void userCancelLikeComment() throws Exception {
         commentLikeRepository.save(CommentLike.of(myself, myFeedComment));

@@ -1,22 +1,20 @@
 package container.restaurant.server.domain.user;
 
-import container.restaurant.server.config.auth.dto.OAuthAttributes;
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.process.oauth.OAuthAgentFactory;
+import container.restaurant.server.process.oauth.OAuthAgentService;
+import container.restaurant.server.utils.jwt.JwtLoginService;
 import container.restaurant.server.web.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -27,41 +25,36 @@ public class UserService {
 
     private final ImageService imageService;
 
-    private final OAuthAgentFactory authAgentFactory;
+    private final OAuthAgentService oAuthAgentService;
+
+    private final JwtLoginService jwtLoginService;
 
     @Transactional
     public User createOrUpdate(
-            AuthProvider provider, String authId, Supplier<@Valid ? extends User> supplier
+            OAuth2Identifier identifier, Supplier<@Valid ? extends User> supplier
     ) {
-        User user = userRepository.findByAuthProviderAndAuthId(provider, authId)
+        User user = userRepository.findByIdentifier(identifier)
                 .orElseGet(supplier);
 
         return userRepository.save(user);
     }
 
     @Transactional
-    public UserDto.Info createFrom(UserDto.Create dto) {
-        OAuthAttributes attrs = authAgentFactory.get(dto.getProvider())
-                .getAuthAttrFrom(dto.getAccessToken())
-                .orElseThrow(() -> new ValidationException("유효하지 않은 액세스토큰입니다."));
-
-        User newUser = of(attrs.toEntity())
-                .flatMap(user -> userRepository.findByAuthProviderAndAuthId(user.getAuthProvider(), user.getAuthId()))
-                .orElseGet(() -> userRepository.save(attrs.toEntity()));
-
-        ofNullable(dto.getProfileId())
-                .ifPresent(profileId -> newUser.setProfile(imageService.findById(profileId)));
-
-        return UserDto.Info.from(newUser);
+    public UserDto.Token newToken(UserDto.ToRequestToken dto) {
+        CustomOAuth2User authUser = oAuthAgentService.getAuthUser(dto);
+        Long userId = userRepository.findByIdentifier(authUser.getIdentifier())
+                 .orElseGet(() -> userRepository.save(
+                         User.builder().identifier(authUser.getIdentifier()).build()))
+                 .getId();
+        String newToken = jwtLoginService.tokenize(authUser);
+        return new UserDto.Token(userId, newToken);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<UserDto.Info> tokenLogin(UserDto.TokenLogin dto) {
-        return authAgentFactory.get(dto.getProvider())
-                .getAuthAttrFrom(dto.getAccessToken())
-                .flatMap(attributes -> userRepository
-                        .findByAuthProviderAndAuthId(attributes.getProvider(), attributes.getAuthId())
-                        .map(UserDto.Info::from));
+    @Transactional
+    public Long getUserIdFromIdentifier(OAuth2Identifier identifier) {
+        return userRepository.findByIdentifier(identifier)
+                .map(User::getId)
+                .orElse(null);
     }
 
     @Transactional(readOnly = true)

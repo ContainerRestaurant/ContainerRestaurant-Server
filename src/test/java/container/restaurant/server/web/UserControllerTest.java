@@ -1,33 +1,31 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.config.auth.dto.OAuthAttributes;
+import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.user.AuthProvider;
-import container.restaurant.server.domain.user.User;
+import container.restaurant.server.domain.user.OAuth2Registration;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.process.oauth.OAuthAgent;
-import container.restaurant.server.process.oauth.OAuthAgentFactory;
+import container.restaurant.server.process.oauth.OAuthAgentService;
+import container.restaurant.server.utils.jwt.JwtLoginService;
 import container.restaurant.server.web.base.BaseUserControllerTest;
 import container.restaurant.server.web.dto.user.UserDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.ResultActions;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolationException;
 
-import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -42,100 +40,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest extends BaseUserControllerTest {
 
     @MockBean
-    private OAuthAgentFactory oAuthAgentFactory;
+    OAuthAgentService oAuthAgentService;
+
+    @MockBean
+    JwtLoginService jwtLoginService;
 
     @Autowired
     HttpSession httpSession;
 
     @Test
-    @DisplayName("토큰으로 로그인")
-    void tokenLogin() throws Exception {
-        //given-1 테스트용 액세스 토큰과 요청
-        String testToken = "[ACCESS_TOKEN]";
-        UserDto.TokenLogin dto = new UserDto.TokenLogin(testToken, myself.getAuthProvider());
+    @DisplayName("인증 토큰 생성")
+    void 인증_토큰_생성() throws Exception {
+        //given
+        OAuth2Registration reg = OAuth2Registration.KAKAO;
+        String accessToken = "[TEST_ACCESS_TOKEN]";
+        UserDto.ToRequestToken dto = new UserDto.ToRequestToken(reg, accessToken);
 
-        //given-2 OAuth Provider 로 부터 제공받은 사용자 정보 모킹 - myself 정보
-        OAuthAgent agent = mock(OAuthAgent.class);
-        when(oAuthAgentFactory.get(myself.getAuthProvider())).thenReturn(agent);
-        when(agent.getAuthAttrFrom(testToken)).thenReturn(of(OAuthAttributes.builder()
-                .provider(myself.getAuthProvider())
-                .nickname("ProviderNickname")
-                .authId(myself.getAuthId())
-                .email(myself.getEmail())
-                .build()));
+        String expectedToken = "[NEW_AUTH_TOKEN]";
+        ArgumentCaptor<UserDto.ToRequestToken> captor = ArgumentCaptor.forClass(UserDto.ToRequestToken.class);
+        CustomOAuth2User authUser = mock(CustomOAuth2User.class);
 
-        //when
-        mvc.perform(post("/api/user/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(dto)))
+        when(oAuthAgentService.getAuthUser(any())).thenReturn(authUser);
+        when(authUser.getIdentifier()).thenReturn(myself.getIdentifier());
+        when(jwtLoginService.tokenize(authUser)).thenReturn(expectedToken);
+
+        //when 요청을 수행하면
+        ResultActions perform = mvc.perform(post("/api/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)));
+
+        //then 1 요청에 사용한 dto 로 oAuthAgentService.getAuthUser() 를 호출
+        verify(oAuthAgentService).getAuthUser(captor.capture());
+        assertThat(captor.getValue()).isEqualTo(dto);
+
+        //then 2 아래 명세를 따름
+        perform
                 .andExpect(status().isOk())
-                .andDo(document("login-token",
-                        responseHeaders(
-                                headerWithName("Container-Restaurant-User-Id").description("로그인 된 사용자의 식별 ID")
-                        ),
-                        requestFields(
-                                fieldWithPath("provider").description("로그인할 사용자의 OAuth 제공자 +\n(KAKAO)"),
-                                fieldWithPath("accessToken").description("로그인 인증할 액세스 토큰")
-                        )
-                ));
-
-        //then myself 로 로그인 되어있다.
-        assertThat(httpSession.getAttribute("userId")).isNotNull();
-        assertThat(((Long) httpSession.getAttribute("userId"))).isEqualTo(myself.getId());
-    }
-
-    @Test
-    @DisplayName("토큰으로 회원가입")
-    void createWithToken() throws Exception {
-        //given-1 회원 가입 요청이 주어진다.
-        AuthProvider testProvider = AuthProvider.KAKAO;
-        String testAccessToken = "[ACCESS_TOKEN]";
-        Long testProfileId = image.getId();
-
-        UserDto.Create dto = UserDto.Create.builder()
-                .accessToken(testAccessToken)
-                .provider(testProvider)
-                .profileId(testProfileId)
-                .build();
-
-        // given-2 OAuth Provider 로 부터 제공받은 사용자 정보 모킹
-        String testAuthId = "123123123";
-        String testEmail = "test@test.com";
-        OAuthAgent agent = mock(OAuthAgent.class);
-        when(oAuthAgentFactory.get(testProvider)).thenReturn(agent);
-        when(agent.getAuthAttrFrom(testAccessToken)).thenReturn(of(OAuthAttributes.builder()
-                .provider(testProvider)
-                .authId(testAuthId)
-                .email(testEmail)
-                .build()));
-
-        //when
-        mvc.perform(post("/api/user")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
-                .andDo(document("user-create",
-                        responseHeaders(
-                                headerWithName(HttpHeaders.LOCATION).description("생성된 사용자의 리소스 경로"),
-                                headerWithName("Container-Restaurant-User-Id").description("로그인 된 사용자의 식별 ID")
-                        ),
-                        requestFields(
-                                fieldWithPath("provider").description("가입 시 사용자 정보를 가져올 OAuth 제공자 +\n(KAKAO)"),
-                                fieldWithPath("accessToken").description("OAuth 제공자에서 사용할 액세스 토큰"),
-                                fieldWithPath("profileId").description("(Optional) 가입 시 사용할 프로필 사진 식별 ID"),
-                                fieldWithPath("pushToken").description("(Optional) 가입하는 사용자가 사용하고있는 푸쉬 토큰")
-                        )
-                ));
-
-        //then
-        User newUser = userRepository.findByAuthProviderAndAuthId(testProvider, testAuthId)
-                .orElseThrow();
-
-        assertThat(newUser.getId()).isNotNull();
-        assertThat(newUser.getAuthId()).isEqualTo(testAuthId);
-        assertThat(newUser.getNickname()).isNull();
-        assertThat(newUser.getProfile().getId()).isEqualTo(testProfileId);
-        assertThat(newUser.getEmail()).isEqualTo(testEmail);
+                .andExpect(jsonPath("token").value(expectedToken))
+                .andExpect(jsonPath("id").value(myself.getId()))
+                .andDo(document("user-new-token",
+                        responseFields(
+                                fieldWithPath("token").description("생성된 인증 토큰"),
+                                fieldWithPath("id").description("생성된 인증 토큰으로 식별되는 유저의 식별 ID"))));
     }
 
     @Test
@@ -221,6 +167,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 닉네임, 프로필 업데이트")
     void testUpdateUser() throws Exception {
         String nickname = "this는nikname이라능a";
@@ -258,6 +205,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 업데이트 실패 (400)")
     void testFailToUpdateUserBy400() throws Exception {
         String nickname = "this는nikname이라능!";
@@ -284,6 +232,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 업데이트 실패 (403)")
     void testFailToUpdateUserBy403() throws Exception {
         String nickname = "this는nikname이라능a";
@@ -307,6 +256,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 탈퇴")
     void testDeleteUser() throws Exception {
         mvc.perform(
@@ -319,6 +269,7 @@ class UserControllerTest extends BaseUserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     @DisplayName("사용자 탈퇴 실패 (403)")
     void testFailToDeleteUser() throws Exception {
         mvc.perform(

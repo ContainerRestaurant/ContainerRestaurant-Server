@@ -10,7 +10,8 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
-import container.restaurant.server.domain.user.AuthProvider;
+import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.OAuth2Identifier;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -65,8 +66,7 @@ class CommentLikeServiceTest {
                 .build());
 
         user = userRepository.save(User.builder()
-                .authId("authId")
-                .authProvider(AuthProvider.KAKAO)
+                .identifier(OAuth2Identifier.of("authId", OAuth2Registration.KAKAO))
                 .email("test@test.com")
                 .profile(image)
                 .nickname("testNickname")

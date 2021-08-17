@@ -110,40 +110,16 @@ operation::banners[snippets='curl-request,http-response']
 
 include::{snippets}/banner/response-fields-beneath-_embedded.bannerInfoDtoList.adoc[]
 
-[[login]]
-== 로그인
-
-[[login-web]]
-=== 웹에서의 로그인
-`GET /login`
-
-OAuth 2.0 제공자에 아래 리다이렉트 URI 를 등록하여 로그인 및 회원가입을 할 수 있습니다.
-(웹에서 로그인/회원 가입시 사용하는 API 로, 모바일 앱에서는 다른 방식을 이용합니다.)
-
-[[login-token]]
-=== 액세스 토큰으로 로그인
-
-OAuth 2.0 제공자와 응답받은 액세스 토큰 만으로도 로그인이 가능합니다.
-서버에서는 해당 정보를 이용해 OAuth 2.0 에게 인증받은 유효한 토큰인지 확인 후 로그인 됩니다.
-
-operation::login-token[snippets='curl-request,request-fields,http-response']
-
-응답 형식은 <<user-get>> 을 참조합니다. 로그인에 실패한 경우 _401 Unauthorized_ 상태를 응답합니다.
-
-로그인에 실패한 경우 <<user-create>>를 참조합니다.
-
-[[logout]]
-== 로그아웃
-`GET /logout`
-
 [[user]]
 == 사용자
 
-[[user-create]]
-=== 토큰으로 사용자 정보생성
+[[user-new-token]]
+=== 로그인 토큰 생성
 `POST /api/user`
 
-operation::user-create[snippets='curl-request,request-fields,http-response,response-headers']
+operation::user-new-token[snippets='curl-request,http-response,response-fields']
+
+사용자를 인증하기 위해서는 요청 헤더에 `Authorization` 속성을 `Bearer [생성된_인증_토큰]` 으로 설정해야합니다.
 
 [[user-get]]
 === 사용자 정보 조회
