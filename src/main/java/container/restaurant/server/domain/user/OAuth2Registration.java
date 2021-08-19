@@ -24,7 +24,7 @@ public enum OAuth2Registration {
                 EXPIRATION_TIME, getLongTime(now.plusMonths(1)),
                 ISSUED_AT, getLongTime(now),
                 REGISTRATION, "KAKAO",
-                EMAIL, kakaoAccount.get("email")
+                EMAIL, kakaoAccount.getOrDefault("email", "")
         );
     }),
     APPLE((String userNameAttributeName, Map<String, Object> attributes) -> {
