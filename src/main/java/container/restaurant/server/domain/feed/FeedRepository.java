@@ -46,4 +46,6 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @EntityGraph(attributePaths = { "owner", "thumbnail", "restaurant" })
     Page<Feed> findAllByCreatedDateBetweenOrderByCreatedDateDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
+    @EntityGraph(attributePaths = { "thumbnail", "restaurant"})
+    Feed findFirstByRestaurantIdAndThumbnailIdIsNotNullOrderByLikeCountDesc(Long restaurantId);
 }

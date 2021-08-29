@@ -111,4 +111,7 @@ public class Restaurant extends BaseEntity {
         return  welcomeCount >= 2;
     }
 
+    public void setThumbnail(Image thumbnail){
+        this.thumbnail =  thumbnail;
+    }
 }

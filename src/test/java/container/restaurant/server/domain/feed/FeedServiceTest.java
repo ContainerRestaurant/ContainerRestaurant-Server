@@ -85,6 +85,7 @@ class FeedServiceTest extends BaseServiceTest {
         when(userService.findById(user.getId())).thenReturn(user);
         when(restaurantService.findByDto(any())).thenReturn(restaurant);
         when(imageService.findById(any())).thenReturn(thumbnail);
+        when(feedRepository.findFirstByRestaurantIdAndThumbnailIdIsNotNullOrderByLikeCountDesc(any())).thenReturn(feed);
 
         FeedMenuDto mainMenuDto = FeedMenuDto.builder()
                 .menuName("mainMenu")

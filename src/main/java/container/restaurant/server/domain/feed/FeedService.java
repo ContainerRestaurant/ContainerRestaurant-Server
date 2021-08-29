@@ -141,9 +141,8 @@ public class FeedService {
         User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantService.findByDto(dto.getRestaurantCreateDto());
         Image thumbnail = imageService.findById(dto.getThumbnailImageId());
-
         Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant, thumbnail));
-
+        restaurant.setThumbnail(findRestaurantRepFeedThumbnail(restaurant));
         statisticsService.addRecentUser(user);
 
         feed.getOwner().feedCountUp();
@@ -213,5 +212,11 @@ public class FeedService {
                 .isLike(feedLikeRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
                 .isScraped(scrapFeedRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Image findRestaurantRepFeedThumbnail(Restaurant restaurant) {
+        Feed repFeed = feedRepository.findFirstByRestaurantIdAndThumbnailIdIsNotNullOrderByLikeCountDesc(restaurant.getId());
+        return repFeed.getThumbnail();
     }
 }
