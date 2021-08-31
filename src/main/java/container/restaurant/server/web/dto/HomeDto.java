@@ -1,6 +1,5 @@
 package container.restaurant.server.web.dto;
 
-import container.restaurant.server.domain.user.ContainerLevel;
 import container.restaurant.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Getter
-public class IndexDto extends RepresentationModel<IndexDto> {
+public class HomeDto extends RepresentationModel<HomeDto> {
 
     private final Long loginId;
     private final Integer myContainer;
@@ -23,7 +22,7 @@ public class IndexDto extends RepresentationModel<IndexDto> {
     private final String phrase;
 
     @Builder
-    protected IndexDto(User user, Long totalContainer, String phrase) {
+    protected HomeDto(User user, Long totalContainer, String phrase) {
         this(
                 from(user, User::getId, null),
                 from(user, User::getFeedCount, 0),
