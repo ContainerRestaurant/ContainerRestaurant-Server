@@ -1,6 +1,7 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginId;
+import container.restaurant.server.domain.home.banner.BannerRepository;
 import container.restaurant.server.domain.home.phrase.PhraseService;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
@@ -33,6 +34,8 @@ public class HomeController {
     private final StatisticsService statisticsService;
     private final PhraseService phraseService;
 
+    private final BannerRepository bannerRepository;
+
     @GetMapping
     public ResponseEntity<?> home(@LoginId Long loginId) {
         User loginUser = loginId != null ? userService.findById(loginId) : null;
@@ -42,6 +45,8 @@ public class HomeController {
                         .user(loginUser)
                         .totalContainer(statisticsService.getTotalFeed())
                         .phrase(phraseService.getPhrase())
+                        .latestWriters(statisticsService.getRecentFeedUsers())
+                        .banners(bannerRepository.findAllHomeBanner())
                         .build()));
     }
 
