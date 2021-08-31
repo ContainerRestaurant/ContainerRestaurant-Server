@@ -1,5 +1,7 @@
 package container.restaurant.server.domain.user;
 
+import container.restaurant.server.web.dto.statistics.UserProfileDto;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -29,4 +31,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByFeedCountTopUsers(LocalDateTime to, LocalDateTime from);
 
     User findByPushTokenId(Long pushTokenId);
+
+    @Query("select distinct new container.restaurant.server.web.dto.statistics.UserProfileDto" +
+                "(u.id, u.containerLevel, u.nickname, u.profile, max(f.createdDate)) " +
+            "from TB_FEED f inner join f.owner u left outer join u.profile " +
+            "group by u.id " +
+            "order by max(f.createdDate) desc ")
+    List<UserProfileDto> findLatestUsers(Pageable limit);
 }

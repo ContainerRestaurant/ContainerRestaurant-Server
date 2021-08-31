@@ -2,15 +2,19 @@ package container.restaurant.server.domain.statistics;
 
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.web.dto.statistics.StatisticsDto;
 import container.restaurant.server.web.dto.statistics.StatisticsInfoDto;
 import container.restaurant.server.web.dto.statistics.StatisticsUserDto;
+import container.restaurant.server.web.dto.statistics.UserProfileDto;
 import container.restaurant.server.web.linker.FeedLinker;
 import container.restaurant.server.web.linker.UserLinker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,12 +42,39 @@ public class StatisticsService implements ApplicationRunner {
     private final FeedLinker feedLinker;
     private List<StatisticsUserDto> statisticsUserDtoList;
 
+    private List<UserProfileDto> latestWriters = new ArrayList<>();
+    private List<UserProfileDto> topWriters = new ArrayList<>();
+
     private Long totalFeed;
+
+    private final UserRepository userRepository;
 
     @Override
     public void run(ApplicationArguments args) {
+        updateWritersStatistic();
+
         initToDayFeedWriter();
         refreshTotalFeed();
+    }
+
+    public void updateWritersStatistic() {
+        updateLatestWriters();
+        updateTopWriters();
+    }
+
+    public void updateLatestWriters() {
+        latestWriters = new LinkedList<>(userRepository.findLatestUsers(PageRequest.of(0, 100)));
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateTopWriters() {
+        LocalDateTime from = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        LocalDateTime to = LocalDateTime.of(from.minusMonths(1).toLocalDate(), LocalTime.MIN);
+
+        // 현재 최다 피드 사용자는 탑 10 명으로 순서는 따로 매기지 않는다.
+        topWriters = userService.findByFeedCountTopUsers(to, from).stream()
+                        .map(UserProfileDto::from)
+                        .collect(Collectors.toList());
     }
 
     public void initToDayFeedWriter() {
@@ -120,6 +151,15 @@ public class StatisticsService implements ApplicationRunner {
 
     public Long getTotalFeed() {
         return this.totalFeed;
+    }
+
+    public StatisticsDto.TotalContainer totalContainer() {
+        return StatisticsDto.TotalContainer.builder()
+                .feedCount(getTotalFeed())
+                .writerCount(0L)
+                .latestWriters(latestWriters)
+                .topWriters(topWriters)
+                .build();
     }
 
 }

@@ -25,6 +25,11 @@ public class StatisticsController {
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
 
+    @GetMapping("/total-container")
+    public ResponseEntity<?> getFeedStatistics() {
+        return ResponseEntity.ok(statisticsService.totalContainer());
+    }
+
     @GetMapping("/latest")
     public ResponseEntity<?> getRecentFeedUsers() {
         return ResponseEntity.ok(EntityModel.of(statisticsService.getRecentFeedUsers())
