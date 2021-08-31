@@ -45,7 +45,7 @@ public class HomeController {
                         .user(loginUser)
                         .totalContainer(statisticsService.getTotalFeed())
                         .phrase(phraseService.getPhrase())
-                        .latestWriters(statisticsService.getRecentFeedUsers())
+                        .latestWriters(statisticsService.getLatestWriters())
                         .banners(bannerRepository.findAllHomeBanner())
                         .build()));
     }
@@ -58,10 +58,9 @@ public class HomeController {
                         feedLinker.selectFeed().withRel("feed-list"),
                         feedLinker.selectRecommend().withRel("feed-recommend"),
                         feedLinker.createFeed().withRel("feed-create"),
-                        statisticsLinker.getFeedCountTopUsers().withRel("top-users"),
-                        statisticsLinker.getRecentFeedUsers().withRel("recent-users"),
                         bannerLinker.getBanners().withRel("banner-list"),
-                        restaurantLinker.findNearByRestaurants().withRel("restaurant-near")
+                        restaurantLinker.findNearByRestaurants().withRel("restaurant-near"),
+                        statisticsLinker.getFeedStatistics().withRel("total-container")
                 ))
                 .addAllIf(loginId == null, () -> List.of(
                         Link.of("/login").withRel("login")

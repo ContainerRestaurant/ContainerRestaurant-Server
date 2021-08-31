@@ -66,11 +66,10 @@ class HomeControllerTest extends BaseUserControllerTest {
                                 linkWithRel("feed-list").description("전체 피드 리스트 링크 (페이징)"),
                                 linkWithRel("feed-recommend").description("추천 피드 리스트 링크"),
                                 linkWithRel("feed-create").description("피드를 생성하기 위한 링크"),
-                                linkWithRel("top-users").description("누적 피드가 최근 30일간 제일 많은 10명에 대한 리스트 링크"),
-                                linkWithRel("recent-users").description("최근에 피드를 작성한 사용자 리스트 링크"),
                                 linkWithRel("restaurant-near").description("주위 식당을 조회하기 위한 링크"),
                                 linkWithRel("banner-list").description("배너 리스트 링크"),
                                 linkWithRel("my-info").description("사용자 상세 정보 링크"),
+                                linkWithRel("total-container").description("모든 용기 통계 - 용기낸 경험 관련 통계 조회 링크"),
                                 linkWithRel("logout").description("현재 로그인을 로그아웃 하기 위한 링크")
                         ),
                         responseFields(

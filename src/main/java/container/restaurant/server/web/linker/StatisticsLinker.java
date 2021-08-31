@@ -12,9 +12,8 @@ public class StatisticsLinker {
     StatisticsController proxy =
             DummyInvocationUtils.methodOn(StatisticsController.class);
 
-    public LinkBuilder getRecentFeedUsers() {
-        return linkTo(proxy.getRecentFeedUsers());
+    public LinkBuilder getFeedStatistics() {
+        return linkTo(proxy.getFeedStatistics());
     }
 
-    public LinkBuilder getFeedCountTopUsers() {return linkTo(proxy.getFeedCountTopUsers());}
 }

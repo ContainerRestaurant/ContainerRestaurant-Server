@@ -19,25 +19,9 @@ class StatisticsControllerTest extends BaseUserAndFeedControllerTest {
     StatisticsService statisticsService;
 
     @Test
-    void getRecentFeedUsers() throws Exception {
-        statisticsService.addRecentUser(myself);
-        statisticsService.addRecentUser(other);
-
-        mvc.perform(get("/api/statistics/latest"))
-                .andExpect(status().isOk())
-                .andDo(document("statistics-latest",
-                        responseFields(
-                                subsectionWithPath("statisticsUserDto").description("최근에 피드를 작성한 유저 목록"),
-                                fieldWithPath("todayFeedCount").description("금일 작성된 피드 개수"),
-                                subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 목록")
-                        )
-                ));
-    }
-
-    @Test
     void getFeedStatistics() throws Exception {
         //given
-        statisticsService.run(null);
+        statisticsService.updateWritersStatistic();
         String path = "/api/statistics/total-container";
 
         //when
@@ -53,15 +37,6 @@ class StatisticsControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("writerCount").description("현재까지 피드를 작성한 작성자 인원"),
                                 fieldWithPath("feedCount").description("현자까지 작성된 전체 피드 개수")
                         )));
-    }
-
-    @Test
-    void getTopFeedUsers() throws Exception {
-        statisticsService.updateFeedCountTopUsers();
-
-        mvc.perform(get("/api/statistics/top"))
-                .andExpect(status().isOk())
-                .andDo(document("statistics-top"));
     }
 
 }
