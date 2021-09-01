@@ -21,7 +21,7 @@ class StatisticsControllerTest extends BaseUserAndFeedControllerTest {
     @Test
     void getFeedStatistics() throws Exception {
         //given
-        statisticsService.updateWritersStatistic();
+        statisticsService.init();
         String path = "/api/statistics/total-container";
 
         //when

@@ -35,4 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "group by u.id " +
             "order by max(f.createdDate) desc ")
     List<UserProfileDto> findLatestUsers(Pageable limit);
+
+    @Query("select count(u.id) from TB_USERS u where u.feedCount > 0")
+    long writerCount();
 }

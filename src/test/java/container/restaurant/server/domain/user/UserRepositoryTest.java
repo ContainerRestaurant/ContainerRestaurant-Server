@@ -14,7 +14,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static container.restaurant.server.domain.feed.Category.KOREAN;
@@ -165,9 +164,32 @@ class UserRepositoryTest {
     }
 
     private void persistFeedWith(User user, Restaurant restaurant) {
+        try { // 피드 생성시간 차를 두기 위해 잠시 대기
+            Thread.sleep(0, 1);
+        } catch (InterruptedException ignored) {}
         em.persist(Feed.builder().owner(user).restaurant(restaurant).category(KOREAN).difficulty(3)
                 .menus(List.of(Container.of(Menu.mainOf(restaurant, "menu1"), "description1")))
                 .build());
+    }
+
+    @Test
+    @DisplayName("피드 작성자 인원 조회")
+    void 피드_작성자_인원_조회() {
+        //given 피드 카운트업된 유저 둘과 피드 카운트 0인 유저가 주어졌을 때
+        User user1 = em.persist(User.builder().identifier(of("TEST1", KAKAO)).build());
+        User user2 = em.persist(User.builder().identifier(of("TEST2", KAKAO)).build());
+        em.persist(User.builder().identifier(of("TEST3", KAKAO)).build());
+
+        user1.feedCountUp();
+        user2.feedCountUp();
+
+        em.flush();em.clear();
+
+        //when 피드 작성자 인원을 조회하면
+        long result = userRepository.writerCount();
+
+        //then 피드 카운트가 있는 2 의 크기가 반환됨
+        assertThat(result).isEqualTo(2);
     }
 
 }

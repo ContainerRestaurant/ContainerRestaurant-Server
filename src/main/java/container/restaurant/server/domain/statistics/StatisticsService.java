@@ -37,25 +37,30 @@ public class StatisticsService implements ApplicationRunner {
     private List<UserProfileDto> topWriters = new ArrayList<>();
 
     private long feedCountUntilUpdate;
-
+    private long feedWriterCountUntilUpdate;
 
     @Override
     public void run(ApplicationArguments args) {
-        updateWritersStatistic();
+        init();
     }
 
-    public void updateWritersStatistic() {
+    public void init() {
         updateLatestWriters();
         updateTopWriters();
-        refreshTotalFeed();
-    }
-
-    public void updateLatestWriters() {
-        latestWriters = new LinkedList<>(userRepository.findLatestUsers(PageRequest.of(0, 100)));
+        updateCounts();
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void updateTopWriters() {
+    public void dailyUpdate() {
+        updateTopWriters();
+        updateCounts();
+    }
+
+    private void updateLatestWriters() {
+        latestWriters = new LinkedList<>(userRepository.findLatestUsers(PageRequest.of(0, 100)));
+    }
+
+    private void updateTopWriters() {
         LocalDateTime from = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         LocalDateTime to = LocalDateTime.of(from.minusMonths(1).toLocalDate(), LocalTime.MIN);
 
@@ -65,8 +70,9 @@ public class StatisticsService implements ApplicationRunner {
                         .collect(Collectors.toList());
     }
 
-    private void refreshTotalFeed() {
+    private void updateCounts() {
         this.feedCountUntilUpdate = feedRepository.count();
+        this.feedWriterCountUntilUpdate = userRepository.writerCount();
         this.todayFeedCount = 0;
     }
 
@@ -96,7 +102,7 @@ public class StatisticsService implements ApplicationRunner {
     public StatisticsDto.TotalContainer totalContainer() {
         return StatisticsDto.TotalContainer.builder()
                 .feedCount(feedCountUntilUpdate)
-                .writerCount(0L)
+                .writerCount(feedWriterCountUntilUpdate)
                 .latestWriters(latestWriters)
                 .topWriters(topWriters)
                 .build();
