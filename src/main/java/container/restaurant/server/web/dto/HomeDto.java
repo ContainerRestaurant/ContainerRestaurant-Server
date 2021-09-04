@@ -36,7 +36,7 @@ public class HomeDto extends RepresentationModel<HomeDto> {
                 from(user, User::getFeedCount, 0),
                 totalContainer,
                 from(user, User::getLevelTitle, LEVEL_1.getTitle()),
-                from(user, user1 -> user1.getProfile().getUrl(), null),
+                from(user, User::getProfileUrl, null),
                 phrase);
 
         latestWriters.stream().limit(3).forEach(u ->
