@@ -8,11 +8,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HomeBannerDto {
 
-    private final Long bannerId;
     private final String bannerUrl;
+    private final String contentUrl;
+    private final String additionalUrl;
 
     public static HomeBannerDto of(Banner banner) {
-        return new HomeBannerDto(banner.getId(), banner.getBannerURL());
+        return new HomeBannerDto(banner.getBannerURL(), banner.getContentURL(), banner.getAdditionalURL());
     }
 
 }
