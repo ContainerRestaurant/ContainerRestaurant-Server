@@ -3,7 +3,7 @@ package container.restaurant.server.web.base;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
-import container.restaurant.server.domain.feed.container.Container;
+import container.restaurant.server.domain.feed.Container;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantRepository;
 import container.restaurant.server.domain.restaurant.menu.Menu;

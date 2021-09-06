@@ -89,25 +89,21 @@ include::{snippets}/error-example/http-response.adoc[]
 = 리소스
 
 [[index]]
-== 인덱스
-`GET /`
+== 홈
 
-인덱스는 서비스 진입점을 제공한다. 홈 화면 관련 컨텐츠들이 해당 리소스에 포함되어 있다.
+=== 홈 화면 조회
 
-=== 인증된 사용자의 인덱스 조회
+`GET /api/home`
 
-operation::index-user[snippets='curl-request,http-response,response-fields,links']
+operation::home[snippets='curl-request,http-response,response-fields,links']
 
-=== 게스트의 인덱스 조회
+== 배너
 
-operation::index-guest[snippets='curl-request,http-response,links']
+=== 배너 조회
 
-=== 홈 화면 배너
+`GET /api/banners`
 
 operation::banners[snippets='curl-request,http-response']
-
-==== 배너 응답
-
 include::{snippets}/banner/response-fields-beneath-_embedded.bannerInfoDtoList.adoc[]
 
 [[user]]
@@ -380,21 +376,11 @@ operation::comment-report[snippets='curl-request,http-response']
 [[statistics]]
 == 통계
 
-[[statistics-latest]]
-=== 최근 피드 작성자
-`GET /api/statistics/latest`
+[[statistics-total-container]]
+=== 모두의 용기
+`GET /api/statistics/total-container`
 
-operation::statistics-latest[snippets='curl-request,http-response']
-
-응답 필드 상세는 <<user-get>> 응답의 일부를 사용한다.
-
-[[statistics-top]]
-=== 최다 피드 작성자
-`GET /api/statistics/top`
-
-operation::statistics-top[snippets='curl-request,http-response']
-
-응답 필드 상세는 <<user-get>> 응답의 일부를 사용한다.
+operation::statistics-total-container[snippets='curl-request,http-response,response-fields']
 
 [[push-token]]
 == 푸시 토큰

@@ -1,6 +1,6 @@
 package container.restaurant.server.web;
 
-import container.restaurant.server.domain.statistics.StatisticsService;
+import container.restaurant.server.domain.home.banner.BannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/statistics")
-public class StatisticsController {
+@RequestMapping("api/banners")
+public class BannerController {
 
-    private final StatisticsService statisticsService;
+    private final BannerService bannerService;
 
-    @GetMapping("/total-container")
-    public ResponseEntity<?> getFeedStatistics() {
-        return ResponseEntity.ok(statisticsService.totalContainer());
+    @GetMapping
+    public ResponseEntity<?> getBanners(){
+        return ResponseEntity.ok(
+                bannerService.getBanners()
+        );
     }
 
 }

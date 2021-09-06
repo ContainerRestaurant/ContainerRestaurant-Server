@@ -93,11 +93,6 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findByToDayFeedWriters(LocalDateTime to, LocalDateTime from) {
-        return userRepository.findByToDayFeedWriter(to, from);
-    }
-
-    @Transactional(readOnly = true)
     public List<User> findByFeedCountTopUsers(LocalDateTime to, LocalDateTime from) {
         return userRepository.findByFeedCountTopUsers(to, from);
     }

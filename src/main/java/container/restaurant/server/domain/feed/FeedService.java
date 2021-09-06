@@ -1,6 +1,5 @@
 package container.restaurant.server.domain.feed;
 
-import container.restaurant.server.domain.feed.container.Container;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;

@@ -1,7 +1,6 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseTimeEntity;
-import container.restaurant.server.domain.feed.container.Container;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
@@ -87,8 +86,9 @@ public class Feed extends BaseTimeEntity {
         this.isBlind = false;
         this.isDeleted = false;
 
-        if (menus != null) {
-            this.containerList.addAll(menus);
+        if (menus != null) for (Container menu : menus) {
+            menu.setFeed(this);
+            containerList.add(menu);
         }
     }
 

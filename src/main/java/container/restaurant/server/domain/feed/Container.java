@@ -1,7 +1,6 @@
-package container.restaurant.server.domain.feed.container;
+package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.domain.base.BaseEntity;
-import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,9 +33,17 @@ public class Container extends BaseEntity {
         return new Container(feed, menu, description);
     }
 
+    public static Container of(Menu menu, String description) {
+        return new Container(null, menu, description);
+    }
+
     public Container setMenu(Menu menu) {
         this.menu = menu;
         return this;
+    }
+
+    void setFeed(Feed feed) {
+        this.feed = feed;
     }
 
     public void setDescription(String description) {
