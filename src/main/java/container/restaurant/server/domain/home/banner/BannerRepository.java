@@ -9,7 +9,7 @@ import java.util.List;
 public interface BannerRepository extends JpaRepository<Banner, Long> {
 
     @Query("select new container.restaurant.server.web.dto." +
-              "HomeBannerDto(b.bannerURL, b.contentURL, b.additionalURL) " +
+              "HomeBannerDto(b.bannerUrl, b.contentUrl, b.additionalUrl) " +
             "from TB_BANNER b")
     List<HomeBannerDto> findAllHomeBanner();
 

@@ -16,10 +16,10 @@ public class BannerInfoDto {
 
     protected BannerInfoDto(Banner banner, String baseURL) {
         this.title = banner.getTitle();
-        this.bannerURL = baseURL + banner.getBannerURL();
-        this.contentURL = banner.getContentURL() != null ?
-                baseURL + banner.getContentURL() : null;
-        this.additionalURL = banner.getAdditionalURL() != null ?
-                baseURL + banner.getAdditionalURL() : null;
+        this.bannerURL = baseURL + banner.getBannerUrl();
+        this.contentURL = banner.getContentUrl() != null ?
+                baseURL + banner.getContentUrl() : null;
+        this.additionalURL = banner.getAdditionalUrl() != null ?
+                baseURL + banner.getAdditionalUrl() : null;
     }
 }

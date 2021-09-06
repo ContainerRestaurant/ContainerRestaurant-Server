@@ -29,9 +29,9 @@ class BannerControllerTest extends BaseMvcControllerTest {
     public void getBanners() throws Exception {
         for (int i = 0; i < 4; i++) {
             bannerRepository.save(Banner.builder()
-                    .bannerURL("bannerURL" + i)
-                    .additionalURL("additionalURL" + i)
-                    .contentURL("contentURL" + i)
+                    .bannerUrl("bannerURL" + i)
+                    .additionalUrl("additionalURL" + i)
+                    .contentUrl("contentURL" + i)
                     .title("title" + i)
                     .build());
         }
