@@ -56,6 +56,6 @@ public class ImageService {
     }
 
     public static String getUrlFromPath(String path) {
-        return imageLinker.getImage(path).toString();
+        return path == null ? null : imageLinker.getImage(path).toString();
     }
 }
