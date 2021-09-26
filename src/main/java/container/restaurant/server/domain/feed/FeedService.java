@@ -207,10 +207,9 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public FeedPreviewDto createFeedPreviewDto(Feed feed, Long loginId) {
-        return FeedPreviewDto.builder()
-                .feed(feed)
-                .isLike(feedLikeRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
-                .isScraped(scrapFeedRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
-                .build();
+        return FeedPreviewDto.from(
+                feed,
+                feedLikeRepository.existsByUserIdAndFeedId(loginId, feed.getId()),
+                scrapFeedRepository.existsByUserIdAndFeedId(loginId, feed.getId()));
     }
 }

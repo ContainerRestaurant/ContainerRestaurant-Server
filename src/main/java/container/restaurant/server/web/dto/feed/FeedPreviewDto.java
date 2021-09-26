@@ -2,7 +2,6 @@ package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.ImageService;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.NonNull;
@@ -27,19 +26,22 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
 
     @NonNull
     public static FeedPreviewDto from(Feed feed, Boolean isLike, Boolean isScraped) {
-        return new FeedPreviewDto(feed, isLike, isScraped);
+        return new FeedPreviewDto(
+                feed.getId(), ImageService.getUrlFromImage(feed.getThumbnail()),
+                feed.getOwner().getNickname(), feed.getContent(), feed.getLikeCount(),
+                feed.getReplyCount(), feed.getRestaurant().isContainerFriendly(), isLike, isScraped);
     }
 
-    @Builder
-    protected FeedPreviewDto(Feed feed, Boolean isLike, Boolean isScraped) {
-        this.id = feed.getId();
-
-        this.thumbnailUrl = ImageService.getUrlFromImage(feed.getThumbnail());
-        this.ownerNickname = feed.getOwner().getNickname();
-        this.content = feed.getContent();
-        this.likeCount = feed.getLikeCount();
-        this.replyCount = feed.getReplyCount();
-        this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
+    private FeedPreviewDto(Long id, String thumbnailUrl, String ownerNickname, String content, Integer likeCount,
+                          Integer replyCount, Boolean isContainerFriendly, Boolean isLike, Boolean isScraped
+    ) {
+        this.id = id;
+        this.thumbnailUrl = thumbnailUrl;
+        this.ownerNickname = ownerNickname;
+        this.content = content;
+        this.likeCount = likeCount;
+        this.replyCount = replyCount;
+        this.isContainerFriendly = isContainerFriendly;
         this.isLike = isLike;
         this.isScraped = isScraped;
     }
