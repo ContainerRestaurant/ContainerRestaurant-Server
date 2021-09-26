@@ -204,25 +204,20 @@ public class FeedService {
     private class FeedPreviewDtoAssembler implements RepresentationModelAssembler<Feed, FeedPreviewDto> {
 
         final Set<Long> likeIdSet;
-        final Set<Long> scrapIdSet;
 
         public FeedPreviewDtoAssembler(Long loginId, Supplier<Stream<Feed>> feedSupplier) {
             List<Long> feedIdList = feedSupplier.get()
                     .map(Feed::getId)
                     .collect(Collectors.toList());
+
             likeIdSet = loginId == null ? Set.of() :
                     feedLikeRepository.checkFeedLikeOnIdList(loginId, feedIdList);
-            scrapIdSet = loginId == null ? Set.of() :
-                    scrapFeedRepository.checkScrapFeedOnIdList(loginId, feedIdList);
         }
 
         @NotNull
         @Override
         public FeedPreviewDto toModel(@NotNull Feed entity) {
-            return FeedPreviewDto.from(
-                    entity,
-                    likeIdSet.contains(entity.getId()),
-                    scrapIdSet.contains(entity.getId()));
+            return FeedPreviewDto.from(entity, likeIdSet.contains(entity.getId()));
         }
     }
 }

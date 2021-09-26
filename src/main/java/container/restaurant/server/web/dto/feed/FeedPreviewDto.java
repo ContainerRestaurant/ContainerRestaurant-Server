@@ -20,28 +20,25 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
     private final String content;
     private final Integer likeCount;
     private final Integer replyCount;
-    private final Boolean isContainerFriendly;
-
     private final Boolean isLike;
-    private final Boolean isScraped;
 
     @NonNull
-    public static FeedPreviewDto from(Feed feed, Boolean isLike, Boolean isScraped) {
+    public static FeedPreviewDto from(Feed feed, Boolean isLike) {
         return new FeedPreviewDto(
                 feed.getId(), ImageService.getUrlFromImage(feed.getThumbnail()),
                 feed.getOwner().getNickname(), feed.getContent(), feed.getLikeCount(),
-                feed.getReplyCount(), feed.getRestaurant().isContainerFriendly(), isLike, isScraped);
+                feed.getReplyCount(), isLike);
     }
 
     @NonNull
-    public static FeedPreviewDto from(RecommendFeed recommendFeed, Boolean isLike, Boolean isScraped) {
+    public static FeedPreviewDto from(RecommendFeed recommendFeed, Boolean isLike) {
         return new FeedPreviewDto(recommendFeed.getId(), recommendFeed.getThumbnailUrl(),
                 recommendFeed.getOwnerNickname(), recommendFeed.getContent(), recommendFeed.getLikeCount(),
-                recommendFeed.getReplyCount(), recommendFeed.getIsContainerFriendly(), isLike, isScraped);
+                recommendFeed.getReplyCount(), isLike);
     }
 
     private FeedPreviewDto(Long id, String thumbnailUrl, String ownerNickname, String content, Integer likeCount,
-                          Integer replyCount, Boolean isContainerFriendly, Boolean isLike, Boolean isScraped
+                           Integer replyCount, Boolean isLike
     ) {
         this.id = id;
         this.thumbnailUrl = thumbnailUrl;
@@ -49,9 +46,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
         this.content = content;
         this.likeCount = likeCount;
         this.replyCount = replyCount;
-        this.isContainerFriendly = isContainerFriendly;
         this.isLike = isLike;
-        this.isScraped = isScraped;
     }
 
 }

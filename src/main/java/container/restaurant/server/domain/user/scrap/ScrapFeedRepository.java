@@ -19,7 +19,4 @@ public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
 
     Boolean existsByUserIdAndFeedId(Long userId, Long feedId);
 
-    @Query("select sf.feed.id from TB_SCRAP_FEED sf where sf.user.id=:userId and sf.feed.id in :idList")
-    Set<Long> checkScrapFeedOnIdList(Long userId, List<Long> idList);
-
 }

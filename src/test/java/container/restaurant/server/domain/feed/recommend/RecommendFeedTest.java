@@ -36,7 +36,6 @@ public class RecommendFeedTest {
         assertThat(result.getContent()).isEqualTo(feed.getContent());
         assertThat(result.getLikeCount()).isEqualTo(feed.getLikeCount());
         assertThat(result.getReplyCount()).isEqualTo(feed.getReplyCount());
-        assertThat(result.getIsContainerFriendly()).isEqualTo(feed.getRestaurant().isContainerFriendly());
     }
 
     @Test
@@ -62,7 +61,6 @@ public class RecommendFeedTest {
         assertThat(recommendFeed.getContent()).isEqualTo(to.getContent());
         assertThat(recommendFeed.getLikeCount()).isEqualTo(to.getLikeCount());
         assertThat(recommendFeed.getReplyCount()).isEqualTo(to.getReplyCount());
-        assertThat(recommendFeed.getIsContainerFriendly()).isEqualTo(to.getRestaurant().isContainerFriendly());
     }
 
     @Test
@@ -88,7 +86,6 @@ public class RecommendFeedTest {
         assertThat(recommendFeed.getContent()).isEqualTo(origin.getContent());
         assertThat(recommendFeed.getLikeCount()).isEqualTo(origin.getLikeCount());
         assertThat(recommendFeed.getReplyCount()).isEqualTo(origin.getReplyCount());
-        assertThat(recommendFeed.getIsContainerFriendly()).isEqualTo(origin.getRestaurant().isContainerFriendly());
     }
 
     @Test
@@ -113,7 +110,6 @@ public class RecommendFeedTest {
         assertThat(recommendFeed.getContent()).isEqualTo(origin.getContent());
         assertThat(recommendFeed.getLikeCount()).isEqualTo(origin.getLikeCount());
         assertThat(recommendFeed.getReplyCount()).isEqualTo(origin.getReplyCount());
-        assertThat(recommendFeed.getIsContainerFriendly()).isEqualTo(origin.getRestaurant().isContainerFriendly());
     }
 
     @NotNull

@@ -3,7 +3,6 @@ package container.restaurant.server.domain.feed.recommend;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
-import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,6 @@ public class RecommendFeedService {
 
     private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
-    private final ScrapFeedRepository scrapFeedRepository;
 
     private List<RecommendFeed> recommendFeeds = List.of();
 
@@ -35,20 +33,18 @@ public class RecommendFeedService {
 
     @Autowired
     public RecommendFeedService(
-            FeedRepository feedRepository, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository
+            FeedRepository feedRepository, FeedLikeRepository feedLikeRepository
     ) {
         this.feedRepository = feedRepository;
         this.feedLikeRepository = feedLikeRepository;
-        this.scrapFeedRepository = scrapFeedRepository;
     }
 
     RecommendFeedService(
-            FeedRepository feedRepository, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository,
+            FeedRepository feedRepository, FeedLikeRepository feedLikeRepository,
             List<RecommendFeed> initCollection
     ) {
         this.feedRepository = feedRepository;
         this.feedLikeRepository = feedLikeRepository;
-        this.scrapFeedRepository = scrapFeedRepository;
         this.recommendFeeds = initCollection;
     }
 
@@ -59,14 +55,11 @@ public class RecommendFeedService {
 
         Set<Long> likeIdSet = loginId == null ? Set.of() :
                 feedLikeRepository.checkFeedLikeOnIdList(loginId, recommendFeedIds);
-        Set<Long> scrapIdSet = loginId == null ? Set.of() :
-                scrapFeedRepository.checkScrapFeedOnIdList(loginId, recommendFeedIds);
 
         return recommendFeeds.stream()
                 .map(recommendFeed -> FeedPreviewDto.from(
                         recommendFeed,
-                        likeIdSet.contains(recommendFeed.getId()),
-                        scrapIdSet.contains(recommendFeed.getId())))
+                        likeIdSet.contains(recommendFeed.getId())))
                 .collect(Collectors.toList());
     }
 

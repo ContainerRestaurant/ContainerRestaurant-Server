@@ -7,7 +7,6 @@ import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -42,8 +41,6 @@ class RecommendFeedServiceTest extends BaseMockTest {
     FeedRepository feedRepository;
     @Mock
     FeedLikeRepository feedLikeRepository;
-    @Mock
-    ScrapFeedRepository scrapFeedRepository;
 
     @InjectMocks
     RecommendFeedService service;
@@ -60,7 +57,7 @@ class RecommendFeedServiceTest extends BaseMockTest {
                 newRecommendFeed(3L), newRecommendFeed(4L));
 
         RecommendFeedService listInjectedService = new RecommendFeedService(
-                feedRepository, feedLikeRepository, scrapFeedRepository, recommendFeeds);
+                feedRepository, feedLikeRepository, recommendFeeds);
 
         //when 주어진 피드로 checkAndUpdate() 를 콜하면
         listInjectedService.checkAndUpdate(feed);
@@ -86,7 +83,7 @@ class RecommendFeedServiceTest extends BaseMockTest {
                 newRecommendFeed(3L), newRecommendFeed(4L));
 
         RecommendFeedService listInjectedService = new RecommendFeedService(
-                feedRepository, feedLikeRepository, scrapFeedRepository, recommendFeeds);
+                feedRepository, feedLikeRepository, recommendFeeds);
 
         //when 주어진 피드로 checkAndUpdate() 를 콜하면
         listInjectedService.checkAndUpdate(feed);
@@ -105,7 +102,7 @@ class RecommendFeedServiceTest extends BaseMockTest {
                 newRecommendFeed(3L), newRecommendFeed(4L));
 
         RecommendFeedService listInjectedService = new RecommendFeedService(
-                feedRepository, feedLikeRepository, scrapFeedRepository, recommendFeeds);
+                feedRepository, feedLikeRepository, recommendFeeds);
 
         //when null 피드로 checkAndUpdate() 를 콜하면
         listInjectedService.checkAndUpdate(null);
@@ -132,7 +129,6 @@ class RecommendFeedServiceTest extends BaseMockTest {
                 }));
 
         when(feedLikeRepository.checkFeedLikeOnIdList(any(), any())).thenReturn(Set.of());
-        when(scrapFeedRepository.checkScrapFeedOnIdList(any(), any())).thenReturn(Set.of());
 
         //when 추천 업데이트 작업을 실행하고 결과 리스트를 ID 로 리스트로 변환
         service.updateRecommendFeed();

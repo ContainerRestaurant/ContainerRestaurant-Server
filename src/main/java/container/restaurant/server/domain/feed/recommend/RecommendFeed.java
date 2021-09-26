@@ -19,7 +19,6 @@ public class RecommendFeed {
     private String content;
     private Integer likeCount;
     private Integer replyCount;
-    private Boolean isContainerFriendly;
 
     public RecommendFeed(Feed feed) {
         setValues(feed);
@@ -39,6 +38,5 @@ public class RecommendFeed {
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();
         this.replyCount = feed.getReplyCount();
-        this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
     }
 }
