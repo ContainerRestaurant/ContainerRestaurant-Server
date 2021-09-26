@@ -47,4 +47,31 @@ class ScrapFeedRepositoryTest extends BaseDataJpaTest {
         assertThat(scrap.getFeed().getId()).isEqualTo(feed.getId());
     }
 
+    @Test
+    @DisplayName("주어진 피드 ID 중에 스크랩한 ID 필터링")
+    void checkScrapFeedOnIdList() {
+        //given 4 개의 피드가 주어졌을 때, 1, 3 번째 피드만 스크랩했을 때
+        User user = newUser();
+        Restaurant restaurant = newRestaurant();
+
+        Feed feed1 = newFeed(user, restaurant);
+        Feed feed2 = newFeed(user, restaurant);
+        Feed feed3 = newFeed(user, restaurant);
+        Feed feed4 = newFeed(user, restaurant);
+
+        em.persist(ScrapFeed.of(user, feed1));
+        em.persist(ScrapFeed.of(user, feed3));
+
+        //when 주어진 피드 ID 리스트를 이용해 주어진 유저가 checkScrapFeedOnIdList() 콜하면
+        List<Long> feedIdList = List.of(
+                feed1.getId(), feed2.getId(), feed3.getId(), feed4.getId());
+        Set<Long> result = scrapFeedRepository.checkScrapFeedOnIdList(user.getId(), feedIdList);
+
+        //then 1, 3 번째 피드 ID 두 개 만을 포함하고 있음
+        assertThat(result)
+                .hasSize(2)
+                .contains(feed1.getId(), feed3.getId())
+                .doesNotContain(feed2.getId(), feed4.getId());
+    }
+
 }
