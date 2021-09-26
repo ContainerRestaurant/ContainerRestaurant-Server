@@ -13,7 +13,7 @@ public class HomeBannerDto {
     private final String additionalUrl;
 
     public static HomeBannerDto of(Banner banner) {
-        return new HomeBannerDto(banner.getBannerURL(), banner.getContentURL(), banner.getAdditionalURL());
+        return new HomeBannerDto(banner.getBannerUrl(), banner.getContentUrl(), banner.getAdditionalUrl());
     }
 
 }

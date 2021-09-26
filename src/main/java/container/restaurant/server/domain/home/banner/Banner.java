@@ -15,7 +15,7 @@ import javax.persistence.Entity;
 @Entity(name = "TB_BANNER")
 public class Banner extends BaseEntity {
     private String title;
-    private String bannerURL;
-    private String contentURL;
-    private String additionalURL;
+    private String bannerUrl;
+    private String contentUrl;
+    private String additionalUrl;
 }
