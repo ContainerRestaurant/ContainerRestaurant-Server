@@ -5,6 +5,7 @@ import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.push.event.FeedHitEvent;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
@@ -48,6 +49,7 @@ public class FeedService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final StatisticsService statisticsService;
+    private final RecommendFeedService recommendFeedService;
     private final UserLevelFeedCountService userLevelFeedCountService;
     private final ImageService imageService;
 
@@ -162,6 +164,8 @@ public class FeedService {
         dto.updateSimpleAttrs(feed);
         updateRelationalAttrs(feed, dto);
         feed.getRestaurant().feedCountUp(feed);
+
+        recommendFeedService.checkAndUpdate(feed);
     }
 
     private void updateRelationalAttrs(Feed feed, FeedInfoDto dto) {

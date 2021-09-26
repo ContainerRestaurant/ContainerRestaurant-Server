@@ -1,10 +1,19 @@
 package container.restaurant.server.domain.feed;
 
-import container.restaurant.server.domain.BaseServiceTest;
+import container.restaurant.server.BaseMockTest;
+import container.restaurant.server.domain.feed.hit.FeedHitRepository;
+import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.restaurant.Restaurant;
+import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.restaurant.menu.Menu;
+import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.domain.user.level.UserLevelFeedCountService;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedMenuDto;
@@ -21,9 +30,30 @@ import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class FeedServiceTest extends BaseServiceTest {
+class FeedServiceTest extends BaseMockTest {
 
     private static final int MENU_NUM = 3;
+
+    @Mock
+    FeedRepository feedRepository;
+    @Mock
+    UserService userService;
+    @Mock
+    RestaurantService restaurantService;
+    @Mock
+    ImageService imageService;
+    @Mock
+    UserLevelFeedCountService userLevelFeedCountService;
+    @Mock
+    FeedHitRepository feedHitRepository;
+    @Mock
+    RecommendFeedService recommendFeedService;
+    @Mock
+    FeedLikeRepository feedLikeRepository;
+    @Mock
+    ScrapFeedRepository scrapFeedRepository;
+    @Mock
+    StatisticsService statisticsService;
 
     @Spy
     @InjectMocks
@@ -191,8 +221,9 @@ class FeedServiceTest extends BaseServiceTest {
                 .hasSize(2)
                 .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
                 .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
-    }
 
+        verify(recommendFeedService).checkAndUpdate(feed);
+    }
 
     @Test
     @DisplayName("피드 수정 테스트 - 식당 변경")
