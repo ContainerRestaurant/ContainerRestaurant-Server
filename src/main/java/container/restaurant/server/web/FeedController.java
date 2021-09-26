@@ -53,7 +53,8 @@ public class FeedController {
 
     @GetMapping("recommend")
     public ResponseEntity<?> selectRecommend(@LoginId Long loginId) {
-        CollectionModel<FeedPreviewDto> recommendFeeds = recommendFeedService.getRecommendFeeds(loginId);
+        CollectionModel<FeedPreviewDto> recommendFeeds = CollectionModel.of(
+                recommendFeedService.findRecommends(loginId));
         if (recommendFeeds.getLink("self").isEmpty()) {
             setLinks(recommendFeeds);
         }

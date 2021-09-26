@@ -2,12 +2,13 @@ package container.restaurant.server.domain.feed.recommend;
 
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.feed.like.FeedLikeRepository;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,25 +17,57 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
 public class RecommendFeedService {
 
     private final FeedService feedService;
+    private final FeedLikeRepository feedLikeRepository;
+    private final ScrapFeedRepository scrapFeedRepository;
 
-    private List<Feed> recommendFeeds = List.of();
+    private List<RecommendFeed> recommendFeeds = List.of();
 
     private final static int DEFAULT_PAGE_SIZE = 1000;
     private final static Pageable DEFAULT_PAGEABLE = PageRequest.of(0, DEFAULT_PAGE_SIZE);
     private Pageable pageable = null;
 
-    public CollectionModel<FeedPreviewDto> getRecommendFeeds(Long loginId) {
-        return CollectionModel.of(recommendFeeds.stream()
-                .map(feed -> feedService.createFeedPreviewDto(feed, loginId))
-                .collect(Collectors.toList()));
+    @Autowired
+    public RecommendFeedService(
+            FeedService feedService, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository
+    ) {
+        this.feedService = feedService;
+        this.feedLikeRepository = feedLikeRepository;
+        this.scrapFeedRepository = scrapFeedRepository;
+    }
+
+    RecommendFeedService(
+            FeedService feedService, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository,
+            List<RecommendFeed> initCollection
+    ) {
+        this.feedService = feedService;
+        this.feedLikeRepository = feedLikeRepository;
+        this.scrapFeedRepository = scrapFeedRepository;
+        this.recommendFeeds = initCollection;
+    }
+
+    public Collection<FeedPreviewDto> findRecommends(Long loginId) {
+        List<Long> recommendFeedIds = recommendFeeds.stream()
+                .map(RecommendFeed::getId)
+                .collect(Collectors.toList());
+
+        Set<Long> likeIdSet = loginId == null ? Set.of() :
+                feedLikeRepository.checkFeedLikeOnIdList(loginId, recommendFeedIds);
+        Set<Long> scrapIdSet = loginId == null ? Set.of() :
+                scrapFeedRepository.checkScrapFeedOnIdList(loginId, recommendFeedIds);
+
+        return recommendFeeds.stream()
+                .map(recommendFeed -> FeedPreviewDto.from(
+                        recommendFeed,
+                        likeIdSet.contains(recommendFeed.getId()),
+                        scrapIdSet.contains(recommendFeed.getId())))
+                .collect(Collectors.toList());
     }
 
     @PostConstruct
@@ -53,7 +86,7 @@ public class RecommendFeedService {
             p = p.next();
             page = feedService.findForUpdatingRecommend(from, to, p);
         }
-        recommendFeeds = queue.getList();
+        recommendFeeds = queue.recommendFeedsTo(ArrayList::new, ArrayList::add);
     }
 
     public void setPageSize(int pageSize) {

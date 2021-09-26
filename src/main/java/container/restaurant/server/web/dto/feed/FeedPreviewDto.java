@@ -2,6 +2,7 @@ package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.feed.recommend.RecommendFeed;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.NonNull;
@@ -30,6 +31,13 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
                 feed.getId(), ImageService.getUrlFromImage(feed.getThumbnail()),
                 feed.getOwner().getNickname(), feed.getContent(), feed.getLikeCount(),
                 feed.getReplyCount(), feed.getRestaurant().isContainerFriendly(), isLike, isScraped);
+    }
+
+    @NonNull
+    public static FeedPreviewDto from(RecommendFeed recommendFeed, Boolean isLike, Boolean isScraped) {
+        return new FeedPreviewDto(recommendFeed.getId(), recommendFeed.getThumbnailUrl(),
+                recommendFeed.getOwnerNickname(), recommendFeed.getContent(), recommendFeed.getLikeCount(),
+                recommendFeed.getReplyCount(), recommendFeed.getIsContainerFriendly(), isLike, isScraped);
     }
 
     private FeedPreviewDto(Long id, String thumbnailUrl, String ownerNickname, String content, Integer likeCount,

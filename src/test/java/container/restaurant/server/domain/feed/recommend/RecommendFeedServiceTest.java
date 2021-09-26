@@ -1,15 +1,19 @@
 package container.restaurant.server.domain.feed.recommend;
 
-import container.restaurant.server.domain.BaseServiceTest;
+import container.restaurant.server.BaseMockTest;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,14 +33,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class RecommendFeedServiceTest extends BaseServiceTest {
+class RecommendFeedServiceTest extends BaseMockTest {
+
+    @Mock
+    FeedService feedService;
+    @Mock
+    FeedLikeRepository feedLikeRepository;
+    @Mock
+    ScrapFeedRepository scrapFeedRepository;
+
 
     @InjectMocks
     RecommendFeedService recommendFeedService;
 
-    @ParameterizedTest(name = "[{index}] - {0}")
+    @ParameterizedTest(name = "추천 점수에 따른 리스트 순서 테스트 [{index}] - {0}")
     @MethodSource
-    void updateRecommendFeed(String TEST, List<Feed> input, List<Long> res) {
+    void findRecommends(String TEST, List<Feed> input, List<Long> res) {
         //given-1 기본날짜 / Pageable 이 주어지고 job 의 배치 페이지 사이즈를 세팅
         int pageSize = 10;
         recommendFeedService.setPageSize(pageSize);
@@ -49,14 +62,12 @@ class RecommendFeedServiceTest extends BaseServiceTest {
                     return new PageImpl<>(input.subList(from, to), p, input.size());
                 }));
 
-        when(feedService.createFeedPreviewDto(any(), any()))
-                .then(answer((Feed feed, Long loginId) ->
-                        FeedPreviewDto.from(feed, true, false)));
+        when(feedLikeRepository.checkFeedLikeOnIdList(any(), any())).thenReturn(Set.of());
+        when(scrapFeedRepository.checkScrapFeedOnIdList(any(), any())).thenReturn(Set.of());
 
         //when 추천 업데이트 작업을 실행하고 결과 리스트를 ID 로 리스트로 변환
         recommendFeedService.updateRecommendFeed();
-        List<Long> actualRes = recommendFeedService.getRecommendFeeds(null)
-                .getContent().stream()
+        List<Long> actualRes = recommendFeedService.findRecommends(null).stream()
                 .map(FeedPreviewDto::getId)
                 .collect(Collectors.toList());
 
@@ -64,7 +75,7 @@ class RecommendFeedServiceTest extends BaseServiceTest {
         assertThat(actualRes).isEqualTo(res);
     }
 
-    static Stream<Arguments> updateRecommendFeed() {
+    static Stream<Arguments> findRecommends() {
         LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
         return Stream.of(
                 arguments("스코어가 다른 경우 테스트", List.of(
