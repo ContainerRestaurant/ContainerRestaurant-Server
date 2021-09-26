@@ -1,7 +1,7 @@
 package container.restaurant.server.domain.feed.recommend;
 
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
@@ -17,13 +17,16 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class RecommendFeedService {
 
-    private final FeedService feedService;
+    private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
 
@@ -35,18 +38,18 @@ public class RecommendFeedService {
 
     @Autowired
     public RecommendFeedService(
-            FeedService feedService, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository
+            FeedRepository feedRepository, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository
     ) {
-        this.feedService = feedService;
+        this.feedRepository = feedRepository;
         this.feedLikeRepository = feedLikeRepository;
         this.scrapFeedRepository = scrapFeedRepository;
     }
 
     RecommendFeedService(
-            FeedService feedService, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository,
+            FeedRepository feedRepository, FeedLikeRepository feedLikeRepository, ScrapFeedRepository scrapFeedRepository,
             List<RecommendFeed> initCollection
     ) {
-        this.feedService = feedService;
+        this.feedRepository = feedRepository;
         this.feedLikeRepository = feedLikeRepository;
         this.scrapFeedRepository = scrapFeedRepository;
         this.recommendFeeds = initCollection;
@@ -80,11 +83,11 @@ public class RecommendFeedService {
         to = to.minusNanos(1);
 
         Pageable p = getPageable();
-        Page<Feed> page = feedService.findForUpdatingRecommend(from, to, p);
+        Page<Feed> page = feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, p);
         while (page.hasContent()) {
             queue.addAll(page.getContent());
             p = p.next();
-            page = feedService.findForUpdatingRecommend(from, to, p);
+            page = feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, p);
         }
         recommendFeeds = queue.recommendFeedsTo(ArrayList::new, ArrayList::add);
     }

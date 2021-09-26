@@ -29,7 +29,6 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,11 +199,6 @@ public class FeedService {
     @Transactional
     public boolean checkHit(Long loginId, Long feedId) {
         return feedHitRepository.existsByUserIdAndFeedId(loginId, feedId);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Feed> findForUpdatingRecommend(LocalDateTime from, LocalDateTime to, Pageable pageable) {
-        return feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
     }
 
     private class FeedPreviewDtoAssembler implements RepresentationModelAssembler<Feed, FeedPreviewDto> {

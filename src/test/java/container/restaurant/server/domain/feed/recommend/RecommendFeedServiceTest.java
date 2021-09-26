@@ -2,6 +2,7 @@ package container.restaurant.server.domain.feed.recommend;
 
 import container.restaurant.server.BaseMockTest;
 import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
 class RecommendFeedServiceTest extends BaseMockTest {
 
     @Mock
-    FeedService feedService;
+    FeedRepository feedRepository;
     @Mock
     FeedLikeRepository feedLikeRepository;
     @Mock
@@ -54,7 +55,7 @@ class RecommendFeedServiceTest extends BaseMockTest {
         recommendFeedService.setPageSize(pageSize);
 
         //given-2 주어진 날짜 사이에 모든 피드를 가져오는 로직을 목
-        when(feedService.findForUpdatingRecommend(any(), any(), any()))
+        when(feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(any(), any(), any()))
                 .then(answer((LocalDateTime ign, LocalDateTime ore, Pageable p) -> {
                     int from = p.getPageSize() * p.getPageNumber();
                     if (from >= input.size()) return Page.empty(p);
