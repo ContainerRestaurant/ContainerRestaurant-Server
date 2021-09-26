@@ -17,10 +17,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,6 +68,15 @@ public class RecommendFeedService {
                         likeIdSet.contains(recommendFeed.getId()),
                         scrapIdSet.contains(recommendFeed.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public void checkAndUpdate(Feed feed) {
+        if (feed == null) return;
+
+        recommendFeeds.stream()
+                .filter(recommendFeed -> Objects.equals(recommendFeed.getId(), feed.getId()))
+                .findFirst()
+                .ifPresent(recommendFeed -> recommendFeed.update(feed));
     }
 
     @PostConstruct

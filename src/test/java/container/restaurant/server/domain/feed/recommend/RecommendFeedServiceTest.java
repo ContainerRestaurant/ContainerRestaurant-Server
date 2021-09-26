@@ -3,13 +3,15 @@ package container.restaurant.server.domain.feed.recommend;
 import container.restaurant.server.BaseMockTest;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedRepository;
-import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,8 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class RecommendFeedServiceTest extends BaseMockTest {
 
@@ -43,16 +45,82 @@ class RecommendFeedServiceTest extends BaseMockTest {
     @Mock
     ScrapFeedRepository scrapFeedRepository;
 
-
     @InjectMocks
-    RecommendFeedService recommendFeedService;
+    RecommendFeedService service;
+
+    @Test
+    @DisplayName("추천 피드이면 업데이트 - 추천 피드에 존재하는 경우")
+    void checkAndUpdate() {
+        //given 추천 피드 리스트에 주어진 피드 ID 를 가지는 추천피드가 있을 때
+        Feed feed = mock(Feed.class);
+        when(feed.getId()).thenReturn(1L);
+
+        List<RecommendFeed> recommendFeeds = List.of(
+                newRecommendFeed(1L), newRecommendFeed(2L),
+                newRecommendFeed(3L), newRecommendFeed(4L));
+
+        RecommendFeedService listInjectedService = new RecommendFeedService(
+                feedRepository, feedLikeRepository, scrapFeedRepository, recommendFeeds);
+
+        //when 주어진 피드로 checkAndUpdate() 를 콜하면
+        listInjectedService.checkAndUpdate(feed);
+
+        //then ID 가 일치하는 추천 피드에서만 주어진 피드로 update() 가 호출됨
+        for (RecommendFeed recommendFeed : recommendFeeds) {
+            if (Objects.equals(recommendFeed.getId(), feed.getId()))
+                verify(recommendFeed).update(feed);
+            else
+                verify(recommendFeed, never()).update(any());
+        }
+    }
+
+    @Test
+    @DisplayName("추천 피드이면 업데이트 - 추천 피드에 존재하지 않는 경우")
+    void checkAndUpdate__absent() {
+        //given 추천 피드 리스트에 주어진 피드 ID 를 가지는 추천피드가 없을 때
+        Feed feed = mock(Feed.class);
+        when(feed.getId()).thenReturn(5L);
+
+        List<RecommendFeed> recommendFeeds = List.of(
+                newRecommendFeed(1L), newRecommendFeed(2L),
+                newRecommendFeed(3L), newRecommendFeed(4L));
+
+        RecommendFeedService listInjectedService = new RecommendFeedService(
+                feedRepository, feedLikeRepository, scrapFeedRepository, recommendFeeds);
+
+        //when 주어진 피드로 checkAndUpdate() 를 콜하면
+        listInjectedService.checkAndUpdate(feed);
+
+        //then 주어진 피드로 update() 가 호출되지 않음
+        for (RecommendFeed recommendFeed : recommendFeeds)
+            verify(recommendFeed, never()).update(any());
+    }
+
+    @Test
+    @DisplayName("추천 피드이면 업데이트 - 피드가 null")
+    void checkAndUpdate__null() {
+        //given 주어진 피드가 없을 때
+        List<RecommendFeed> recommendFeeds = List.of(
+                newRecommendFeed(1L), newRecommendFeed(2L),
+                newRecommendFeed(3L), newRecommendFeed(4L));
+
+        RecommendFeedService listInjectedService = new RecommendFeedService(
+                feedRepository, feedLikeRepository, scrapFeedRepository, recommendFeeds);
+
+        //when null 피드로 checkAndUpdate() 를 콜하면
+        listInjectedService.checkAndUpdate(null);
+
+        //then 주어진 피드로 update() 가 호출되지 않음
+        for (RecommendFeed recommendFeed : recommendFeeds)
+            verify(recommendFeed, never()).update(any());
+    }
 
     @ParameterizedTest(name = "추천 점수에 따른 리스트 순서 테스트 [{index}] - {0}")
     @MethodSource
     void findRecommends(String TEST, List<Feed> input, List<Long> res) {
         //given-1 기본날짜 / Pageable 이 주어지고 job 의 배치 페이지 사이즈를 세팅
         int pageSize = 10;
-        recommendFeedService.setPageSize(pageSize);
+        service.setPageSize(pageSize);
 
         //given-2 주어진 날짜 사이에 모든 피드를 가져오는 로직을 목
         when(feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(any(), any(), any()))
@@ -67,8 +135,8 @@ class RecommendFeedServiceTest extends BaseMockTest {
         when(scrapFeedRepository.checkScrapFeedOnIdList(any(), any())).thenReturn(Set.of());
 
         //when 추천 업데이트 작업을 실행하고 결과 리스트를 ID 로 리스트로 변환
-        recommendFeedService.updateRecommendFeed();
-        List<Long> actualRes = recommendFeedService.findRecommends(null).stream()
+        service.updateRecommendFeed();
+        List<Long> actualRes = service.findRecommends(null).stream()
                 .map(FeedPreviewDto::getId)
                 .collect(Collectors.toList());
 
@@ -144,5 +212,12 @@ class RecommendFeedServiceTest extends BaseMockTest {
         when(image.getUrl()).thenReturn("test.path");
         when(restaurant.isContainerFriendly()).thenReturn(false);
         return feed;
+    }
+
+    @NotNull
+    private RecommendFeed newRecommendFeed(long l) {
+        RecommendFeed recommendFeed1 = mock(RecommendFeed.class);
+        when(recommendFeed1.getId()).thenReturn(l);
+        return recommendFeed1;
     }
 }
