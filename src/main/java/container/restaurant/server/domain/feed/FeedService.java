@@ -136,6 +136,7 @@ public class FeedService {
         userLevelFeedCountService.levelFeedDown(feed);
 
         feedRepository.delete(feed);
+        recommendFeedService.checkAndDelete(feed);
     }
 
     @Transactional

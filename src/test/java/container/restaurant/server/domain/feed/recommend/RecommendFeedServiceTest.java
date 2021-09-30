@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -110,6 +111,64 @@ class RecommendFeedServiceTest extends BaseMockTest {
         //then 주어진 피드로 update() 가 호출되지 않음
         for (RecommendFeed recommendFeed : recommendFeeds)
             verify(recommendFeed, never()).update(any());
+    }
+
+    @Test
+    @DisplayName("추천 피드 삭제 - 정상")
+    void checkAndDelete() {
+        //given
+        Feed feed = mock(Feed.class);
+        when(feed.getId()).thenReturn(1L);
+
+        RecommendFeed del = newRecommendFeed(1L);
+        List<RecommendFeed> recommendFeeds = spy(new ArrayList<>(List.of(
+                del, newRecommendFeed(2L))));
+
+        RecommendFeedService listInjectedService = new RecommendFeedService(
+                feedRepository, feedLikeRepository, recommendFeeds);
+
+        //when
+        listInjectedService.checkAndDelete(feed);
+
+        //then
+        verify(recommendFeeds).remove(del);
+    }
+
+    @Test
+    @DisplayName("추천 피드 삭제 - 존재하지 않는 피드")
+    void checkAndDelete_noExists() {
+        //given
+        Feed feed = mock(Feed.class);
+        when(feed.getId()).thenReturn(0L);
+
+        List<RecommendFeed> recommendFeeds = spy(new ArrayList<>(List.of(
+                newRecommendFeed(1L), newRecommendFeed(2L))));
+
+        RecommendFeedService listInjectedService = new RecommendFeedService(
+                feedRepository, feedLikeRepository, recommendFeeds);
+
+        //when
+        listInjectedService.checkAndDelete(feed);
+
+        //then
+        verify(recommendFeeds, never()).remove(any(RecommendFeed.class));
+    }
+
+    @Test
+    @DisplayName("추천 피드 삭제 - null")
+    void checkAndDelete_null() {
+        //given
+        List<RecommendFeed> recommendFeeds = spy(new ArrayList<>(List.of(
+                newRecommendFeed(1L), newRecommendFeed(2L))));
+
+        RecommendFeedService listInjectedService = new RecommendFeedService(
+                feedRepository, feedLikeRepository, recommendFeeds);
+
+        //when
+        listInjectedService.checkAndDelete(null);
+
+        //then
+        verify(recommendFeeds, never()).remove(any(RecommendFeed.class));
     }
 
     @ParameterizedTest(name = "추천 점수에 따른 리스트 순서 테스트 [{index}] - {0}")

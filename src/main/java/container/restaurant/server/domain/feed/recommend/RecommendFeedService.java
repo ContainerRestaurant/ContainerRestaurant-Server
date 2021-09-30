@@ -72,6 +72,15 @@ public class RecommendFeedService {
                 .ifPresent(recommendFeed -> recommendFeed.update(feed));
     }
 
+    public void checkAndDelete(Feed feed) {
+        if (feed == null) return;
+
+        recommendFeeds.stream()
+                .filter(recommendFeed -> Objects.equals(recommendFeed.getId(), feed.getId()))
+                .findFirst()
+                .ifPresent(recommendFeeds::remove);
+    }
+
     @PostConstruct
     @Scheduled(cron = "0 10 0 * * *")
     @Transactional(readOnly = true)
