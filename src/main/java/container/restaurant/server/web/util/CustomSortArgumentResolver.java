@@ -27,19 +27,32 @@ public class CustomSortArgumentResolver implements SortArgumentResolver {
         return Sort.class.equals(parameter.getParameterType());
     }
 
+    /**
+     * [요구사항]
+     *  default - 최신순, 좋아요/난이도 동점시 - 최신순
+     *  가능한 케이스 - 오래된 순(createdDate,asc)
+     **/
     @Override
     @NonNull
     public Sort resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer,
                                 NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         String[] params = webRequest.getParameterValues(SORT_PARAMETER);
 
-        if (params != null && AVAILABLE_SORT_ATTR.contains(params[0])) {
-            if (params.length != 1 && "DESC".equalsIgnoreCase(params[1])) {
-                return Sort.by(DEFAULT_ORDER, Sort.Order.desc(params[0]));
-            } else {
-                return Sort.by(DEFAULT_ORDER, Sort.Order.asc(params[0]));
+        if (params != null) {
+            String[] param=params[0].split(",");
+            if (AVAILABLE_SORT_ATTR.contains(param[0])){ // [CASE 좋아요/난이도] - 동점시 최신순
+                if(param[1].equalsIgnoreCase("desc")){ // 오름차순, 동점처리
+                    return Sort.by(Sort.Order.desc(param[0]),DEFAULT_ORDER);
+                }
+                else{ // 내림차순, 동점처리
+                    return Sort.by(Sort.Order.asc(param[0]),DEFAULT_ORDER);
+                }
+            }
+            else if(param[1].equalsIgnoreCase("asc")){ //[CASE 오래된 순]
+                return Sort.by(Sort.Order.asc(param[0]));
             }
         }
+        //[CASE default 최신순]
         return Sort.by(DEFAULT_ORDER);
     }
 
