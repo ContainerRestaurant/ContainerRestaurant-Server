@@ -272,9 +272,7 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("likeCount").description("해당 피드 좋아요 개수"),
                                 fieldWithPath("replyCount").description("해당 피드 답글 개수"),
                                 fieldWithPath("_links.self.href").description("해당 피드의 상세 정보 링크"),
-                                fieldWithPath("isContainerFriendly").description("용기 친화 식당 여부"),
-                                fieldWithPath("isLike").description("로그인한 사용자의 피드 좋아요 여부"),
-                                fieldWithPath("isScraped").description("로그인한 사용자의 피드 스크랩 여부")
+                                fieldWithPath("isLike").description("로그인한 사용자의 피드 좋아요 여부")
                         )))
                 .andDo(document("feed-list",
                         links(

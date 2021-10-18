@@ -5,6 +5,7 @@ import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.push.event.FeedHitEvent;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
@@ -19,18 +20,23 @@ import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 
@@ -43,6 +49,7 @@ public class FeedService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final StatisticsService statisticsService;
+    private final RecommendFeedService recommendFeedService;
     private final UserLevelFeedCountService userLevelFeedCountService;
     private final ImageService imageService;
 
@@ -75,48 +82,44 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAll(Pageable pageable, Category categoryFilter, Long loginId) {
-        return feedAssembler.toModel(
-                ofNullable(categoryFilter)
-                        .map(category -> feedRepository.findAllByCategory(pageable, categoryFilter))
-                        .orElseGet(() -> feedRepository.findAll(pageable)),
-                feed -> createFeedPreviewDto(feed, loginId)
-        );
+        Page<Feed> page = categoryFilter != null ?
+                feedRepository.findAllByCategory(pageable, categoryFilter) :
+                feedRepository.findAll(pageable);
+
+        return feedAssembler.toModel(page, new FeedPreviewDtoAssembler(loginId, page));
     }
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAllByUser(
-            Long userId, Long loginId, Pageable pageable, Category categoryFilter) {
-        return feedAssembler.toModel(
-                ofNullable(categoryFilter)
-                        .map(category -> feedRepository.findAllByOwnerIdAndCategory(
-                                userId, pageable, categoryFilter))
-                        .orElseGet(() -> feedRepository.findAllByOwnerId(userId, pageable)),
-                feed -> createFeedPreviewDto(feed, loginId)
-        );
+            Long userId, Long loginId, Pageable pageable, Category categoryFilter
+    ) {
+        Page<Feed> page = categoryFilter != null ?
+                feedRepository.findAllByOwnerIdAndCategory(userId, pageable, categoryFilter) :
+                feedRepository.findAllByOwnerId(userId, pageable);
+
+        return feedAssembler.toModel(page, new FeedPreviewDtoAssembler(loginId, page));
     }
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAllByRestaurant(
-            Long restaurantId, Long loginId, Pageable pageable, Category categoryFilter) {
-        return feedAssembler.toModel(
-                ofNullable(categoryFilter)
-                        .map(category -> feedRepository.findAllByRestaurantIdAndCategory(
-                                restaurantId, pageable, categoryFilter))
-                        .orElseGet(() -> feedRepository.findAllByRestaurantId(restaurantId, pageable)),
-                feed -> createFeedPreviewDto(feed, loginId)
-        );
+            Long restaurantId, Long loginId, Pageable pageable, Category categoryFilter
+    ) {
+        Page<Feed> page = categoryFilter != null ?
+                feedRepository.findAllByRestaurantIdAndCategory(restaurantId, pageable, categoryFilter) :
+                feedRepository.findAllByRestaurantId(restaurantId, pageable);
+
+        return feedAssembler.toModel(page, new FeedPreviewDtoAssembler(loginId, page));
     }
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAllByUserScrap(
-            Long userId, Long loginId, Pageable pageable, Category categoryFilter) {
-        return feedAssembler.toModel(
-                ofNullable(categoryFilter)
-                        .map(category -> feedRepository.findAllByScraperIdAndCategory(
-                                userId, pageable, categoryFilter))
-                        .orElseGet(() -> feedRepository.findAllByScraperId(userId, pageable)),
-                feed -> createFeedPreviewDto(feed, loginId)
-        );
+            Long userId, Long loginId, Pageable pageable, Category categoryFilter
+    ) {
+        Page<Feed> page = categoryFilter != null ?
+                feedRepository.findAllByScraperIdAndCategory(userId, pageable, categoryFilter) :
+                feedRepository.findAllByScraperId(userId, pageable);
+
+        return feedAssembler.toModel(page, new FeedPreviewDtoAssembler(loginId, page));
     }
 
     @Transactional
@@ -133,6 +136,7 @@ public class FeedService {
         userLevelFeedCountService.levelFeedDown(feed);
 
         feedRepository.delete(feed);
+        recommendFeedService.checkAndDelete(feed);
     }
 
     @Transactional
@@ -161,6 +165,8 @@ public class FeedService {
         dto.updateSimpleAttrs(feed);
         updateRelationalAttrs(feed, dto);
         feed.getRestaurant().feedCountUp(feed);
+
+        recommendFeedService.checkAndUpdate(feed);
     }
 
     private void updateRelationalAttrs(Feed feed, FeedInfoDto dto) {
@@ -200,17 +206,23 @@ public class FeedService {
         return feedHitRepository.existsByUserIdAndFeedId(loginId, feedId);
     }
 
-    @Transactional(readOnly = true)
-    public Page<Feed> findForUpdatingRecommend(LocalDateTime from, LocalDateTime to, Pageable pageable) {
-        return feedRepository.findAllByCreatedDateBetweenOrderByCreatedDateDesc(from, to, pageable);
-    }
+    private class FeedPreviewDtoAssembler implements RepresentationModelAssembler<Feed, FeedPreviewDto> {
 
-    @Transactional(readOnly = true)
-    public FeedPreviewDto createFeedPreviewDto(Feed feed, Long loginId) {
-        return FeedPreviewDto.builder()
-                .feed(feed)
-                .isLike(feedLikeRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
-                .isScraped(scrapFeedRepository.existsByUserIdAndFeedId(loginId, feed.getId()))
-                .build();
+        final Set<Long> likeIdSet;
+
+        public FeedPreviewDtoAssembler(Long loginId, Supplier<Stream<Feed>> feedSupplier) {
+            List<Long> feedIdList = feedSupplier.get()
+                    .map(Feed::getId)
+                    .collect(Collectors.toList());
+
+            likeIdSet = loginId == null ? Set.of() :
+                    feedLikeRepository.checkFeedLikeOnIdList(loginId, feedIdList);
+        }
+
+        @NotNull
+        @Override
+        public FeedPreviewDto toModel(@NotNull Feed entity) {
+            return FeedPreviewDto.from(entity, likeIdSet.contains(entity.getId()));
+        }
     }
 }

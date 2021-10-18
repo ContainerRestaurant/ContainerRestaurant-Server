@@ -1,5 +1,6 @@
 package container.restaurant.server.domain;
 
+import container.restaurant.server.BaseMockTest;
 import container.restaurant.server.domain.comment.CommentRepository;
 import container.restaurant.server.domain.comment.CommentService;
 import container.restaurant.server.domain.comment.like.CommentLikeRepository;
@@ -28,17 +29,10 @@ import container.restaurant.server.domain.user.level.UserLevelFeedCountRepositor
 import container.restaurant.server.domain.user.level.UserLevelFeedCountService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.domain.user.scrap.ScrapFeedService;
-import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.data.web.PagedResourcesAssembler;
 
-public class BaseServiceTest {
-
-    @BeforeEach
-    void setMock() {
-        MockitoAnnotations.openMocks(this);
-    }
+public abstract class BaseServiceTest extends BaseMockTest {
 
     // --------------------COMMENT DOMAIN--------------------
     @Mock

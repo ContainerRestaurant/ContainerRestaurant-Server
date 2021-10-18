@@ -3,6 +3,7 @@ package container.restaurant.server.domain.comment;
 import container.restaurant.server.domain.comment.like.CommentLikeRepository;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
@@ -29,6 +30,7 @@ public class CommentService {
 
     private final UserService userService;
     private final FeedService feedService;
+    private final RecommendFeedService recommendFeedService;
 
     private final ApplicationEventPublisher publisher;
     private final CommentLikeRepository commentLikeRepository;
@@ -46,6 +48,7 @@ public class CommentService {
 
         feed.commentCountUp();
         publisher.publishEvent(new FeedCommentedEvent(comment));
+        recommendFeedService.checkAndUpdate(feed);
 
         return CommentInfoDto.from(comment);
     }
@@ -103,6 +106,8 @@ public class CommentService {
             commentRepository.delete(comment);
         }
         comment.getFeed().commentCountDown();
+
+        recommendFeedService.checkAndUpdate(comment.getFeed());
     }
 
     @Transactional
