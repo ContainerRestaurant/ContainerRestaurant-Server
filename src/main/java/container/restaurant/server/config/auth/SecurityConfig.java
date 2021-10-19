@@ -26,10 +26,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers(GET).permitAll()
                         .antMatchers(POST, "/api/user/login", "/api/user").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtTokenFilter, OAuth2LoginAuthenticationFilter.class)
-                .oauth2Login(o -> o
-                        .userInfoEndpoint().userService(customOAuth2UserService))
-                .logout(l -> l
-                        .logoutSuccessUrl("/"));
+                .addFilterBefore(jwtTokenFilter, OAuth2LoginAuthenticationFilter.class);
     }
 }

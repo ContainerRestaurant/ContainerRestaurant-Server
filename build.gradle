@@ -34,8 +34,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	implementation 'org.springframework.session:spring-session-jdbc:2.5.0'
-
 	implementation 'org.locationtech.jts:jts-core'
 	implementation 'org.hibernate:hibernate-spatial:5.4.30.Final'
 
