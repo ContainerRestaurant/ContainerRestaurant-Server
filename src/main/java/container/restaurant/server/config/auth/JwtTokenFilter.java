@@ -1,6 +1,7 @@
 package container.restaurant.server.config.auth;
 
 import container.restaurant.server.config.auth.user.CustomOAuth2User;
+import container.restaurant.server.exception.UnauthorizedException;
 import container.restaurant.server.utils.jwt.JwtLoginService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +33,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         final String token = header.split(" ")[1].trim();
-        CustomOAuth2User loginUser = jwtLoginService.parse(token);
-
-        SecurityContextHolder.getContext().setAuthentication(loginUser.getAuthentication());
+        try {
+            CustomOAuth2User loginUser = jwtLoginService.parse(token);
+            SecurityContextHolder.getContext().setAuthentication(loginUser.getAuthentication());
+        } catch (UnauthorizedException e) {
+            response.sendError(401, e.getMessage());
+            return;
+        }
         filterChain.doFilter(request, response);
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
 }

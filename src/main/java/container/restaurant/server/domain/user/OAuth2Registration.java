@@ -12,6 +12,15 @@ import static container.restaurant.server.config.auth.user.CustomOAuth2User.*;
 @RequiredArgsConstructor
 public enum OAuth2Registration {
 
+    TEST((ignore1, ignore2) ->  {
+        LocalDateTime now = LocalDateTime.now();
+        return Map.of(
+                SUBJECT, "TEST",
+                EXPIRATION_TIME, getLongTime(now.plusMonths(1)),
+                ISSUED_AT, getLongTime(now),
+                REGISTRATION, "TEST"
+        );
+    }),
     KAKAO((userNameAttributeName, attributes) -> {
         //noinspection unchecked
         Map<String, String> kakaoAccount = (Map<String, String>)
