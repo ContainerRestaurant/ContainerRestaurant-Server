@@ -1,7 +1,7 @@
 package container.restaurant.server.web.dto.comment;
 
 import container.restaurant.server.domain.comment.Comment;
-import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -43,7 +43,7 @@ public class CommentInfoDto extends RepresentationModel<CommentInfoDto> {
         this.likeCount = comment.getLikeCount();
         this.ownerId = comment.getOwner().getId();
         this.ownerNickName = comment.getOwner().getNickname();
-        this.ownerProfile = ImageService.getUrlFromImage(comment.getOwner().getProfile());
+        this.ownerProfile = ImageUtils.getUrlFromImage(comment.getOwner().getProfile());
         this.ownerLevelTitle = comment.getOwner().getLevelTitle();
         this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("MM.dd"));
         this.isLike = isLike;

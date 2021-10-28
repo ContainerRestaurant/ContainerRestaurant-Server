@@ -1,10 +1,10 @@
 package container.restaurant.server.web.dto.user;
 
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.OAuth2Registration;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -53,7 +53,7 @@ public interface UserDto {
             this.id = user.getId();
             this.email = user.getEmail();
             this.nickname = user.getNickname();
-            this.profile = ImageService.getUrlFromImage(user.getProfile());
+            this.profile = ImageUtils.getUrlFromImage(user.getProfile());
             this.levelTitle = user.getLevelTitle();
             this.feedCount = user.getFeedCount();
             this.scrapCount = user.getScrapCount();

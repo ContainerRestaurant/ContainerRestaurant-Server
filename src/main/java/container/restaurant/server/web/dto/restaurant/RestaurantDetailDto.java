@@ -1,7 +1,7 @@
 package container.restaurant.server.web.dto.restaurant;
 
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.restaurant.Restaurant;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -29,7 +29,7 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
         this.longitude = restaurant.getLongitude();
         this.feedCount = restaurant.getFeedCount();
         this.difficultyAvg = restaurant.getDifficultyAvg();
-        this.image_path = ImageService.getUrlFromImage(restaurant.getThumbnail());
+        this.image_path = ImageUtils.getUrlFromImage(restaurant.getThumbnail());
         this.isContainerFriendly = restaurant.isContainerFriendly();
         this.isFavorite = isFavorite;
     }

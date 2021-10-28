@@ -2,12 +2,10 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
-import container.restaurant.server.exception.ResourceNotFoundException;
+import container.restaurant.server.utils.ImageUtils;
 import container.restaurant.server.web.dto.image.ImageDto;
 import container.restaurant.server.web.linker.ImageLinker;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -39,7 +36,8 @@ public class ImageController {
     @GetMapping(value = "{path}")
     public RedirectView getImageFile(@PathVariable String path) {
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(imageService.getFileServerUrl(path));
+        redirectView.setUrl(ImageUtils.getFileServerUrl(path));
         return redirectView;
     }
+
 }
