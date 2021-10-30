@@ -46,14 +46,14 @@ class CustomSortArgumentResolverTest {
         MethodParameter parameter = mock(MethodParameter.class);
         NativeWebRequest webRequest = mock(NativeWebRequest.class);
         when(webRequest.getParameterValues(SORT_PARAMETER))
-                .thenReturn(params.split(","));
+                .thenReturn(params.split("/"));
 
         //then
         Sort sort = resolver.resolveArgument(parameter, null,
                 webRequest, null);
 
         //when
-        assertThat(sort).isEqualTo(Sort.by(DEFAULT_ORDER, res));
+        assertThat(sort).isEqualTo(Sort.by(res,DEFAULT_ORDER));
     }
 
     static Stream<Arguments> testValidSort() {
@@ -77,7 +77,7 @@ class CustomSortArgumentResolverTest {
         MethodParameter parameter = mock(MethodParameter.class);
         NativeWebRequest webRequest = mock(NativeWebRequest.class);
         when(webRequest.getParameterValues(SORT_PARAMETER))
-                .thenReturn(params.split(","));
+                .thenReturn(params.split("/"));
 
         //then
         Sort sort = resolver.resolveArgument(parameter, null,
@@ -95,5 +95,4 @@ class CustomSortArgumentResolverTest {
                 arguments("DESC")
         );
     }
-
 }

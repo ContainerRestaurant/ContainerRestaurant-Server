@@ -40,19 +40,27 @@ public class CustomSortArgumentResolver implements SortArgumentResolver {
 
         if (params != null) {
             String[] param=params[0].split(",");
+
             if (AVAILABLE_SORT_ATTR.contains(param[0])){ // [CASE 좋아요/난이도] - 동점시 최신순
-                if(param[1].equalsIgnoreCase("desc")){ // 오름차순, 동점처리
+                boolean desc_flag=false;
+                if(param.length>1){ // desc/asc 안 들어오거나 asc일 경우 false
+                    if(param[1].equalsIgnoreCase("desc"))
+                        desc_flag=true;
+                }
+                if(desc_flag){ // 내림차순, 동점처리
                     return Sort.by(Sort.Order.desc(param[0]),DEFAULT_ORDER);
                 }
-                else{ // 내림차순, 동점처리
+                else{ // 오름차순, 동점처리
                     return Sort.by(Sort.Order.asc(param[0]),DEFAULT_ORDER);
                 }
             }
-            else if(param[1].equalsIgnoreCase("asc")){ //[CASE 오래된 순]
-                return Sort.by(Sort.Order.asc(param[0]));
+            else if(param.length>1 && param[0].equals(DEFAULT_ATTR)){
+                if(param[1].equalsIgnoreCase("asc")){ //[CASE 오래된 순]
+                    return Sort.by(Sort.Order.asc(param[0]));
+                }
             }
         }
-        //[CASE default 최신순]
+        //[CASE default/invalid 최신순]
         return Sort.by(DEFAULT_ORDER);
     }
 
