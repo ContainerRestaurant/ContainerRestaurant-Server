@@ -38,6 +38,13 @@ public class AwsS3ImageService implements ImageService {
     private void initClient() {
         if (awsS3 != null) return;
 
+        if (accessKey == null) accessKey = System.getenv("AWS_ACCESS_KEY_ID");
+        if (secretKey == null) secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+        if (bucketName == null) bucketName = System.getenv("AWS_S3_BUCKET_NAME");
+
+        if (accessKey == null || secretKey == null || bucketName == null)
+            throw new IllegalStateException("AWS 연결에 실패했습니다.");
+
         final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 
         awsS3 = AmazonS3ClientBuilder.standard()
