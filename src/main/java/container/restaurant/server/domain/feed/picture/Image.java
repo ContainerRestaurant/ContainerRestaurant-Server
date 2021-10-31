@@ -15,10 +15,10 @@ import javax.validation.constraints.NotEmpty;
 public class Image extends BaseEntity {
 
     public static Image from(String imageKey) {
-        return new Image("/api/image/" + imageKey);
+        return new Image(imageKey);
     }
 
-    // 실제로는... uri 를 갖는다...
+    // 실제로는... /api/image/ 뒤에올 uri 를 갖는다...
     @NotEmpty
     @Column(nullable = false)
     private String url;

@@ -50,7 +50,19 @@ public class AwsS3ImageService implements ImageService {
     public Image upload(MultipartFile imageFile) {
         initClient();
 
-        String key = newImageId();
+        final ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(imageFile.getContentType());
+
+        String key = newImageUuid();
+        InputStream in = getInputStream(imageFile);
+
+        awsS3.putObject(bucketName, key, in, metadata);
+
+        return imageRepository.save(Image.from(key));
+    }
+
+    @NotNull
+    private InputStream getInputStream(MultipartFile imageFile) {
         InputStream in;
 
         try {
@@ -58,15 +70,11 @@ public class AwsS3ImageService implements ImageService {
         } catch (IOException e) {
             throw new IllegalArgumentException("요청한 파일을 읽을 수 없습니다.");
         }
-
-        awsS3.putObject(bucketName, key, in, new ObjectMetadata());
-        awsS3.shutdown();
-
-        return imageRepository.save(Image.from(key));
+        return in;
     }
 
     @NotNull
-    private String newImageId() {
+    private String newImageUuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
@@ -89,10 +97,12 @@ public class AwsS3ImageService implements ImageService {
     }
 
     @Override
-    public InputStream getImageStream(String key) {
+    public ImageFileDto getImage(String key) {
         initClient();
-
         final S3Object object = awsS3.getObject(bucketName, key);
-        return object.getObjectContent();
+
+        return ImageFileDto.from(object.getObjectContent(),
+                object.getObjectMetadata().getContentType());
     }
+
 }

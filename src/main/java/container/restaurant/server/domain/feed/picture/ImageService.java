@@ -13,6 +13,6 @@ public interface ImageService {
 
     Boolean deleteById(Long id);
 
-    InputStream getImageStream(String key);
+    ImageFileDto getImage(String key);
 
 }

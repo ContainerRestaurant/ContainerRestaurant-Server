@@ -4,12 +4,10 @@ import com.google.gson.JsonObject;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.utils.MultipartUtility;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -43,11 +41,11 @@ public class OldImageService implements ImageService {
 
     @Override
     public Boolean deleteById(Long id) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
-    public InputStream getImageStream(String key) {
-        throw new UnsupportedOperationException();
+    public ImageFileDto getImage(String key) {
+        return null;
     }
 }

@@ -1,7 +1,7 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.feed.picture.ImageFileDto;
 import container.restaurant.server.web.dto.image.ImageDto;
 import container.restaurant.server.web.linker.ImageLinker;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import container.restaurant.server.domain.feed.picture.ImageService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,11 +37,11 @@ public class ImageController {
 
     @GetMapping(value = "{path}")
     public ResponseEntity<Resource> getImageFile(@PathVariable String path) {
-        final InputStream imageStream = imageService.getImageStream(path);
+        final ImageFileDto imageDto = imageService.getImage(path);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(new InputStreamResource(imageStream));
+                .contentType(imageDto.getImageType())
+                .body(new InputStreamResource(imageDto.getImageStream()));
     }
 
 }
