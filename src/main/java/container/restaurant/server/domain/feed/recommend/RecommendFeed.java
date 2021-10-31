@@ -1,7 +1,7 @@
 package container.restaurant.server.domain.feed.recommend;
 
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -33,7 +33,7 @@ public class RecommendFeed {
 
     private void setValues(Feed feed) {
         this.id = feed.getId();
-        this.thumbnailUrl = ImageService.getUrlFromImage(feed.getThumbnail());
+        this.thumbnailUrl = ImageUtils.getUrlFromImage(feed.getThumbnail());
         this.ownerNickname = feed.getOwner().getNickname();
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();

@@ -2,9 +2,9 @@ package container.restaurant.server.domain.feed.recommend;
 
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.utils.ImageUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class RecommendFeedTest {
         assertThat(result.getId()).isEqualTo(feed.getId());
         assertThat(result.getThumbnailUrl())
                 .isNotNull()
-                .isEqualTo(ImageService.getUrlFromImage(feed.getThumbnail()));
+                .isEqualTo(ImageUtils.getUrlFromImage(feed.getThumbnail()));
         assertThat(result.getOwnerNickname())
                 .isNotNull()
                 .isEqualTo(feed.getOwner().getNickname());
@@ -54,7 +54,7 @@ public class RecommendFeedTest {
         assertThat(recommendFeed.getId()).isEqualTo(to.getId());
         assertThat(recommendFeed.getThumbnailUrl())
                 .isNotNull()
-                .isEqualTo(ImageService.getUrlFromImage(to.getThumbnail()));
+                .isEqualTo(ImageUtils.getUrlFromImage(to.getThumbnail()));
         assertThat(recommendFeed.getOwnerNickname())
                 .isNotNull()
                 .isEqualTo(to.getOwner().getNickname());
@@ -79,7 +79,7 @@ public class RecommendFeedTest {
         assertThat(recommendFeed.getId()).isEqualTo(origin.getId());
         assertThat(recommendFeed.getThumbnailUrl())
                 .isNotNull()
-                .isEqualTo(ImageService.getUrlFromImage(origin.getThumbnail()));
+                .isEqualTo(ImageUtils.getUrlFromImage(origin.getThumbnail()));
         assertThat(recommendFeed.getOwnerNickname())
                 .isNotNull()
                 .isEqualTo(origin.getOwner().getNickname());
@@ -103,7 +103,7 @@ public class RecommendFeedTest {
         assertThat(recommendFeed.getId()).isEqualTo(origin.getId());
         assertThat(recommendFeed.getThumbnailUrl())
                 .isNotNull()
-                .isEqualTo(ImageService.getUrlFromImage(origin.getThumbnail()));
+                .isEqualTo(ImageUtils.getUrlFromImage(origin.getThumbnail()));
         assertThat(recommendFeed.getOwnerNickname())
                 .isNotNull()
                 .isEqualTo(origin.getOwner().getNickname());

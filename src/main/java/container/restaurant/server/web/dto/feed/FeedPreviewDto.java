@@ -1,8 +1,8 @@
 package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeed;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.NonNull;
@@ -25,7 +25,7 @@ public class FeedPreviewDto extends RepresentationModel<FeedPreviewDto> {
     @NonNull
     public static FeedPreviewDto from(Feed feed, Boolean isLike) {
         return new FeedPreviewDto(
-                feed.getId(), ImageService.getUrlFromImage(feed.getThumbnail()),
+                feed.getId(), ImageUtils.getUrlFromImage(feed.getThumbnail()),
                 feed.getOwner().getNickname(), feed.getContent(), feed.getLikeCount(),
                 feed.getReplyCount(), isLike);
     }

@@ -2,7 +2,7 @@ package container.restaurant.server.web.dto.feed;
 
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
@@ -49,12 +49,12 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
 
         this.ownerNickname = feed.getOwner().getNickname();
         this.ownerContainerLevel = feed.getOwner().getLevelTitle();
-        this.ownerProfile = ImageService.getUrlFromImage(feed.getOwner().getProfile());
+        this.ownerProfile = ImageUtils.getUrlFromImage(feed.getOwner().getProfile());
 
         this.restaurantName = feed.getRestaurant().getName();
         this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
         this.category = feed.getCategory();
-        this.thumbnailUrl = ImageService.getUrlFromImage(feed.getThumbnail());
+        this.thumbnailUrl = ImageUtils.getUrlFromImage(feed.getThumbnail());
         this.content = feed.getContent();
         this.welcome = feed.getWelcome();
         this.difficulty = feed.getDifficulty();

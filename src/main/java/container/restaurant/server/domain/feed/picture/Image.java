@@ -14,6 +14,11 @@ import javax.validation.constraints.NotEmpty;
 @Entity(name = "TB_IMAGE_INFO")
 public class Image extends BaseEntity {
 
+    public static Image from(String imageKey) {
+        return new Image(imageKey);
+    }
+
+    // 실제로는... /api/image/ 뒤에올 uri 를 갖는다...
     @NotEmpty
     @Column(nullable = false)
     private String url;
@@ -21,6 +26,10 @@ public class Image extends BaseEntity {
     @Builder
     public Image(String url) {
         this.url = url;
+    }
+
+    public String getKey() {
+        return url.substring(url.lastIndexOf('/') + 1);
     }
 
 }

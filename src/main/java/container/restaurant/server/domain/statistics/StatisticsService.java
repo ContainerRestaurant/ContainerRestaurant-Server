@@ -8,8 +8,9 @@ import container.restaurant.server.web.dto.statistics.StatisticsDto;
 import container.restaurant.server.web.dto.statistics.UserProfileDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 @Log4j2
-public class StatisticsService implements ApplicationRunner {
+public class StatisticsService implements ApplicationListener<ContextStartedEvent> {
     private static final int MAX_COUNT = 100;
     private final UserService userService;
     private final FeedRepository feedRepository;
@@ -40,7 +41,7 @@ public class StatisticsService implements ApplicationRunner {
     private long feedWriterCountUntilUpdate;
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void onApplicationEvent(@NotNull ContextStartedEvent event) {
         init();
     }
 

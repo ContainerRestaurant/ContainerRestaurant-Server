@@ -2,9 +2,9 @@ package container.restaurant.server.domain.user;
 
 import container.restaurant.server.domain.base.BaseCreatedTimeEntity;
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -75,7 +75,7 @@ public class User extends BaseCreatedTimeEntity {
     }
 
     public String getProfileUrl() {
-        return profile != null ? ImageService.getUrlFromImage(profile) : null;
+        return profile != null ? ImageUtils.getUrlFromImage(profile) : null;
     }
 
     public void setNickname(String nickname) {

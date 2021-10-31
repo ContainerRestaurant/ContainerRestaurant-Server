@@ -3,6 +3,7 @@ package container.restaurant.server.web;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.web.base.BaseMvcControllerTest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,5 +50,4 @@ class ImageControllerTest extends BaseMvcControllerTest {
                         )
                 ));
     }
-
 }

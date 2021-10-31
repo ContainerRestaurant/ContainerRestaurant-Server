@@ -1,9 +1,9 @@
 package container.restaurant.server.web.dto.statistics;
 
 import container.restaurant.server.domain.feed.picture.Image;
-import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.user.ContainerLevel;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.utils.ImageUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -25,11 +25,11 @@ public class UserProfileDto {
     }
 
     public UserProfileDto(Long id, ContainerLevel level, String nickname, Image profile, LocalDateTime createdDate) {
-        this(id, level.getTitle(), nickname, ImageService.getUrlFromImage(profile));
+        this(id, level.getTitle(), nickname, ImageUtils.getUrlFromImage(profile));
     }
 
     public static UserProfileDto from(User user) {
         return new UserProfileDto(user.getId(), user.getLevelTitle(),
-                user.getNickname(), ImageService.getUrlFromImage(user.getProfile()));
+                user.getNickname(), ImageUtils.getUrlFromImage(user.getProfile()));
     }
 }
