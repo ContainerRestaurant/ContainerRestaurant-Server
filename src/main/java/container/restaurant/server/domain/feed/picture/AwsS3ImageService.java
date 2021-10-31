@@ -22,13 +22,13 @@ import java.util.UUID;
 @Service
 public class AwsS3ImageService implements ImageService {
 
-    @Value("${aws.key.access}")
+    @Value("${aws.key.access:}")
     private String accessKey;
 
-    @Value("${aws.key.secret}")
+    @Value("${aws.key.secret:}")
     private String secretKey;
 
-    @Value("${aws.s3.bucket.name}")
+    @Value("${aws.s3.bucket.name:}")
     private String bucketName;
 
     private AmazonS3 awsS3;
