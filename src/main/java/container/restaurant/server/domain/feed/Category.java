@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Category {
+    ALL("전체"),
     KOREAN("한식"),
     NIGHT_MEAL("야식"),
     CHINESE("중식"),

@@ -82,9 +82,9 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAll(Pageable pageable, Category categoryFilter, Long loginId) {
-        Page<Feed> page = categoryFilter != null ?
-                feedRepository.findAllByCategory(pageable, categoryFilter) :
-                feedRepository.findAll(pageable);
+        Page<Feed> page = (categoryFilter == null || categoryFilter.toString().equalsIgnoreCase("ALL")) ?
+                feedRepository.findAll(pageable) :
+                feedRepository.findAllByCategory(pageable, categoryFilter);
 
         return feedAssembler.toModel(page, new FeedPreviewDtoAssembler(loginId, page));
     }
