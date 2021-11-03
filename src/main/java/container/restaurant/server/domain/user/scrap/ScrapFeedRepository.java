@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.user.scrap;
 
+import container.restaurant.server.domain.feed.Feed;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,5 +19,7 @@ public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
     Optional<ScrapFeed> findByUserIdAndFeedId(Long userId, Long feedId);
 
     Boolean existsByUserIdAndFeedId(Long userId, Long feedId);
+
+    void deleteAllByFeed(Feed feed);
 
 }

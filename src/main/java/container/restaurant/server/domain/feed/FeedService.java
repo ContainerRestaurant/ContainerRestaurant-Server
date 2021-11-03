@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.feed;
 
+import container.restaurant.server.domain.comment.CommentRepository;
 import container.restaurant.server.domain.feed.hit.FeedHit;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
@@ -56,6 +57,7 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final ScrapFeedRepository scrapFeedRepository;
     private final FeedHitRepository feedHitRepository;
+    private final CommentRepository commentRepository;
 
     private final PagedResourcesAssembler<Feed> feedAssembler;
 
@@ -135,7 +137,13 @@ public class FeedService {
         feedHitRepository.deleteAllByFeed(feed);
         userLevelFeedCountService.levelFeedDown(feed);
 
+        // 피드 -< 댓글, 스크랩, 좋아요 삭제 추가 작업 (container는 cascade 삭제되는 것으로 파악)
+        commentRepository.deleteAllByFeed(feed);
+        scrapFeedRepository.deleteAllByFeed(feed);
+        feedLikeRepository.deleteAllByFeed(feed);
+
         feedRepository.delete(feed);
+
         recommendFeedService.checkAndDelete(feed);
     }
 
