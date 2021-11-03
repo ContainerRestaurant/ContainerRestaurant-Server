@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
@@ -42,12 +43,15 @@ public class UserService {
     @Transactional
     public UserDto.Token newToken(UserDto.ToRequestToken dto) {
         CustomOAuth2User authUser = oAuthAgentService.getAuthUser(dto);
-        Long userId = userRepository.findByIdentifier(authUser.getIdentifier())
-                 .orElseGet(() -> userRepository.save(
-                         User.builder().identifier(authUser.getIdentifier()).build()))
-                 .getId();
+
+        final Optional<User> optionalUser = userRepository.findByIdentifier(authUser.getIdentifier());
+
+        boolean isNewUser = optionalUser.isEmpty();
+        final User user = optionalUser
+                .orElseGet(() -> userRepository.save(User.builder().identifier(authUser.getIdentifier()).build()));
+
         String newToken = jwtLoginService.tokenize(authUser);
-        return new UserDto.Token(userId, newToken);
+        return new UserDto.Token(user.getId(), newToken, isNewUser);
     }
 
     @Transactional
