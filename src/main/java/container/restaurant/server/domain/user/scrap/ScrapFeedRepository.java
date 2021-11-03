@@ -7,9 +7,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Set;
 
 public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
 
@@ -21,5 +20,8 @@ public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
     Boolean existsByUserIdAndFeedId(Long userId, Long feedId);
 
     void deleteAllByFeed(Feed feed);
+
+    @Query("select sf.user.id from TB_SCRAP_FEED sf where sf.feed.id=:feedId")
+    ArrayList<Long> findUserIdByFeedId(Long feedId);
 
 }

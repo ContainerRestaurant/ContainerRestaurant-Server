@@ -139,7 +139,15 @@ public class FeedService {
 
         // 피드 -< 댓글, 스크랩, 좋아요 삭제 추가 작업 (container는 cascade 삭제되는 것으로 파악)
         commentRepository.deleteAllByFeed(feed);
-        scrapFeedRepository.deleteAllByFeed(feed);
+
+        List<Long> scrapUserId= scrapFeedRepository.findUserIdByFeedId(feedId);
+        if(!scrapUserId.isEmpty()){ // 피드 연관된 사용자 scrap count down
+            for(Long scrapUser:scrapUserId){
+                userService.findById(scrapUser).scrapCountDown();
+            }
+            scrapFeedRepository.deleteAllByFeed(feed);
+        }
+
         feedLikeRepository.deleteAllByFeed(feed);
 
         feedRepository.delete(feed);
