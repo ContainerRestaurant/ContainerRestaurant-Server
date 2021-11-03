@@ -170,12 +170,11 @@ class FeedServiceTest extends BaseMockTest {
         feedService.delete(feed.getId(), user.getId());
 
         //then
-        InOrder order = inOrder(feedHitRepository, commentRepository, scrapFeedRepository, feedLikeRepository, feedRepository);
+        InOrder order = inOrder(feedHitRepository, commentRepository, feedLikeRepository, feedRepository);
         verify(userLevelFeedCountService).levelFeedDown(feed);
         verify(recommendFeedService).checkAndDelete(feed);
         order.verify(feedHitRepository).deleteAllByFeed(feed);
         order.verify(commentRepository).deleteAllByFeed(feed);
-        order.verify(scrapFeedRepository).deleteAllByFeed(feed);
         order.verify(feedLikeRepository).deleteAllByFeed(feed);
         order.verify(feedRepository).delete(feed);
     }
