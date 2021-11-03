@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.feed;
 
 import container.restaurant.server.BaseMockTest;
+import container.restaurant.server.domain.comment.CommentRepository;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
@@ -52,6 +53,8 @@ class FeedServiceTest extends BaseMockTest {
     FeedLikeRepository feedLikeRepository;
     @Mock
     ScrapFeedRepository scrapFeedRepository;
+    @Mock
+    CommentRepository commentRepository;
     @Mock
     StatisticsService statisticsService;
 
@@ -167,10 +170,13 @@ class FeedServiceTest extends BaseMockTest {
         feedService.delete(feed.getId(), user.getId());
 
         //then
-        InOrder order = inOrder(feedHitRepository, feedRepository);
+        InOrder order = inOrder(feedHitRepository, commentRepository, scrapFeedRepository, feedLikeRepository, feedRepository);
         verify(userLevelFeedCountService).levelFeedDown(feed);
         verify(recommendFeedService).checkAndDelete(feed);
         order.verify(feedHitRepository).deleteAllByFeed(feed);
+        order.verify(commentRepository).deleteAllByFeed(feed);
+        order.verify(scrapFeedRepository).deleteAllByFeed(feed);
+        order.verify(feedLikeRepository).deleteAllByFeed(feed);
         order.verify(feedRepository).delete(feed);
     }
 
