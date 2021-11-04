@@ -78,10 +78,12 @@ class UserControllerTest extends BaseUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("token").value(expectedToken))
                 .andExpect(jsonPath("id").value(myself.getId()))
+                .andExpect(jsonPath("isNicknameNull").value(false))
                 .andDo(document("user-new-token",
                         responseFields(
                                 fieldWithPath("token").description("생성된 인증 토큰"),
-                                fieldWithPath("id").description("생성된 인증 토큰으로 식별되는 유저의 식별 ID"))));
+                                fieldWithPath("id").description("생성된 인증 토큰으로 식별되는 유저의 식별 ID"),
+                                fieldWithPath("isNicknameNull").description("로그인한 유저의 닉네임 null 여부"))));
     }
 
     @Test

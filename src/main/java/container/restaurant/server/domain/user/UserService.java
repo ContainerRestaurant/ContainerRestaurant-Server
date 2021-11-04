@@ -42,12 +42,11 @@ public class UserService {
     @Transactional
     public UserDto.Token newToken(UserDto.ToRequestToken dto) {
         CustomOAuth2User authUser = oAuthAgentService.getAuthUser(dto);
-        Long userId = userRepository.findByIdentifier(authUser.getIdentifier())
-                 .orElseGet(() -> userRepository.save(
-                         User.builder().identifier(authUser.getIdentifier()).build()))
-                 .getId();
+        final User user = userRepository.findByIdentifier(authUser.getIdentifier())
+                .orElseGet(() -> userRepository.save(
+                        User.builder().identifier(authUser.getIdentifier()).build()));
         String newToken = jwtLoginService.tokenize(authUser);
-        return new UserDto.Token(userId, newToken);
+        return new UserDto.Token(user.getId(), newToken, user.getNickname() == null);
     }
 
     @Transactional

@@ -31,6 +31,7 @@ public interface UserDto {
     class Token {
         private final Long id;
         private final String token;
+        private final Boolean isNicknameNull;
     }
 
     @Getter
