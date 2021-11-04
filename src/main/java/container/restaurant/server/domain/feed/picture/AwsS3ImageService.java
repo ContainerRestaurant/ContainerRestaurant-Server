@@ -38,6 +38,10 @@ public class AwsS3ImageService implements ImageService {
     private void initClient() {
         if (awsS3 != null) return;
 
+        System.out.println("===TEST===");
+        System.out.println("accessKey = " + accessKey);
+        System.out.println("secretKey = " + secretKey);
+        System.out.println("bucketName = " + bucketName);
         final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 
         awsS3 = AmazonS3ClientBuilder.standard()
