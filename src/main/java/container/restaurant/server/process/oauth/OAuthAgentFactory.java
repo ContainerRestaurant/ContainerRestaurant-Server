@@ -1,6 +1,7 @@
 package container.restaurant.server.process.oauth;
 
 import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.process.oauth.kakao.KakaoOAuthAgent;
 
 import java.util.Locale;
 import java.util.Map;
