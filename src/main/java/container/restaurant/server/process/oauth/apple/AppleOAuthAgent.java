@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.config.auth.user.CustomOAuth2User;
+import container.restaurant.server.domain.user.OAuth2Registration;
 import container.restaurant.server.exception.UnauthorizedException;
 import container.restaurant.server.process.oauth.OAuthAgent;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -14,6 +16,8 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 
+import static container.restaurant.server.config.auth.user.CustomOAuth2User.REGISTRATION;
+import static container.restaurant.server.domain.user.OAuth2Registration.APPLE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.of;
 
@@ -38,12 +42,13 @@ public class AppleOAuthAgent implements OAuthAgent {
         AppleAuthKeys authKeys = getPublicKeys();
         PublicKey publicKey = authKeys.publicKeyFrom(tokenHeader);
 
-        return of(OAuthAttributes.ofApple(
-                Jwts.parserBuilder()
-                        .setSigningKey(publicKey)
-                        .build()
+        Map<String, Object> attrs = Jwts.parserBuilder()
+                .setSigningKey(publicKey)
+                .build()
                 .parseClaimsJws(accessToken)
-                .getBody()));
+                .getBody();
+        attrs.put(REGISTRATION, APPLE);
+        return of(OAuthAttributes.ofApple(attrs));
     }
 
     private Map<String, String> getTokenHeader(String accessToken) {
@@ -53,7 +58,7 @@ public class AppleOAuthAgent implements OAuthAgent {
             //noinspection unchecked
             return new ObjectMapper().readValue(tokenHeaderStr, Map.class);
         } catch (JsonProcessingException e) {
-            throw new UnauthorizedException("액세스 토큰 인증에 실패했습니다.", e);
+            throw new UnauthorizedException("액세스 토큰 인증에 실패했습니다. (헤더 파싱 실패)", e);
         }
     }
 
