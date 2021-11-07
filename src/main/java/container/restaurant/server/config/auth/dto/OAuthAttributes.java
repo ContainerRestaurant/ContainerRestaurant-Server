@@ -40,6 +40,14 @@ public class OAuthAttributes {
                 .build();
     }
 
+    public static OAuthAttributes ofApple(Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .identifier(OAuth2Identifier.of(attributes.get("sub").toString(), OAuth2Registration.APPLE))
+                .email((String) attributes.get("email"))
+                .attributes(attributes)
+                .build();
+    }
+
     public static OAuthAttributes ofKakao(Map<String, Object> attributes) {
         return ofKakao(null, attributes);
     }
