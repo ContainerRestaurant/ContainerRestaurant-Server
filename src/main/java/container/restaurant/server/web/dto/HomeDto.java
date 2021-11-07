@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static container.restaurant.server.domain.user.ContainerLevel.LEVEL_1;
 import static java.util.Optional.ofNullable;
@@ -26,7 +27,7 @@ public class HomeDto extends RepresentationModel<HomeDto> {
     private final String myProfile;
     private final String phrase;
 
-    private final List<String> latestWriterProfile = new ArrayList<>();
+    private final List<UserProfileDto> latestWriterProfile = new ArrayList<>();
     private final List<HomeBannerDto> banners = new ArrayList<>();
 
     @Builder
@@ -39,8 +40,7 @@ public class HomeDto extends RepresentationModel<HomeDto> {
                 from(user, User::getProfileUrl, null),
                 phrase);
 
-        latestWriters.stream().limit(3).forEach(u ->
-                this.latestWriterProfile.add(u.getProfile()));
+        latestWriterProfile.addAll(latestWriters.stream().limit(3).collect(Collectors.toList()));
 
         this.banners.addAll(banners);
     }
