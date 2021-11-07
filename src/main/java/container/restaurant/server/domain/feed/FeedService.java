@@ -159,7 +159,8 @@ public class FeedService {
     public Long createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantService.findByDto(dto.getRestaurantCreateDto());
-        Image thumbnail = imageService.findById(dto.getThumbnailImageId());
+        Image thumbnail = dto.getThumbnailImageId() == null ? null :
+                imageService.findById(dto.getThumbnailImageId());
 
         Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant, thumbnail));
 
