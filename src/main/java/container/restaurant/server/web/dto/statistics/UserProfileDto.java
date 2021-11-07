@@ -24,12 +24,16 @@ public class UserProfileDto {
         this.profile = profile;
     }
 
+    public String getProfile() {
+        return ImageUtils.getFileServerUrl(profile);
+    }
+
     public UserProfileDto(Long id, ContainerLevel level, String nickname, Image profile, LocalDateTime createdDate) {
-        this(id, level.getTitle(), nickname, ImageUtils.getUrlFromImage(profile));
+        this(id, level.getTitle(), nickname, profile != null ? profile.getUrl() : null);
     }
 
     public static UserProfileDto from(User user) {
         return new UserProfileDto(user.getId(), user.getLevelTitle(),
-                user.getNickname(), ImageUtils.getUrlFromImage(user.getProfile()));
+                user.getNickname(), user.getProfile() != null ? user.getProfile().getUrl() : null);
     }
 }
