@@ -79,7 +79,7 @@ class HomeControllerTest extends BaseUserControllerTest {
                                 fieldWithPath("myLevelTitle").description("로그인한 사용자의 레벨 타이틀"),
                                 fieldWithPath("myProfile").description("로그인한 사용자의 프로필 이미지"),
                                 fieldWithPath("phrase").description("메인 문구"),
-                                fieldWithPath("latestWriterProfile").description("최근 피드 작성자 3인의 프로필 이미지"),
+                                subsectionWithPath("latestWriterProfile").description("최근 피드 작성자 3인의 정보"),
                                 subsectionWithPath("banners").description("배너 Id 와 배너 이미지 url 목록"),
                                 subsectionWithPath("_links").description("본 응답에서 전이 가능한 링크 명세")
                         )
