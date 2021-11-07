@@ -1,7 +1,8 @@
-package container.restaurant.server.process.oauth;
+package container.restaurant.server.process.oauth.kakao;
 
 import container.restaurant.server.config.auth.dto.OAuthAttributes;
 import container.restaurant.server.config.auth.user.CustomOAuth2User;
+import container.restaurant.server.process.oauth.OAuthAgent;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;

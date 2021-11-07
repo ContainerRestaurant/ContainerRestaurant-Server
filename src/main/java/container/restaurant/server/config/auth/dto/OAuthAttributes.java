@@ -16,11 +16,8 @@ public class OAuthAttributes {
 
     private final Map<String, Object> attributes;
 
-    private final String nickname;
     private final String email;
     private final OAuth2Identifier identifier;
-
-    private final String nameAttributeKey;
 
     public static OAuthAttributes of(
             String registrationId, String userNameAttributeName, Map<String, Object> attributes
@@ -35,8 +32,14 @@ public class OAuthAttributes {
                 .identifier(OAuth2Identifier.of(attributes.get("sub").toString(), OAuth2Registration.GOOGLE))
                 .email((String) attributes.get("email"))
                 .attributes(attributes)
-                .nameAttributeKey(userNameAttributeName)
-                .nickname((String) attributes.get("name"))
+                .build();
+    }
+
+    public static OAuthAttributes ofApple(Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .identifier(OAuth2Identifier.of(attributes.get("sub").toString(), OAuth2Registration.APPLE))
+                .email((String) attributes.get("email"))
+                .attributes(attributes)
                 .build();
     }
 
@@ -53,8 +56,6 @@ public class OAuthAttributes {
                 .identifier(OAuth2Identifier.of(attributes.get("id").toString(), OAuth2Registration.KAKAO))
                 .email(kakaoAccount.get("email"))
                 .attributes(attributes)
-                .nameAttributeKey(userNameAttributeName)
-                .nickname(properties.get("nickname"))
                 .build();
     }
 

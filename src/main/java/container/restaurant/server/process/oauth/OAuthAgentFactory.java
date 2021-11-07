@@ -1,9 +1,13 @@
 package container.restaurant.server.process.oauth;
 
 import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.process.oauth.apple.AppleOAuthAgent;
+import container.restaurant.server.process.oauth.kakao.KakaoOAuthAgent;
 
 import java.util.Locale;
 import java.util.Map;
+
+import static container.restaurant.server.domain.user.OAuth2Registration.*;
 
 public class OAuthAgentFactory {
 
@@ -11,7 +15,8 @@ public class OAuthAgentFactory {
 
     public static OAuthAgentFactory createDefaultFactory() {
         return new OAuthAgentFactory(Map.of(
-                OAuth2Registration.KAKAO, new KakaoOAuthAgent()
+                KAKAO, new KakaoOAuthAgent(),
+                APPLE, new AppleOAuthAgent()
         ));
     }
 
@@ -24,6 +29,6 @@ public class OAuthAgentFactory {
     }
 
     public OAuthAgent get(String provider) {
-        return agentMap.get(OAuth2Registration.valueOf(provider.toUpperCase(Locale.ROOT)));
+        return agentMap.get(valueOf(provider.toUpperCase(Locale.ROOT)));
     }
 }

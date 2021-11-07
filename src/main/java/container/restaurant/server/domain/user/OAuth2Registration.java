@@ -37,7 +37,15 @@ public enum OAuth2Registration {
         );
     }),
     APPLE((String userNameAttributeName, Map<String, Object> attributes) -> {
-        throw new UnsupportedOperationException("아직 지원하지 않는 로그인 제공자입니다.(APPLE)");}),
+        LocalDateTime now = LocalDateTime.now();
+
+        return Map.of(
+                SUBJECT, attributes.get("sub"),
+                EXPIRATION_TIME, getLongTime(now.plusMonths(1)),
+                ISSUED_AT, getLongTime(now),
+                REGISTRATION, "APPLE",
+                EMAIL, attributes.getOrDefault("email", ""));
+    }),
     GOOGLE((String userNameAttributeName, Map<String, Object> attributes) -> {
         throw new UnsupportedOperationException("아직 지원하지 않는 로그인 제공자입니다.(GOOGLE)");});
 
