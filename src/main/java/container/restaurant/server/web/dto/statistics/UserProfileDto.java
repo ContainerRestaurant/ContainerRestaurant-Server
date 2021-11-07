@@ -25,7 +25,7 @@ public class UserProfileDto {
     }
 
     public String getProfile() {
-        return ImageUtils.getFileServerUrl(profile);
+        return profile != null ? ImageUtils.getFileServerUrl(profile) : null;
     }
 
     public UserProfileDto(Long id, ContainerLevel level, String nickname, Image profile, LocalDateTime createdDate) {
