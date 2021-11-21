@@ -13,8 +13,10 @@ public class LevelUpDto {
 
     private LevelUpDto(ContainerLevel to) {
         this.levelFeedCount = to.getNeedCount();
-        this.from = getLevel(to.getLevel() - 1).getTitle();
         this.to = to.getTitle();
+
+        ContainerLevel levelFrom = getLevel(to.getLevel() - 1);
+        this.from = levelFrom != null ? levelFrom.getTitle() : null;
     }
 
     public static LevelUpDto to(ContainerLevel to) {
