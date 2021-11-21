@@ -1,6 +1,5 @@
 package container.restaurant.server.domain.feed;
 
-import container.restaurant.server.domain.comment.Comment;
 import container.restaurant.server.domain.comment.CommentRepository;
 import container.restaurant.server.domain.comment.like.CommentLikeRepository;
 import container.restaurant.server.domain.feed.hit.FeedHit;
@@ -19,9 +18,7 @@ import container.restaurant.server.domain.user.level.UserLevelFeedCountService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedRepository;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.web.dto.feed.FeedDetailDto;
-import container.restaurant.server.web.dto.feed.FeedInfoDto;
-import container.restaurant.server.web.dto.feed.FeedPreviewDto;
+import container.restaurant.server.web.dto.feed.*;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
@@ -162,7 +159,7 @@ public class FeedService {
     }
 
     @Transactional
-    public Long createFeed(FeedInfoDto dto, Long ownerId) {
+    public FeedCreateResultDto createFeed(FeedInfoDto dto, Long ownerId) {
         User user = userService.findById(ownerId);
         Restaurant restaurant = restaurantService.findByDto(dto.getRestaurantCreateDto());
         Image thumbnail = dto.getThumbnailImageId() == null ? null :
@@ -174,8 +171,8 @@ public class FeedService {
 
         feed.getOwner().feedCountUp();
         feed.getRestaurant().feedCountUp(feed);
-        userLevelFeedCountService.levelFeedUp(feed);
-        return feed.getId();
+        LevelUpDto levelUpDto = userLevelFeedCountService.levelFeedUp(feed);
+        return new FeedCreateResultDto(feed.getId(), levelUpDto);
     }
 
     @Transactional

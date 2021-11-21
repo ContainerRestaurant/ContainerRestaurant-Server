@@ -2,6 +2,7 @@ package container.restaurant.server.domain.user.level;
 
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.user.User;
+import container.restaurant.server.web.dto.feed.LevelUpDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,13 @@ public class UserLevelFeedCountService {
     private final UserLevelFeedCountRepository userLevelRepository;
 
     @Transactional
-    public void levelFeedUp(Feed feed) {
+    public LevelUpDto levelFeedUp(Feed feed) {
         User owner = feed.getOwner();
 
         if (updateAndGetResult(owner, feed, 1) <= DAY_LIMIT) {
-            owner.levelFeedUp(1);
+            return owner.levelFeedUp(1);
         }
+        return null;
     }
 
     @Transactional
