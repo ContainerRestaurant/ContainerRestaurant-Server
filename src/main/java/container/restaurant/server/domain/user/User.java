@@ -110,6 +110,14 @@ public class User extends BaseCreatedTimeEntity {
         this.feedCount--;
     }
 
+    public void bookmarkedCountUp() {
+        this.bookmarkedCount++;
+    }
+
+    public void bookmarkedCountDown() {
+        this.bookmarkedCount--;
+    }
+
     public LevelUpDto levelFeedUp(int count) {
         return updateLevelFeed(count);
     }

@@ -31,6 +31,7 @@ public class RestaurantFavoriteService {
                         restaurantFavorite -> {/* do nothing*/},
                         () -> {
                             restaurantFavoriteRepository.save(RestaurantFavorite.of(user, restaurant));
+                            user.bookmarkedCountUp();
                             restaurant.favoriteCountUp();
                         }
                 );
@@ -44,6 +45,7 @@ public class RestaurantFavoriteService {
         restaurantFavoriteRepository.findByUserAndRestaurant(user, restaurant)
                 .ifPresent(restaurantFavorite -> {
                     restaurantFavoriteRepository.delete(restaurantFavorite);
+                    user.bookmarkedCountDown();
                     restaurant.favoriteCountDown();
                 });
     }
