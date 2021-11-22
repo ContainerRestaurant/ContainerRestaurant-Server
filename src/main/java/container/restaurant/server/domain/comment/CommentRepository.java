@@ -13,5 +13,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Long> findCommentIdByFeedId(Long feedId);
 
     List<Comment> findAllByUpperReplyId(Long id);
+
     void deleteAllByFeed(Feed feed);
+
+    void deleteAllByOwnerId(Long ownerId);
+
+    @Query("select c.feed.id from TB_COMMENT c where c.owner.id=:ownerId")
+    List<Long> findAllByOwnerId(Long ownerId);
+
+    List<Long> findIdByOwnerId(Long ownerId);
 }

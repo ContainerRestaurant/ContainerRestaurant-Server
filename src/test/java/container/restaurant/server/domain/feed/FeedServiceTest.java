@@ -7,6 +7,7 @@ import container.restaurant.server.domain.feed.like.FeedLikeRepository;
 import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
+import container.restaurant.server.domain.report.ReportFeedRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.restaurant.menu.Menu;
@@ -57,6 +58,8 @@ class FeedServiceTest extends BaseMockTest {
     CommentRepository commentRepository;
     @Mock
     StatisticsService statisticsService;
+    @Mock
+    ReportFeedRepository reportFeedRepository;
 
     @Spy
     @InjectMocks
@@ -170,10 +173,11 @@ class FeedServiceTest extends BaseMockTest {
         feedService.delete(feed.getId(), user.getId());
 
         //then
-        InOrder order = inOrder(feedHitRepository, commentRepository, feedLikeRepository, feedRepository);
+        InOrder order = inOrder(feedHitRepository,reportFeedRepository, commentRepository, feedLikeRepository, feedRepository);
         verify(userLevelFeedCountService).levelFeedDown(feed);
         verify(recommendFeedService).checkAndDelete(feed);
         order.verify(feedHitRepository).deleteAllByFeed(feed);
+        order.verify(reportFeedRepository).deleteAllByFeedId(feed.getId());
         order.verify(commentRepository).deleteAllByFeed(feed);
         order.verify(feedLikeRepository).deleteAllByFeed(feed);
         order.verify(feedRepository).delete(feed);

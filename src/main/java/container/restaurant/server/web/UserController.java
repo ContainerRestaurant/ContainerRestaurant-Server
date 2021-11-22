@@ -1,7 +1,13 @@
 package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.LoginId;
+import container.restaurant.server.domain.comment.CommentService;
+import container.restaurant.server.domain.comment.like.CommentLikeService;
+import container.restaurant.server.domain.feed.FeedService;
+import container.restaurant.server.domain.feed.like.FeedLikeService;
+import container.restaurant.server.domain.report.ReportService;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.domain.user.scrap.ScrapFeedService;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.web.dto.user.UserDto;
@@ -24,6 +30,12 @@ import static java.util.Optional.ofNullable;
 public class UserController {
 
     private final UserService userService;
+    private final FeedService feedService;
+    private final CommentLikeService commentLikeService;
+    private final CommentService commentService;
+    private final FeedLikeService feedLikeService;
+    private final ScrapFeedService scrapFeedService;
+    private final ReportService reportService;
 
     private final UserLinker userLinker;
     private final FeedLinker feedLinker;
@@ -69,6 +81,21 @@ public class UserController {
         if (!id.equals(loginId))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
 
+        //report 삭제
+        reportService.deleteAllByReporterId(id);
+        //tb_feed 삭제
+        List<Long> userFeedIdList = feedService.findAllByOwnerId(id);
+        for (Long userFeedId : userFeedIdList) {
+            feedService.delete(userFeedId, id);
+        }
+        //tb_comment에서 해당 comment like_count-- 후 tb_comment_like 삭제
+        commentLikeService.deleteAllByUserId(id);
+        //tb_feed에서 reply_count--후 tb_comment 삭제
+        commentService.deleteAllByOwnerId(id);
+        // 해당 feed에서 like,scrap count--후 tb_feed_hit, tb_feed_like, tb_scrap_feed 삭제
+        feedLikeService.deleteAllByUserId(id);
+        scrapFeedService.deleteAllByUserId(id);
+        //최종 사용자 및 테이블 데이터 삭제
         userService.deleteById(id);
 
         return ResponseEntity.noContent().build();

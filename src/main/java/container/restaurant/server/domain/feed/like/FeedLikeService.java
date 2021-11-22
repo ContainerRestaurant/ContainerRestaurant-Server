@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class FeedLikeService {
@@ -51,5 +53,14 @@ public class FeedLikeService {
                 });
 
         recommendFeedService.checkAndUpdate(feed);
+    }
+    @Transactional
+    public void deleteAllByUserId(Long userId){
+        List<Long> feedIdList=feedLikeRepository.findAllByUserId(userId);
+        for(Long feedId:feedIdList){
+            Feed feed=feedService.findById(feedId);
+            feed.likeCountDown();
+        }
+        feedLikeRepository.deleteAllByUserId(userId);
     }
 }

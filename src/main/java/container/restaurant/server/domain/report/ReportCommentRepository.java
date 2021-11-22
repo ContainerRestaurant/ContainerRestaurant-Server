@@ -6,4 +6,7 @@ public interface ReportCommentRepository extends JpaRepository<ReportComment, Lo
 
     boolean existsDistinctByReporterIdAndCommentId(Long reporterId, Long commentId);
 
+    void deleteAllByReporterId(Long reporterId);
+
+    void deleteAllByCommentId(Long commentId);
 }

@@ -10,6 +10,7 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.push.event.FeedHitEvent;
+import container.restaurant.server.domain.report.ReportFeedRepository;
 import container.restaurant.server.domain.restaurant.Restaurant;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.statistics.StatisticsService;
@@ -61,6 +62,7 @@ public class FeedService {
     private final FeedHitRepository feedHitRepository;
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final ReportFeedRepository reportFeedRepository;
     private final PagedResourcesAssembler<Feed> feedAssembler;
 
     private final ApplicationEventPublisher publisher;
@@ -83,7 +85,10 @@ public class FeedService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "존재하지 않는 피드입니다..(id:" + id + ")"));
     }
-
+    @Transactional(readOnly = true)
+    public List<Long> findAllByOwnerId(Long ownerId){
+        return feedRepository.findAllByOwnerId(ownerId);
+    }
     @Transactional(readOnly = true)
     public PagedModel<FeedPreviewDto> findAll(Pageable pageable, Category categoryFilter, Long loginId) {
         Page<Feed> page = (categoryFilter == null || categoryFilter.toString().equalsIgnoreCase("ALL")) ?
@@ -138,6 +143,8 @@ public class FeedService {
         feed.getRestaurant().feedCountDown(feed);
         feedHitRepository.deleteAllByFeed(feed);
         userLevelFeedCountService.levelFeedDown(feed);
+
+        reportFeedRepository.deleteAllByFeedId(feedId);
 
         // 댓글 좋아요 삭제
         List<Long> commentIdList=commentRepository.findCommentIdByFeedId(feedId);

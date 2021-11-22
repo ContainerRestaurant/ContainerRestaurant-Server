@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -48,5 +49,13 @@ public class CommentLikeService {
                     commentLikeRepository.delete(commentLike);
                     commentService.likeCountDown(commentId);
                 });
+    }
+    @Transactional
+    public void deleteAllByUserId(Long userId){
+        List<Long> commentIdList=commentLikeRepository.findAllByUserId(userId);
+        for(Long commentId:commentIdList){
+            commentService.likeCountDown(commentId);
+        }
+        commentLikeRepository.deleteAllByUserId(userId);
     }
 }

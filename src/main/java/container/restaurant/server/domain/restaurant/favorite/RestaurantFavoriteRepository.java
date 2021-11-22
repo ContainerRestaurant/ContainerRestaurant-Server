@@ -16,4 +16,6 @@ public interface RestaurantFavoriteRepository extends JpaRepository<RestaurantFa
     List<RestaurantFavorite> findAllByUser(User user);
 
     Boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId);
+
+    void deleteAllByUserId(Long userId);
 }

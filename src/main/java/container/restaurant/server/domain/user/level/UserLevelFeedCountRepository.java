@@ -15,4 +15,5 @@ public interface UserLevelFeedCountRepository extends JpaRepository<UserLevelFee
     @EntityGraph(attributePaths = {"user"})
     List<UserLevelFeedCount> findAllByDateBefore(LocalDate date);
 
+    void deleteAllByUserId(Long userId);
 }

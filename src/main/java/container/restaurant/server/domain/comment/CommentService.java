@@ -5,6 +5,7 @@ import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;
+import container.restaurant.server.domain.report.ReportCommentRepository;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.exception.ResourceNotFoundException;
@@ -27,6 +28,7 @@ import static java.util.Optional.ofNullable;
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final ReportCommentRepository reportCommentRepository;
 
     private final UserService userService;
     private final FeedService feedService;
@@ -130,5 +132,19 @@ public class CommentService {
     public void likeCountDown(Long commentId) {
         Comment comment = findById(commentId);
         comment.likeCountDown();
+    }
+
+    @Transactional
+    public void deleteAllByOwnerId(Long ownerId){
+        List<Long>  feedIdList=commentRepository.findAllByOwnerId(ownerId);
+        for(Long feedId:feedIdList){
+            Feed feed = feedService.findById(feedId);
+            feed.commentCountDown();
+        }
+        List<Long> commentIdList=commentRepository.findIdByOwnerId(ownerId);
+        for(Long commentId:commentIdList){
+            reportCommentRepository.deleteAllByCommentId(commentId);
+        }
+        commentRepository.deleteAllByOwnerId(ownerId);
     }
 }

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class ScrapFeedService {
@@ -42,5 +44,14 @@ public class ScrapFeedService {
                     user.scrapCountDown();
                     feed.scrapCountDown();
                 });
+    }
+    @Transactional
+    public void deleteAllByUserId(Long userId){
+        List<Long> feedIdList=scrapFeedRepository.findAllByUserId(userId);
+        for(Long feedId:feedIdList){
+            Feed feed=feedService.findById(feedId);
+            feed.scrapCountDown();
+        }
+        scrapFeedRepository.deleteAllByUserId(userId);
     }
 }
