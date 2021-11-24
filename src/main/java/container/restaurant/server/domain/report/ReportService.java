@@ -41,4 +41,9 @@ public class ReportService {
         reportCommentRepository.save(ReportComment.of(reporter, comment));
     }
 
+    @Transactional
+    public void deleteAllByReporterId(Long reporterId){
+        reportCommentRepository.deleteAllByReporterId(reporterId);
+        reportFeedRepository.deleteAllByReporterId(reporterId);
+    }
 }

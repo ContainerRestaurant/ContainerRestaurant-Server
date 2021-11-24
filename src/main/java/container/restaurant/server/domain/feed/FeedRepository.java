@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
@@ -24,6 +25,9 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByOwnerId(Long userId, Pageable pageable);
+
+    @Query("select f.id from TB_FEED f where f.owner.id=:ownerId")
+    List<Long> findAllByOwnerId(Long ownerId);
 
     @EntityGraph(attributePaths = { "owner", "thumbnail" })
     Page<Feed> findAllByRestaurantId(Long restaurantId, Pageable pageable);

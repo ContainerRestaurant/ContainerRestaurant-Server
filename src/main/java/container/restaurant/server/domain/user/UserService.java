@@ -1,7 +1,10 @@
 package container.restaurant.server.domain.user;
 
 import container.restaurant.server.config.auth.user.CustomOAuth2User;
+import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
+import container.restaurant.server.domain.user.level.UserLevelFeedCountRepository;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgentService;
 import container.restaurant.server.utils.jwt.JwtLoginService;
@@ -28,6 +31,10 @@ public class UserService {
     private final OAuthAgentService oAuthAgentService;
 
     private final JwtLoginService jwtLoginService;
+
+    private final RestaurantFavoriteRepository restaurantFavoriteRepository;
+    private final UserLevelFeedCountRepository userLevelFeedCountRepository;
+    private final FeedHitRepository feedHitRepository;
 
     @Transactional
     public User createOrUpdate(
@@ -83,6 +90,10 @@ public class UserService {
 
     @Transactional
     public void deleteById(Long id) {
+        restaurantFavoriteRepository.deleteAllByUserId(id);
+        userLevelFeedCountRepository.deleteAllByUserId(id);
+        feedHitRepository.deleteAllByUserId(id);
+
         userRepository.deleteById(id);
     }
 

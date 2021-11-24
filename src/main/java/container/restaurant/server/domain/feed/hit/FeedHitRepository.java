@@ -7,5 +7,5 @@ public interface FeedHitRepository extends JpaRepository<FeedHit, Long> {
 
     boolean existsByUserIdAndFeedId(Long userId, Long feedId);
     void deleteAllByFeed(Feed feed);
-
+    void deleteAllByUserId(Long userId);
 }

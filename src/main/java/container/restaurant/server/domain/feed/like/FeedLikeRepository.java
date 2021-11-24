@@ -22,4 +22,8 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
 
     void deleteAllByFeed(Feed feed);
 
+    void deleteAllByUserId(Long userId);
+
+    @Query("select fl.feed.id from TB_FEED_LIKE fl where fl.user.id=:userId")
+    List<Long> findAllByUserId(Long userId);
 }

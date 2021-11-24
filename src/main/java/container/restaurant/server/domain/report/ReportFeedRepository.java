@@ -6,4 +6,8 @@ public interface ReportFeedRepository extends JpaRepository<ReportFeed, Long> {
 
     boolean existsDistinctByReporterIdAndFeedId(Long reporterId, Long feedId);
 
+    void deleteAllByReporterId(Long reporterId);
+
+    void deleteAllByFeedId(Long feedId);
+
 }

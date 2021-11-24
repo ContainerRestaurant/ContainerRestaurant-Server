@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
@@ -24,4 +25,8 @@ public interface ScrapFeedRepository extends JpaRepository<ScrapFeed, Long> {
     @Query("select sf.user.id from TB_SCRAP_FEED sf where sf.feed.id=:feedId")
     ArrayList<Long> findUserIdByFeedId(Long feedId);
 
+    void deleteAllByUserId(Long userId);
+
+    @Query("select sf.feed.id from TB_SCRAP_FEED sf where sf.user.id=:userId")
+    List<Long> findAllByUserId(Long userId);
 }
