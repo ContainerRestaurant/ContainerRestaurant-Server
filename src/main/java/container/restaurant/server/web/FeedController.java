@@ -4,6 +4,7 @@ import container.restaurant.server.config.auth.LoginId;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
+import container.restaurant.server.web.dto.feed.FeedCreateResultDto;
 import container.restaurant.server.web.dto.feed.FeedDetailDto;
 import container.restaurant.server.web.dto.feed.FeedInfoDto;
 import container.restaurant.server.web.dto.feed.FeedPreviewDto;
@@ -89,11 +90,11 @@ public class FeedController {
     public ResponseEntity<?> createFeed(
             @Valid @RequestBody FeedInfoDto dto, @LoginId Long loginId
     ) {
-        Long newFeedId = feedService.createFeed(dto, loginId);
+        FeedCreateResultDto result = feedService.createFeed(dto, loginId);
 
         return ResponseEntity
-                .created(feedLinker.getFeedDetail(newFeedId).toUri())
-                .build();
+                .created(feedLinker.getFeedDetail(result.getFeedId()).toUri())
+                .body(result);
     }
 
     @PatchMapping("{feedId}")

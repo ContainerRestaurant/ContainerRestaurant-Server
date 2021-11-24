@@ -5,11 +5,15 @@ import container.restaurant.server.domain.feed.picture.Image;
 import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.validator.NicknameConstraint;
 import container.restaurant.server.utils.ImageUtils;
+import container.restaurant.server.web.dto.feed.LevelUpDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 import static container.restaurant.server.domain.user.ContainerLevel.*;
 
@@ -106,30 +110,37 @@ public class User extends BaseCreatedTimeEntity {
         this.feedCount--;
     }
 
-    public void levelFeedUp(int count) {
-        updateLevelFeed(count);
+    public void bookmarkedCountUp() {
+        this.bookmarkedCount++;
+    }
+
+    public void bookmarkedCountDown() {
+        this.bookmarkedCount--;
+    }
+
+    public LevelUpDto levelFeedUp(int count) {
+        return updateLevelFeed(count);
     }
 
     public void levelFeedDown(int count) {
         updateLevelFeed(-count);
     }
 
-    private void updateLevelFeed(int count) {
+    private LevelUpDto updateLevelFeed(int count) {
         this.levelFeedCount += count;
-        updateLevel();
+        return updateLevel();
     }
 
-    private void updateLevel() {
-        if (this.levelFeedCount <= 0) {
-            this.containerLevel = LEVEL_1;
-        } else if (this.levelFeedCount < 5) {
-            this.containerLevel = LEVEL_2;
-        } else if (this.levelFeedCount < 10) {
-            this.containerLevel = LEVEL_3;
-        } else if (this.levelFeedCount < 20) {
-            this.containerLevel = LEVEL_4;
-        } else {
-            this.containerLevel = LEVEL_5;
+    private LevelUpDto updateLevel() {
+        for (ContainerLevel level : values()) {
+            if (this.levelFeedCount > level.getNeedCount()) {
+                this.containerLevel = level;
+                break;
+            } else if (Objects.equals(this.levelFeedCount, level.getNeedCount())) {
+                this.containerLevel = level;
+                return LevelUpDto.to(level);
+            }
         }
+        return null;
     }
 }

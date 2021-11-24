@@ -478,6 +478,10 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("welcome").description("(Optional) 사장님 환영 여부"),
                                 fieldWithPath("thumbnailImageId").description("(Optional) 썸네일 이미지 식별값"),
                                 fieldWithPath("content").description("(Optional) 피드 콘텐트")
+                        ), responseFields(
+                                fieldWithPath("feedId").description("생성된 피드의 id"),
+                                subsectionWithPath("levelUp").description("(Optional) 사용자가 레벨업 한 경우 반환되는 " +
+                                        "정보로, 레벨에 관여한 피드 개수와 레벨 타이틀을 포함한다.")
                         )));
     }
 

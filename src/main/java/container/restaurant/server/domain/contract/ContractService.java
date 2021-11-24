@@ -16,13 +16,15 @@ import java.util.List;
 public class ContractService {
     private final ContractRepository contractRepository;
 
-    List<ContractInfoDto>  contractInfoDto = new ArrayList<>();
+    List<ContractInfoDto> contractInfoDto = new ArrayList<>();
 
     @PostConstruct
     @Scheduled(cron = "0 0 3 * * *")
     public void putContract(){
+        List<ContractInfoDto> newContractInfoDto = new ArrayList<>();
         contractRepository.findAll().forEach(contract ->
-                contractInfoDto.add(ContractInfoDto.from(contract)));
+                newContractInfoDto.add(ContractInfoDto.from(contract)));
+        this.contractInfoDto = newContractInfoDto;
     }
 
     @Transactional(readOnly = true)
