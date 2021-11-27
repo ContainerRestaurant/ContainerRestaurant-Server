@@ -137,7 +137,7 @@ public class FeedService {
         statisticsService.removeRecentUser(feed.getOwner());
 
         feed.getOwner().feedCountDown();
-        feed.getRestaurant().feedCountDown(feed);
+        feed.getRestaurant().deleteFeedStatics(feed);
         feedHitRepository.deleteAllByFeed(feed);
         userLevelFeedCountService.levelFeedDown(feed);
 
@@ -173,11 +173,11 @@ public class FeedService {
                 imageService.findById(dto.getThumbnailImageId());
 
         Feed feed = feedRepository.save(dto.toFeedWith(user, restaurant, thumbnail));
+        user.feedCountUp();
+        restaurant.updateFeedStatics(feed);
 
         statisticsService.addRecentUser(user);
 
-        feed.getOwner().feedCountUp();
-        feed.getRestaurant().feedCountUp(feed);
         LevelUpDto levelUpDto = userLevelFeedCountService.levelFeedUp(feed);
         return new FeedCreateResultDto(feed.getId(), levelUpDto);
     }
@@ -188,10 +188,10 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
 
-        feed.getRestaurant().feedCountDown(feed);
+        feed.getRestaurant().deleteFeedStatics(feed);
         dto.updateSimpleAttrs(feed);
         updateRelationalAttrs(feed, dto);
-        feed.getRestaurant().feedCountUp(feed);
+        feed.getRestaurant().updateFeedStatics(feed);
 
         recommendFeedService.checkAndUpdate(feed);
     }
