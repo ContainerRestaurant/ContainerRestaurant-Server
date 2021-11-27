@@ -116,7 +116,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     }
 
     private void updateBestMenus() {
-        Pageable page = PageRequest.of(1, 1000);
+        Pageable page = PageRequest.of(0, 1000);
 
         while (!Objects.equals(page, unpaged())) {
             page = restaurantService.updateBestMenusPage(page);
@@ -124,7 +124,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     }
 
     private void updateRestaurantThumbnail() {
-        Pageable page = PageRequest.of(1, 1000);
+        Pageable page = PageRequest.of(0, 1000);
 
         while (!Objects.equals(page, unpaged())) {
             page = restaurantService.updateThumbnailPage(page);
