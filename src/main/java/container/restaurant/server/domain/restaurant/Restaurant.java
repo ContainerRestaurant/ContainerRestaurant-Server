@@ -1,7 +1,7 @@
 package container.restaurant.server.domain.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import container.restaurant.server.domain.base.BaseEntity;
+import container.restaurant.server.domain.base.BaseTimeEntity;
 import container.restaurant.server.domain.feed.Container;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.domain.feed.picture.Image;
@@ -27,7 +27,7 @@ import static container.restaurant.server.utils.SpatialUtils.createPointType;
 @Getter
 @NoArgsConstructor
 @Entity(name = "TB_RESTAURANT")
-public class Restaurant extends BaseEntity {
+public class Restaurant extends BaseTimeEntity {
 
     @NotNull
     private String name;
@@ -149,5 +149,11 @@ public class Restaurant extends BaseEntity {
         return feed.getContainerList().stream()
                 .map(Container::getMenu)
                 .collect(Collectors.toList());
+    }
+
+    public void setBestMenu(List<Menu> bestMenu) {
+        this.bestMenu1 = this.bestMenu2 = null;
+        if (!bestMenu.isEmpty()) this.bestMenu1 = bestMenu.get(0).getName();
+        if (bestMenu.size() > 1) this.bestMenu2 = bestMenu.get(1).getName();
     }
 }

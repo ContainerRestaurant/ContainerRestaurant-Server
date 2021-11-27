@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.statistics;
 
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.UserService;
@@ -11,19 +12,18 @@ import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Pageable.unpaged;
 
 @RequiredArgsConstructor
 @Service
@@ -31,8 +31,11 @@ import java.util.stream.Collectors;
 public class StatisticsService implements ApplicationListener<ApplicationStartedEvent> {
     private static final int MAX_COUNT = 100;
     private final UserService userService;
+    private final RestaurantService restaurantService;
+
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
+
     private int todayFeedCount = 0;
 
     private Deque<UserProfileDto> latestWriters = new LinkedList<>();
@@ -56,6 +59,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     public void dailyUpdate() {
         updateTopWriters();
         updateCounts();
+        updateBestMenus();
     }
 
     private void updateLatestWriters() {
@@ -108,6 +112,14 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
                 .latestWriters(latestWriters)
                 .topWriters(topWriters)
                 .build();
+    }
+
+    private void updateBestMenus() {
+        Pageable page = PageRequest.of(1, 1000);
+
+        while (!Objects.equals(page, unpaged())) {
+            page = restaurantService.updateBestMenusPage(page);
+        }
     }
 
 }

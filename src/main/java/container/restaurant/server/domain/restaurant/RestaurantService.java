@@ -1,14 +1,18 @@
 package container.restaurant.server.domain.restaurant;
 
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
+import container.restaurant.server.domain.restaurant.menu.Menu;
 import container.restaurant.server.exception.ResourceNotFoundException;
-import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantDetailDto;
+import container.restaurant.server.web.dto.restaurant.RestaurantInfoDto;
 import container.restaurant.server.web.dto.restaurant.RestaurantNearInfoDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,5 +58,19 @@ public class RestaurantService {
     public Restaurant findByDto(RestaurantInfoDto dto) {
         return restaurantRepository.findByName(dto.getName())
                 .orElseGet(() -> restaurantRepository.save(dto.toEntity()));
+    }
+
+    @Transactional
+    public Pageable updateBestMenusPage(Pageable page) {
+        LocalDate fromDate = LocalDate.now().minusDays(7);
+        var restaurants = restaurantRepository.selectForBestMenuUpdate(fromDate, page);
+        for (Restaurant restaurant : restaurants) {
+            List<Menu> bestMenu = restaurant.getMenu().stream()
+                    .sorted(Comparator.comparingInt(menu -> -menu.getCount()))
+                    .limit(2)
+                    .collect(Collectors.toList());
+            restaurant.setBestMenu(bestMenu);
+        }
+        return restaurants.nextPageable();
     }
 }
