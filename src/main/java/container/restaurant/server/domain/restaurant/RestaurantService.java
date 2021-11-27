@@ -1,5 +1,7 @@
 package container.restaurant.server.domain.restaurant;
 
+import container.restaurant.server.domain.feed.Feed;
+import container.restaurant.server.domain.feed.FeedRepository;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import container.restaurant.server.exception.ResourceNotFoundException;
@@ -22,6 +24,8 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
+
+    private final FeedRepository feedRepository;
 
     @Transactional(readOnly = true)
     public RestaurantDetailDto getRestaurantInfoById(Long restaurantId, Long loginId) {
@@ -61,9 +65,9 @@ public class RestaurantService {
     }
 
     @Transactional
-    public Pageable updateBestMenusPage(Pageable page) {
+    public Pageable updateBestMenusPage(Pageable pageable) {
         LocalDate fromDate = LocalDate.now().minusDays(7);
-        var restaurants = restaurantRepository.selectForBestMenuUpdate(fromDate, page);
+        var restaurants = restaurantRepository.selectForBestMenuUpdate(fromDate, pageable);
         for (Restaurant restaurant : restaurants) {
             List<Menu> bestMenu = restaurant.getMenu().stream()
                     .sorted(Comparator.comparingInt(menu -> -menu.getCount()))
@@ -72,5 +76,16 @@ public class RestaurantService {
             restaurant.setBestMenu(bestMenu);
         }
         return restaurants.nextPageable();
+    }
+
+    @Transactional
+    public Pageable updateThumbnailPage(Pageable pageable) {
+        LocalDate fromDate = LocalDate.now().minusMonths(1);
+        var feeds = feedRepository.selectForRestaurantThumbnailUpdate(fromDate, pageable);
+
+        for (Feed feed : feeds) {
+            feed.getRestaurant().setThumbnail(feed.getThumbnail());
+        }
+        return feeds.nextPageable();
     }
 }

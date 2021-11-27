@@ -60,6 +60,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         updateTopWriters();
         updateCounts();
         updateBestMenus();
+        updateRestaurantThumbnail();
     }
 
     private void updateLatestWriters() {
@@ -119,6 +120,14 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
 
         while (!Objects.equals(page, unpaged())) {
             page = restaurantService.updateBestMenusPage(page);
+        }
+    }
+
+    private void updateRestaurantThumbnail() {
+        Pageable page = PageRequest.of(1, 1000);
+
+        while (!Objects.equals(page, unpaged())) {
+            page = restaurantService.updateThumbnailPage(page);
         }
     }
 

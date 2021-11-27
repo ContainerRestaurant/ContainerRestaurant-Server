@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -50,4 +51,11 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @EntityGraph(attributePaths = { "owner", "thumbnail", "restaurant" })
     Page<Feed> findAllByCreatedDateBetweenOrderByCreatedDateDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
+    @Query("select f " +
+            "from TB_FEED f " +
+            "where f.modifiedDate <= :fromDate " +
+            "   and f.thumbnail is not null " +
+            "group by f.restaurant " +
+            "having max(f.likeCount)")
+    Page<Feed> selectForRestaurantThumbnailUpdate(LocalDate fromDate, Pageable page);
 }
