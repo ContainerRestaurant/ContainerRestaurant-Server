@@ -157,6 +157,14 @@ public class Restaurant extends BaseTimeEntity {
         if (bestMenu.size() > 1) this.bestMenu2 = bestMenu.get(1).getName();
     }
 
+    public List<String> getBestMenu() {
+        if (bestMenu2 != null) {
+            return List.of(bestMenu1, bestMenu2);
+        } else if (bestMenu1 != null) {
+            return List.of(bestMenu1);
+        } else return List.of();
+    }
+
     public void setThumbnail(Image thumbnail) {
         this.thumbnail = thumbnail;
     }

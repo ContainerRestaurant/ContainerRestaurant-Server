@@ -5,6 +5,8 @@ import container.restaurant.server.utils.ImageUtils;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.List;
+
 @Getter
 public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInfoDto> {
 
@@ -18,6 +20,7 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
     private final Float difficultyAvg;
     private final Boolean isContainerFriendly;
     private final Boolean isFavorite;
+    private final List<String> bestMenu;
 
     public static RestaurantNearInfoDto from(Restaurant restaurant, Boolean isFavorite) {
         return new RestaurantNearInfoDto(restaurant, isFavorite);
@@ -34,7 +37,7 @@ public class RestaurantNearInfoDto extends RepresentationModel<RestaurantNearInf
         this.image_path = ImageUtils.getUrlFromImage(restaurant.getThumbnail());
         this.isContainerFriendly = restaurant.isContainerFriendly();
         this.isFavorite = isFavorite;
-
+        this.bestMenu = restaurant.getBestMenu();
     }
 
 }

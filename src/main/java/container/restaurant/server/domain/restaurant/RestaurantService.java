@@ -1,7 +1,6 @@
 package container.restaurant.server.domain.restaurant;
 
-import container.restaurant.server.domain.feed.Feed;
-import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.restaurant.dto.RestaurantThumbnailDto;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
 import container.restaurant.server.domain.restaurant.menu.Menu;
 import container.restaurant.server.exception.ResourceNotFoundException;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +24,6 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
-
-    private final FeedRepository feedRepository;
 
     @Transactional(readOnly = true)
     public RestaurantDetailDto getRestaurantInfoById(Long restaurantId, Long loginId) {
@@ -66,7 +64,7 @@ public class RestaurantService {
 
     @Transactional
     public Pageable updateBestMenusPage(Pageable pageable) {
-        LocalDate fromDate = LocalDate.now().minusDays(7);
+        LocalDateTime fromDate = LocalDate.now().minusDays(7).atStartOfDay();
         var restaurants = restaurantRepository.selectForBestMenuUpdate(fromDate, pageable);
         for (Restaurant restaurant : restaurants) {
             List<Menu> bestMenu = restaurant.getMenu().stream()
@@ -80,12 +78,13 @@ public class RestaurantService {
 
     @Transactional
     public Pageable updateThumbnailPage(Pageable pageable) {
-        LocalDate fromDate = LocalDate.now().minusMonths(1);
-        var feeds = feedRepository.selectForRestaurantThumbnailUpdate(fromDate, pageable);
+        LocalDateTime fromDate = LocalDate.now().minusMonths(1).atStartOfDay();
+        var dtoPage = restaurantRepository.selectForRestaurantThumbnailUpdate(fromDate, pageable);
 
-        for (Feed feed : feeds) {
-            feed.getRestaurant().setThumbnail(feed.getThumbnail());
+        for (RestaurantThumbnailDto dto : dtoPage) {
+            dto.getRestaurant().setThumbnail(dto.getFeedThumbnail());
         }
-        return feeds.nextPageable();
+
+        return dtoPage.nextPageable();
     }
 }

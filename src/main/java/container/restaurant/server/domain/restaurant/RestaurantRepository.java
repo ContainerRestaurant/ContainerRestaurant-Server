@@ -1,5 +1,6 @@
 package container.restaurant.server.domain.restaurant;
 
+import container.restaurant.server.domain.restaurant.dto.RestaurantThumbnailDto;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +29,17 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     Optional<Restaurant> findByName(String name);
 
-    @Query("select r " +
+    @Query("select distinct r " +
             "from TB_RESTAURANT r " +
-            "join fetch r.menu " +
-            "where :fromDate <= r.modifiedDate")
-    Page<Restaurant> selectForBestMenuUpdate(LocalDate fromDate, Pageable page);
+            "join r.menu " +
+            "where r.modifiedDate >= :fromDate")
+    Page<Restaurant> selectForBestMenuUpdate(LocalDateTime fromDate, Pageable page);
+
+    @Query("select r as restaurant, f.thumbnail as feedThumbnail, max(f.likeCount) as likeCount " +
+            "from TB_FEED f " +
+            "join f.restaurant r " +
+            "where f.modifiedDate >= :fromDate " +
+            "   and f.thumbnail is not null " +
+            "group by f.restaurant ")
+    Page<RestaurantThumbnailDto> selectForRestaurantThumbnailUpdate(LocalDateTime fromDate, Pageable page);
 }

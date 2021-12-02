@@ -51,11 +51,4 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @EntityGraph(attributePaths = { "owner", "thumbnail", "restaurant" })
     Page<Feed> findAllByCreatedDateBetweenOrderByCreatedDateDesc(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
-    @Query("select f " +
-            "from TB_FEED f " +
-            "where f.modifiedDate <= :fromDate " +
-            "   and f.thumbnail is not null " +
-            "group by f.restaurant " +
-            "having max(f.likeCount)")
-    Page<Feed> selectForRestaurantThumbnailUpdate(LocalDate fromDate, Pageable page);
 }

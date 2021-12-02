@@ -5,6 +5,8 @@ import container.restaurant.server.utils.ImageUtils;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.List;
+
 @Getter
 public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto> {
 
@@ -17,6 +19,7 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
     private final Float difficultyAvg;
     private final Boolean isContainerFriendly;
     private final Boolean isFavorite;
+    private final List<String> bestMenu;
 
     public static RestaurantDetailDto from(Restaurant restaurant, Boolean isFavorite) {
         return new RestaurantDetailDto(restaurant, isFavorite);
@@ -32,6 +35,7 @@ public class RestaurantDetailDto extends RepresentationModel<RestaurantDetailDto
         this.image_path = ImageUtils.getUrlFromImage(restaurant.getThumbnail());
         this.isContainerFriendly = restaurant.isContainerFriendly();
         this.isFavorite = isFavorite;
+        this.bestMenu = restaurant.getBestMenu();
     }
 
 }
