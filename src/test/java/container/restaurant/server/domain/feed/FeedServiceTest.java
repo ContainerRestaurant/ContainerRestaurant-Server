@@ -148,6 +148,7 @@ class FeedServiceTest extends BaseMockTest {
         //then FeedInfoDto 정보와 동등한 Feed, FeedMenuDto 정보와 동등한 Containers 가 save 된다.
         verify(userLevelFeedCountService).levelFeedUp(feed);
         verify(feedRepository).save(feedCaptor.capture());
+        verify(restaurant).updateFeedStatics(feed);
         Feed saved = feedCaptor.getValue();
         assertThat(saved.getOwner()).isEqualTo(user);
         assertThat(saved.getRestaurant()).isEqualTo(restaurant);
@@ -176,6 +177,7 @@ class FeedServiceTest extends BaseMockTest {
         InOrder order = inOrder(feedHitRepository,reportFeedRepository, commentRepository, feedLikeRepository, feedRepository);
         verify(userLevelFeedCountService).levelFeedDown(feed);
         verify(recommendFeedService).checkAndDelete(feed);
+        verify(restaurant).deleteFeedStatics(feed);
         order.verify(feedHitRepository).deleteAllByFeed(feed);
         order.verify(reportFeedRepository).deleteAllByFeedId(feed.getId());
         order.verify(commentRepository).deleteAllByFeed(feed);
@@ -232,6 +234,8 @@ class FeedServiceTest extends BaseMockTest {
                 .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
                 .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
 
+        verify(restaurant).deleteFeedStatics(feed);
+        verify(restaurant).updateFeedStatics(feed);
         verify(recommendFeedService).checkAndUpdate(feed);
     }
 
@@ -286,6 +290,9 @@ class FeedServiceTest extends BaseMockTest {
                 .hasSize(2)
                 .anyMatch(container -> equalsMenuAndDto(container, updateMenuDto))
                 .anyMatch(container -> equalsMenuAndDto(container, createMenuDto));
+
+        verify(newRestaurant).updateFeedStatics(feed);
+        verify(restaurant).deleteFeedStatics(feed);
     }
 
     void mockFindFeedByIdWithContainers() {

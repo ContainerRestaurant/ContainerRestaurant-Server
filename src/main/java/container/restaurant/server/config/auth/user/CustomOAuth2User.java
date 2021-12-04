@@ -40,7 +40,13 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
         }
 
         this.attributes = Map.copyOf(attributes);
-        this.authorities = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
+        if (this.attributes.get("sub") == "TEST") {
+            this.authorities = Set.of(
+                    new SimpleGrantedAuthority("ROLE_USER"),
+                    new SimpleGrantedAuthority("ROLE_TEST"));
+        } else {
+            this.authorities = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
     }
 
     //=== 정적 팩토리 메서드 ===//
