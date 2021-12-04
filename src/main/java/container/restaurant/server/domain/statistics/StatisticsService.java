@@ -1,6 +1,7 @@
 package container.restaurant.server.domain.statistics;
 
 import container.restaurant.server.domain.feed.FeedRepository;
+import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
@@ -32,6 +33,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     private static final int MAX_COUNT = 100;
     private final UserService userService;
     private final RestaurantService restaurantService;
+    private final RecommendFeedService recommendFeedService;
 
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
@@ -53,6 +55,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         updateLatestWriters();
         updateTopWriters();
         updateCounts();
+        recommendFeedService.updateRecommendFeed();
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -61,6 +64,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         updateCounts();
         updateBestMenus();
         updateRestaurantThumbnail();
+        recommendFeedService.updateRecommendFeed();
     }
 
     private void updateLatestWriters() {
