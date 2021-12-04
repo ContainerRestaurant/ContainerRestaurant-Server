@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -81,8 +79,6 @@ public class RecommendFeedService {
                 .ifPresent(recommendFeeds::remove);
     }
 
-    @PostConstruct
-    @Scheduled(cron = "0 10 0 * * *")
     @Transactional(readOnly = true)
     public void updateRecommendFeed() {
         RecommendFeedQueue queue = new RecommendFeedQueue();

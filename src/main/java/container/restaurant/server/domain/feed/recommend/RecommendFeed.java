@@ -33,10 +33,14 @@ public class RecommendFeed {
 
     private void setValues(Feed feed) {
         this.id = feed.getId();
-        this.thumbnailUrl = ImageUtils.getUrlFromImage(feed.getThumbnail());
+        this.thumbnailUrl = feed.getThumbnail().getUrl();
         this.ownerNickname = feed.getOwner().getNickname();
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();
         this.replyCount = feed.getReplyCount();
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl != null ? ImageUtils.getFileServerUrl(thumbnailUrl) : null;
     }
 }
