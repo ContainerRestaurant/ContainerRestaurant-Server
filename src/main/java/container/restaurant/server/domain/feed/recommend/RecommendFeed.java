@@ -33,7 +33,7 @@ public class RecommendFeed {
 
     private void setValues(Feed feed) {
         this.id = feed.getId();
-        this.thumbnailUrl = feed.getThumbnail().getUrl();
+        this.thumbnailUrl = ImageUtils.getUrlFromImage(feed.getThumbnail());
         this.ownerNickname = feed.getOwner().getNickname();
         this.content = feed.getContent();
         this.likeCount = feed.getLikeCount();
