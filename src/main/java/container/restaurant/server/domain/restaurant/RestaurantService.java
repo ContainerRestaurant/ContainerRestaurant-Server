@@ -87,4 +87,9 @@ public class RestaurantService {
 
         return dtoPage.nextPageable();
     }
+
+    @Transactional
+    public void delete(Restaurant restaurant) {
+        restaurantRepository.delete(restaurant);
+    }
 }

@@ -136,8 +136,12 @@ public class FeedService {
 
         statisticsService.removeRecentUser(feed.getOwner());
 
+        Restaurant restaurant = feed.getRestaurant();
+        restaurant.deleteFeedStatics(feed);
+        if (restaurant.getFeedCount() == 0)
+            restaurantService.delete(restaurant);
+
         feed.getOwner().feedCountDown();
-        feed.getRestaurant().deleteFeedStatics(feed);
         feedHitRepository.deleteAllByFeed(feed);
         userLevelFeedCountService.levelFeedDown(feed);
 
@@ -188,10 +192,15 @@ public class FeedService {
         if (!feed.getOwner().getId().equals(userId))
             throw new FailedAuthorizationException("해당 피드를 업데이트할 수 없습니다.");
 
-        feed.getRestaurant().deleteFeedStatics(feed);
+        Restaurant beforeRestaurant = feed.getRestaurant();
+
+        beforeRestaurant.deleteFeedStatics(feed);
         dto.updateSimpleAttrs(feed);
         updateRelationalAttrs(feed, dto);
         feed.getRestaurant().updateFeedStatics(feed);
+
+        if (beforeRestaurant.getFeedCount() == 0)
+            restaurantService.delete(beforeRestaurant);
 
         recommendFeedService.checkAndUpdate(feed);
     }

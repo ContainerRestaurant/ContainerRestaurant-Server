@@ -165,10 +165,11 @@ class FeedServiceTest extends BaseMockTest {
     }
 
     @Test
-    @DisplayName("피드 삭제 테스트")
+    @DisplayName("피드 삭제 테스트 - 식당에 남은 피드 없음")
     void deleteTest() {
         //given findByIdWithContainers() 목 데이터
         mockFindFeedByIdWithContainers();
+        when(restaurant.getFeedCount()).thenReturn(0);
 
         //when 함수를 콜하면
         feedService.delete(feed.getId(), user.getId());
@@ -178,6 +179,7 @@ class FeedServiceTest extends BaseMockTest {
         verify(userLevelFeedCountService).levelFeedDown(feed);
         verify(recommendFeedService).checkAndDelete(feed);
         verify(restaurant).deleteFeedStatics(feed);
+        verify(restaurantService).delete(restaurant);
         order.verify(feedHitRepository).deleteAllByFeed(feed);
         order.verify(reportFeedRepository).deleteAllByFeedId(feed.getId());
         order.verify(commentRepository).deleteAllByFeed(feed);
@@ -199,6 +201,7 @@ class FeedServiceTest extends BaseMockTest {
 
 //        Restaurant newRestaurant = mock(Restaurant.class);
         when(restaurantService.findById(restaurant.getId())).thenReturn(restaurant);
+        when(restaurant.getFeedCount()).thenReturn(3);
         FeedMenuDto updateMenuDto = FeedMenuDto.builder()
                 .menuName("updateMenu")
                 .container("test update2")
@@ -237,10 +240,11 @@ class FeedServiceTest extends BaseMockTest {
         verify(restaurant).deleteFeedStatics(feed);
         verify(restaurant).updateFeedStatics(feed);
         verify(recommendFeedService).checkAndUpdate(feed);
+        verify(restaurantService, never()).delete(restaurant);
     }
 
     @Test
-    @DisplayName("피드 수정 테스트 - 식당 변경")
+    @DisplayName("피드 수정 테스트 - 식당 변경되고, 식당에 남은 피드 없음")
     void updateFeedRestaurantChange() {
         //given findByIdWithContainers() 목 데이터
         mockFindFeedByIdWithContainers();
@@ -253,6 +257,7 @@ class FeedServiceTest extends BaseMockTest {
 
         Restaurant newRestaurant = mock(Restaurant.class);
         when(restaurantService.findById(newRestaurant.getId())).thenReturn(newRestaurant);
+        when(restaurant.getFeedCount()).thenReturn(0);
         FeedMenuDto updateMenuDto = FeedMenuDto.builder()
                 .menuName("updateMenu")
                 .container("test update2")
@@ -293,6 +298,7 @@ class FeedServiceTest extends BaseMockTest {
 
         verify(newRestaurant).updateFeedStatics(feed);
         verify(restaurant).deleteFeedStatics(feed);
+        verify(restaurantService).delete(restaurant);
     }
 
     void mockFindFeedByIdWithContainers() {
