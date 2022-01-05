@@ -5,7 +5,6 @@ import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
-import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.statistics.StatisticsDto;
 import container.restaurant.server.web.dto.statistics.UserProfileDto;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,7 +33,6 @@ import static org.springframework.data.domain.Pageable.unpaged;
 @Log4j2
 public class StatisticsService implements ApplicationListener<ApplicationStartedEvent> {
     public static final int RECENT_USER_MAX_COUNT = 100;
-    private final UserService userService;
     private final RestaurantService restaurantService;
     private final RecommendFeedService recommendFeedService;
 
@@ -79,7 +77,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         LocalDateTime to = LocalDateTime.of(from.minusMonths(1).toLocalDate(), LocalTime.MIN);
 
         // 현재 최다 피드 사용자는 탑 10 명으로 순서는 따로 매기지 않는다.
-        topWriters = userService.findByFeedCountTopUsers(to, from).stream()
+        topWriters = userRepository.findByFeedCountTopUsers(to, from).stream()
                         .map(UserProfileDto::from)
                         .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
     }
@@ -95,6 +93,15 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
 
         latestWriters.add(dto);
         todayFeedCount.incrementAndGet();
+    }
+
+    public void updateRecentUser(User user) {
+        UserProfileDto dto = UserProfileDto.from(user);
+
+        boolean updated = latestWriters.update(dto);
+        if (!updated) {
+            addRecentUser(user);
+        }
     }
 
     public void removeRecentUser(User user) {
