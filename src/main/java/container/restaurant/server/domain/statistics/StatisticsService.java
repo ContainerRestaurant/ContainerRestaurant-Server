@@ -98,10 +98,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     public void updateRecentUser(User user) {
         UserProfileDto dto = UserProfileDto.from(user);
 
-        boolean updated = latestWriters.update(dto);
-        if (!updated) {
-            addRecentUser(user);
-        }
+        latestWriters.update(dto);
     }
 
     public void removeRecentUser(User user) {
