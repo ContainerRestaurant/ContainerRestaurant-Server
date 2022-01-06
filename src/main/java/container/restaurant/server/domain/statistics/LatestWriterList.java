@@ -1,7 +1,9 @@
 package container.restaurant.server.domain.statistics;
 
+import static java.util.Collections.synchronizedList;
+import static java.util.Collections.unmodifiableList;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class LatestWriterList<T> {
@@ -11,21 +13,17 @@ class LatestWriterList<T> {
     private static final int DEFAULT_RECENT_USER_MAX_COUNT = 100;
 
     public LatestWriterList() {
-        this.latestWriters = toList(new ArrayList<>());
+        this.latestWriters = synchronizedList(new ArrayList<>());
         this.recentUserMaxCount = DEFAULT_RECENT_USER_MAX_COUNT;
     }
 
     public LatestWriterList(int recentUserMaxCount) {
-        this.latestWriters = toList(new ArrayList<>());
+        this.latestWriters = synchronizedList(new ArrayList<>());
         this.recentUserMaxCount = recentUserMaxCount;
     }
 
-    private List<T> toList(List<T> list) {
-        return Collections.synchronizedList(list);
-    }
-
     public List<T> getList() {
-        return Collections.unmodifiableList(latestWriters);
+        return unmodifiableList(latestWriters);
     }
 
     public boolean add(T item) {
@@ -51,7 +49,7 @@ class LatestWriterList<T> {
     }
 
     public void replaceAll(List<T> list) {
-        latestWriters = toList(list);
+        latestWriters = synchronizedList(list);
     }
 
 }
