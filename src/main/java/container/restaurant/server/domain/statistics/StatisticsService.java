@@ -32,7 +32,7 @@ import static org.springframework.data.domain.Pageable.unpaged;
 @Service
 @Log4j2
 public class StatisticsService implements ApplicationListener<ApplicationStartedEvent> {
-    public static final int RECENT_USER_MAX_COUNT = 100;
+    public static final int RECENT_WRITER_MAX_COUNT = 100;
     private final RestaurantService restaurantService;
     private final RecommendFeedService recommendFeedService;
 
@@ -41,7 +41,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
 
     private final AtomicInteger todayFeedCount = new AtomicInteger(0);
 
-    private final LatestWriterList<UserProfileDto> latestWriters = new LatestWriterList<>(RECENT_USER_MAX_COUNT);
+    private final LatestWriterList<UserProfileDto> latestWriters = new LatestWriterList<>(RECENT_WRITER_MAX_COUNT);
     private List<UserProfileDto> topWriters = new CopyOnWriteArrayList<>();
 
     private final AtomicLong feedCountUntilUpdate = new AtomicLong(0);
