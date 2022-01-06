@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
     private final String ownerProfile;
 
     private final String restaurantName;
+    private final double latitude;
+    private final double longitude;
+
     private final Category category;
     private final String thumbnailUrl;
     private final String content;
@@ -52,6 +56,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
         this.ownerProfile = ImageUtils.getUrlFromImage(feed.getOwner().getProfile());
 
         this.restaurantName = feed.getRestaurant().getName();
+        this.latitude = feed.getRestaurant().getLatitude();
+        this.longitude = feed.getRestaurant().getLongitude();
+
         this.isContainerFriendly = feed.getRestaurant().isContainerFriendly();
         this.category = feed.getCategory();
         this.thumbnailUrl = ImageUtils.getUrlFromImage(feed.getThumbnail());
