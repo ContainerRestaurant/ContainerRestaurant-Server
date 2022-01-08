@@ -4,6 +4,7 @@ import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.picture.ImageService;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
+import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.level.UserLevelFeedCountRepository;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgentService;
@@ -25,16 +26,14 @@ import static java.util.Optional.ofNullable;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    private final ImageService imageService;
-
-    private final OAuthAgentService oAuthAgentService;
-
-    private final JwtLoginService jwtLoginService;
-
+    private final FeedHitRepository feedHitRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
     private final UserLevelFeedCountRepository userLevelFeedCountRepository;
-    private final FeedHitRepository feedHitRepository;
+
+    private final ImageService imageService;
+    private final JwtLoginService jwtLoginService;
+    private final OAuthAgentService oAuthAgentService;
+    private final StatisticsService statisticsService;
 
     @Transactional
     public User createOrUpdate(
@@ -78,6 +77,8 @@ public class UserService {
                 .ifPresent(user::setProfile);
         ofNullable(dto.getPushToken())
                 .ifPresent(user::setPushToken);
+
+        statisticsService.updateRecentUser(user);
         return UserDto.Info.from(user);
     }
 

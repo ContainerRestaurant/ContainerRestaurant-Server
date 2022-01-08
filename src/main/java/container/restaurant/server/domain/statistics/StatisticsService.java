@@ -5,9 +5,11 @@ import container.restaurant.server.domain.feed.recommend.RecommendFeedService;
 import container.restaurant.server.domain.restaurant.RestaurantService;
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
-import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.web.dto.statistics.StatisticsDto;
 import container.restaurant.server.web.dto.statistics.UserProfileDto;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
@@ -30,21 +32,20 @@ import static org.springframework.data.domain.Pageable.unpaged;
 @Service
 @Log4j2
 public class StatisticsService implements ApplicationListener<ApplicationStartedEvent> {
-    private static final int MAX_COUNT = 100;
-    private final UserService userService;
+    public static final int RECENT_WRITER_MAX_COUNT = 100;
     private final RestaurantService restaurantService;
     private final RecommendFeedService recommendFeedService;
 
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
 
-    private int todayFeedCount = 0;
+    private final AtomicInteger todayFeedCount = new AtomicInteger(0);
 
-    private Deque<UserProfileDto> latestWriters = new LinkedList<>();
-    private List<UserProfileDto> topWriters = new ArrayList<>();
+    private final LatestWriterList<UserProfileDto> latestWriters = new LatestWriterList<>(RECENT_WRITER_MAX_COUNT);
+    private List<UserProfileDto> topWriters = new CopyOnWriteArrayList<>();
 
-    private long feedCountUntilUpdate;
-    private long feedWriterCountUntilUpdate;
+    private final AtomicLong feedCountUntilUpdate = new AtomicLong(0);
+    private final AtomicLong feedWriterCountUntilUpdate = new AtomicLong(0);
 
     @Override
     public void onApplicationEvent(@NotNull ApplicationStartedEvent event) {
@@ -68,7 +69,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     }
 
     private void updateLatestWriters() {
-        latestWriters = new LinkedList<>(userRepository.findLatestUsers(PageRequest.of(0, 100)));
+        latestWriters.replaceAll(userRepository.findLatestUsers(PageRequest.of(0, 100)));
     }
 
     private void updateTopWriters() {
@@ -76,45 +77,48 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         LocalDateTime to = LocalDateTime.of(from.minusMonths(1).toLocalDate(), LocalTime.MIN);
 
         // 현재 최다 피드 사용자는 탑 10 명으로 순서는 따로 매기지 않는다.
-        topWriters = userService.findByFeedCountTopUsers(to, from).stream()
+        topWriters = userRepository.findByFeedCountTopUsers(to, from).stream()
                         .map(UserProfileDto::from)
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
     }
 
     private void updateCounts() {
-        this.feedCountUntilUpdate = feedRepository.count();
-        this.feedWriterCountUntilUpdate = userRepository.writerCount();
-        this.todayFeedCount = 0;
+        this.feedCountUntilUpdate.set(feedRepository.count());
+        this.feedWriterCountUntilUpdate.set(userRepository.writerCount());
+        this.todayFeedCount.set(0);
     }
 
     public void addRecentUser(User user) {
         UserProfileDto dto = UserProfileDto.from(user);
-        if (!latestWriters.remove(dto) && latestWriters.size() > MAX_COUNT) {
-            latestWriters.removeFirst();
-        }
 
         latestWriters.add(dto);
-        todayFeedCount++;
+        todayFeedCount.incrementAndGet();
+    }
+
+    public void updateRecentUser(User user) {
+        UserProfileDto dto = UserProfileDto.from(user);
+
+        latestWriters.update(dto);
     }
 
     public void removeRecentUser(User user) {
-        todayFeedCount--;
         latestWriters.remove(UserProfileDto.from(user));
+        todayFeedCount.decrementAndGet();
     }
 
     public Long getTotalFeed() {
-        return this.feedCountUntilUpdate + todayFeedCount;
+        return this.feedCountUntilUpdate.get() + todayFeedCount.get();
     }
 
-    public Deque<UserProfileDto> getLatestWriters() {
-        return this.latestWriters;
+    public List<UserProfileDto> getLatestWriters() {
+        return this.latestWriters.getList();
     }
 
     public StatisticsDto.TotalContainer totalContainer() {
         return StatisticsDto.TotalContainer.builder()
-                .feedCount(feedCountUntilUpdate)
-                .writerCount(feedWriterCountUntilUpdate)
-                .latestWriters(latestWriters)
+                .feedCount(feedCountUntilUpdate.get())
+                .writerCount(feedWriterCountUntilUpdate.get())
+                .latestWriters(latestWriters.getList())
                 .topWriters(topWriters)
                 .build();
     }
