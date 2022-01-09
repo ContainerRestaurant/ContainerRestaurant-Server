@@ -217,6 +217,8 @@ class FeedControllerTest extends BaseUserAndFeedControllerTest {
                                 fieldWithPath("restaurantId").description("본 피드에 등록된 식당의 식별값"),
                                 fieldWithPath("ownerNickname").description("본 피드를 작성한 사용자의 닉네임"),
                                 fieldWithPath("restaurantName").description("본 피드에 등록된 삭당의 이름"),
+                                fieldWithPath("latitude").description("본 피드에 등록된 식당의 위도"),
+                                fieldWithPath("longitude").description("본 피드에 등록된 식당의 경도"),
                                 fieldWithPath("category").description("본 피드에 등록된 식당의 카테고리"),
                                 fieldWithPath("thumbnailUrl").description("본 피드에 썸네일 및 업로드 사진"),
                                 fieldWithPath("content").description("본 피드의 콘텐트"),
