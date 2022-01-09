@@ -23,7 +23,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
             value = "SELECT *, ST_DISTANCE_SPHERE(POINT(?2, ?1), POINT(longitude,latitude)) AS dist " +
                     "FROM tb_restaurant FORCE INDEX FOR JOIN (location) " +
                     "WHERE MBRCONTAINS(ST_LINESTRINGFROMTEXT( getDiagonal(?1,?2,?3)), location) " +
-                    "  AND count > 0 " +
+                    "  AND feed_count > 0 " +
                     "ORDER BY dist")
     List<Restaurant> findNearByRestaurants(double lat, double lon, long radius);
 
