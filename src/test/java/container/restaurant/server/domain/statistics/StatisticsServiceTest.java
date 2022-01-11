@@ -48,7 +48,7 @@ class StatisticsServiceTest {
         // Add user to statistics
         statisticsService.afterFeedCreate(userForUpdate);
 
-        Collection<UserProfileDto> latestWriters = statisticsService.totalStatistics().getLatestWriters();
+        Collection<UserProfileDto> latestWriters = statisticsService.totalContainer().getLatestWriters();
         assertThat(containsUserWithNickname(latestWriters, beforeUpdateNickname)).isTrue();
         assertThat(containsUserWithNickname(latestWriters, afterUpdateNickname)).isFalse();
 
@@ -60,7 +60,7 @@ class StatisticsServiceTest {
         assertThat(update.getNickname()).isEqualTo(afterUpdateNickname);
 
         // Check user info in statistics
-        latestWriters = statisticsService.totalStatistics().getLatestWriters();
+        latestWriters = statisticsService.totalContainer().getLatestWriters();
 
         assertThat(containsUserWithNickname(latestWriters, beforeUpdateNickname)).isFalse();
         assertThat(containsUserWithNickname(latestWriters, afterUpdateNickname)).isTrue();

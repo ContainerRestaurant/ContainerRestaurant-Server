@@ -18,7 +18,7 @@ public class StatisticsController {
 
     @GetMapping("/total-container")
     public ResponseEntity<?> getFeedStatistics() {
-        return ResponseEntity.ok(statisticsService.totalStatistics());
+        return ResponseEntity.ok(statisticsService.totalContainer());
     }
 
     @Secured("ROLE_TEST")

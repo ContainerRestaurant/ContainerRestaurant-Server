@@ -117,7 +117,7 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         return this.latestWriters.getList();
     }
 
-    public StatisticsDto.TotalContainer totalStatistics() {
+    public StatisticsDto.TotalContainer totalContainer() {
         return StatisticsDto.TotalContainer.builder()
                 .feedCount(totalFeedCount.get())
                 .writerCount(totalFeedWriterCount.get())
