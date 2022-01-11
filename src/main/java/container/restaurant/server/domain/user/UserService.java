@@ -78,7 +78,7 @@ public class UserService {
         ofNullable(dto.getPushToken())
                 .ifPresent(user::setPushToken);
 
-        statisticsService.updateRecentUser(user);
+        statisticsService.afterUserUpdate(user);
         return UserDto.Info.from(user);
     }
 

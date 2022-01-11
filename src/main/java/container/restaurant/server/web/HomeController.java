@@ -43,7 +43,7 @@ public class HomeController {
         return ResponseEntity.ok(
                 setLinks(HomeDto.builder()
                         .user(loginUser)
-                        .totalContainer(statisticsService.getTotalFeed())
+                        .totalContainer(statisticsService.getTotalFeedCount())
                         .phrase(phraseService.getPhrase())
                         .latestWriters(statisticsService.getLatestWriters())
                         .banners(bannerRepository.findAllHomeBanner())

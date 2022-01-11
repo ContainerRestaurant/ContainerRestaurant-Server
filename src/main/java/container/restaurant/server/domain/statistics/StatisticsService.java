@@ -8,7 +8,6 @@ import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.web.dto.statistics.StatisticsDto;
 import container.restaurant.server.web.dto.statistics.UserProfileDto;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -39,13 +38,11 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
 
-    private final AtomicInteger todayFeedCount = new AtomicInteger(0);
-
     private final LatestWriterList<UserProfileDto> latestWriters = new LatestWriterList<>(RECENT_WRITER_MAX_COUNT);
     private List<UserProfileDto> topWriters = new CopyOnWriteArrayList<>();
 
-    private final AtomicLong feedCountUntilUpdate = new AtomicLong(0);
-    private final AtomicLong feedWriterCountUntilUpdate = new AtomicLong(0);
+    private final AtomicLong totalFeedCount = new AtomicLong(0);
+    private final AtomicLong totalFeedWriterCount = new AtomicLong(0);
 
     @Override
     public void onApplicationEvent(@NotNull ApplicationStartedEvent event) {
@@ -83,41 +80,47 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
     }
 
     private void updateCounts() {
-        this.feedCountUntilUpdate.set(feedRepository.count());
-        this.feedWriterCountUntilUpdate.set(userRepository.writerCount());
-        this.todayFeedCount.set(0);
+        this.totalFeedCount.set(feedRepository.count());
+        this.totalFeedWriterCount.set(userRepository.writerCount());
     }
 
-    public void addRecentUser(User user) {
+    public void afterFeedCreate(User user) {
         UserProfileDto dto = UserProfileDto.from(user);
 
         latestWriters.add(dto);
-        todayFeedCount.incrementAndGet();
+
+        totalFeedCount.incrementAndGet();
+        if (user.getFeedCount() == 1) {
+            totalFeedWriterCount.incrementAndGet();
+        }
     }
 
-    public void updateRecentUser(User user) {
+    public void afterUserUpdate(User user) {
         UserProfileDto dto = UserProfileDto.from(user);
 
         latestWriters.update(dto);
     }
 
-    public void removeRecentUser(User user) {
-        latestWriters.remove(UserProfileDto.from(user));
-        todayFeedCount.decrementAndGet();
+    public void afterFeedDelete(User user) {
+        if (user.getFeedCount() == 0) {
+            latestWriters.remove(UserProfileDto.from(user));
+            totalFeedWriterCount.decrementAndGet();
+        }
+        totalFeedCount.decrementAndGet();
     }
 
-    public Long getTotalFeed() {
-        return this.feedCountUntilUpdate.get() + todayFeedCount.get();
+    public Long getTotalFeedCount() {
+        return totalFeedCount.get();
     }
 
     public List<UserProfileDto> getLatestWriters() {
         return this.latestWriters.getList();
     }
 
-    public StatisticsDto.TotalContainer totalContainer() {
+    public StatisticsDto.TotalContainer totalStatistics() {
         return StatisticsDto.TotalContainer.builder()
-                .feedCount(feedCountUntilUpdate.get())
-                .writerCount(feedWriterCountUntilUpdate.get())
+                .feedCount(totalFeedCount.get())
+                .writerCount(totalFeedWriterCount.get())
                 .latestWriters(latestWriters.getList())
                 .topWriters(topWriters)
                 .build();

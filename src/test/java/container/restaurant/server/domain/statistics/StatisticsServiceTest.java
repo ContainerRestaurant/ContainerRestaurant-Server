@@ -46,9 +46,9 @@ class StatisticsServiceTest {
                 .build();
 
         // Add user to statistics
-        statisticsService.addRecentUser(userForUpdate);
+        statisticsService.afterFeedCreate(userForUpdate);
 
-        Collection<UserProfileDto> latestWriters = statisticsService.totalContainer().getLatestWriters();
+        Collection<UserProfileDto> latestWriters = statisticsService.totalStatistics().getLatestWriters();
         assertThat(containsUserWithNickname(latestWriters, beforeUpdateNickname)).isTrue();
         assertThat(containsUserWithNickname(latestWriters, afterUpdateNickname)).isFalse();
 
@@ -60,7 +60,7 @@ class StatisticsServiceTest {
         assertThat(update.getNickname()).isEqualTo(afterUpdateNickname);
 
         // Check user info in statistics
-        latestWriters = statisticsService.totalContainer().getLatestWriters();
+        latestWriters = statisticsService.totalStatistics().getLatestWriters();
 
         assertThat(containsUserWithNickname(latestWriters, beforeUpdateNickname)).isFalse();
         assertThat(containsUserWithNickname(latestWriters, afterUpdateNickname)).isTrue();
@@ -73,7 +73,7 @@ class StatisticsServiceTest {
         // Add user under max count
         for (int i = 0; i < StatisticsService.RECENT_WRITER_MAX_COUNT; i++) {
             User mockUser = createMockUser(i);
-            statisticsService.addRecentUser(mockUser);
+            statisticsService.afterFeedCreate(mockUser);
 
             long oldestWriterId = statisticsService.getLatestWriters().get(0).getId();
 
@@ -84,7 +84,7 @@ class StatisticsServiceTest {
         int testLoopCount = 5;
         for (int i = 0; i < testLoopCount; i++) {
             User mockUser = createMockUser(i);
-            statisticsService.addRecentUser(mockUser);
+            statisticsService.afterFeedCreate(mockUser);
 
             List<UserProfileDto> latestWriters = statisticsService.getLatestWriters();
 
