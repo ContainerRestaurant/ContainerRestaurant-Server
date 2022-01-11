@@ -113,6 +113,10 @@ public class StatisticsService implements ApplicationListener<ApplicationStarted
         return totalFeedCount.get();
     }
 
+    public Long getTotalFeedWriterCount() {
+        return totalFeedWriterCount.get();
+    }
+
     public List<UserProfileDto> getLatestWriters() {
         return this.latestWriters.getList();
     }
