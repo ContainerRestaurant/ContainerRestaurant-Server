@@ -44,8 +44,8 @@ class HomeControllerTest extends BaseUserControllerTest {
         bannerRepository.save(new Banner("title2", "banner2", "content2", "additional2"));
         bannerRepository.save(new Banner("title3", "banner3", "content3", "additional3"));
 
-        statisticsService.addRecentUser(myself);
-        statisticsService.addRecentUser(other);
+        statisticsService.afterFeedCreate(myself);
+        statisticsService.afterFeedCreate(other);
     }
 
     @Test

@@ -8,6 +8,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 import container.restaurant.server.domain.user.User;
 import container.restaurant.server.domain.user.UserRepository;
 import container.restaurant.server.domain.user.UserService;
+import container.restaurant.server.web.dto.statistics.StatisticsDto.TotalContainer;
 import container.restaurant.server.web.dto.statistics.UserProfileDto;
 import container.restaurant.server.web.dto.user.UserDto.Info;
 import container.restaurant.server.web.dto.user.UserDto.Update;
@@ -46,7 +47,7 @@ class StatisticsServiceTest {
                 .build();
 
         // Add user to statistics
-        statisticsService.addRecentUser(userForUpdate);
+        statisticsService.afterFeedCreate(userForUpdate);
 
         Collection<UserProfileDto> latestWriters = statisticsService.totalContainer().getLatestWriters();
         assertThat(containsUserWithNickname(latestWriters, beforeUpdateNickname)).isTrue();
@@ -73,7 +74,7 @@ class StatisticsServiceTest {
         // Add user under max count
         for (int i = 0; i < StatisticsService.RECENT_WRITER_MAX_COUNT; i++) {
             User mockUser = createMockUser(i);
-            statisticsService.addRecentUser(mockUser);
+            statisticsService.afterFeedCreate(mockUser);
 
             long oldestWriterId = statisticsService.getLatestWriters().get(0).getId();
 
@@ -84,7 +85,7 @@ class StatisticsServiceTest {
         int testLoopCount = 5;
         for (int i = 0; i < testLoopCount; i++) {
             User mockUser = createMockUser(i);
-            statisticsService.addRecentUser(mockUser);
+            statisticsService.afterFeedCreate(mockUser);
 
             List<UserProfileDto> latestWriters = statisticsService.getLatestWriters();
 
@@ -94,6 +95,61 @@ class StatisticsServiceTest {
             assertThat(actualOldestWriterId).isEqualTo(expectOldestWriterId);
             assertThat(latestWriters.size()).isEqualTo(StatisticsService.RECENT_WRITER_MAX_COUNT);
         }
+    }
+
+    @Test
+    @DisplayName("총 피드 수, 총 피드 작성자 수 테스트")
+    void updateFeedCountRealtime() {
+        TotalContainer totalContainer = statisticsService.totalContainer();
+
+        assertThat(totalContainer.getWriterCount()).isZero();
+        assertThat(totalContainer.getFeedCount()).isZero();
+
+        User mockUser1 = createMockUser(1L);
+        User mockUser2 = createMockUser(2L);
+
+        int mockUser1FeedCount = 0;
+        int mockUser2FeedCount = 0;
+
+        // user1 피드 1개 작성, user2 피드 2개 작성
+        when(mockUser1.getFeedCount()).thenReturn(++mockUser1FeedCount);
+        statisticsService.afterFeedCreate(mockUser1);
+        when(mockUser2.getFeedCount()).thenReturn(++mockUser2FeedCount);
+        statisticsService.afterFeedCreate(mockUser2);
+        when(mockUser2.getFeedCount()).thenReturn(++mockUser2FeedCount);
+        statisticsService.afterFeedCreate(mockUser2);
+
+        totalContainer = statisticsService.totalContainer();
+
+        assertThat(totalContainer.getWriterCount()).isEqualTo(2);
+        assertThat(totalContainer.getFeedCount()).isEqualTo(3);
+
+        // user2 자신 피드 2개 중 1개 삭제
+        when(mockUser2.getFeedCount()).thenReturn(--mockUser2FeedCount);
+        statisticsService.afterFeedDelete(mockUser2);
+
+        totalContainer = statisticsService.totalContainer();
+
+        assertThat(totalContainer.getWriterCount()).isEqualTo(2);
+        assertThat(totalContainer.getFeedCount()).isEqualTo(2);
+
+        // user2 하나 남은 피드 삭제
+        when(mockUser2.getFeedCount()).thenReturn(--mockUser2FeedCount);
+        statisticsService.afterFeedDelete(mockUser2);
+
+        totalContainer = statisticsService.totalContainer();
+
+        assertThat(totalContainer.getWriterCount()).isEqualTo(1);
+        assertThat(totalContainer.getFeedCount()).isEqualTo(1);
+
+        // user1 하나 남은 피드 삭제
+        when(mockUser1.getFeedCount()).thenReturn(--mockUser1FeedCount);
+        statisticsService.afterFeedDelete(mockUser1);
+
+        totalContainer = statisticsService.totalContainer();
+
+        assertThat(totalContainer.getWriterCount()).isZero();
+        assertThat(totalContainer.getFeedCount()).isZero();
     }
 
     private boolean containsUserWithNickname(Collection<UserProfileDto> users, String nickName) {
