@@ -20,6 +20,6 @@ public class BannerInfoDto {
         this.contentURL = banner.getContentUrl() != null ?
                 baseURL + banner.getContentUrl() : null;
         this.additionalURL = banner.getAdditionalUrl() != null ?
-                baseURL + banner.getAdditionalUrl() : null;
+                banner.getAdditionalUrl() : null;
     }
 }
