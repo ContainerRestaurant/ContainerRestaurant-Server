@@ -1,81 +1,86 @@
 package container.restaurant.server.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
-import container.restaurant.server.domain.push.FcmMessage;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import container.restaurant.server.domain.push.PushToken;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import okhttp3.*;
-import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.List;
+import org.springframework.util.StringUtils;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class FirebaseCloudMessageUtils {
 
-    @Value("${google.push.api.url}")
-    private String API_URL;
+    @Value("${firebase.key.path}")
+    private String FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
 
-    private final ObjectMapper objectMapper;
+    private FirebaseMessaging firebaseMessaging;
 
-    public void sendMessage(PushToken target, String title, String body) throws IOException {
-        // 타겟이 Null 일 때 종료
-        if (target == null) return;
-        String message = makeMessage(target.getToken(), title, body);
+    @PostConstruct
+    private void setup() throws IOException {
+        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(new FileInputStream(FIREBASE_SERVICE_ACCOUNT_KEY_PATH))
+                .createScoped((List.of("https://www.googleapis.com/auth/cloud-platform")));
 
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
-                .url(API_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + createAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+        FirebaseOptions firebaseOptions = FirebaseOptions.builder()
+                .setCredentials(googleCredentials)
                 .build();
 
-        Response response = client.newCall(request).execute();
+        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions);
+        this.firebaseMessaging = FirebaseMessaging.getInstance(app);
+    }
 
-        if (response.code() == 200) {
-            log.info("title => [ " + title + " ] Push  Success");
-        } else {
-            log.info("Push Failed Code => " + response.code());
+    public void sendMessage(PushToken target, String title, String body) {
+        // 타겟이 Null 일 때 종료
+        if (target == null || !StringUtils.hasText(target.getToken())) {
+            log.info("PushToken is null.");
+            return;
+        }
+
+        Message message = makeMessage(target.getToken(), title, body);
+        try {
+            String sendMessageId = firebaseMessaging.send(message);
+            log.info("Push success. {}", sendMessageId);
+        } catch (FirebaseMessagingException e) {
+            log.error("Push failed. {}", e.getMessagingErrorCode());
         }
     }
 
-    private String makeMessage(String target, String title, String body) throws JsonProcessingException {
-        FcmMessage fcmMessage = FcmMessage.builder()
-                .message(FcmMessage.Message.builder()
-                                .token(target)
-                                .notification(FcmMessage.Notification.builder()
-                                                .title(title)
-                                                .body(body)
-                                                .image(null)
-//                                .image(IMAGE_DEFAULT + TEMP_IMAGE)
-                                                .build()
-                                )
-                                .build()
-                )
-                .validate_only(false)
-                .build();
-        return objectMapper.writeValueAsString(fcmMessage);
+    public void sendMessage(PushToken target, String title) {
+        this.sendMessage(target, title, null);
     }
 
-    private String createAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase_service_key.json";
+    private Message makeMessage(String target, String title, String body) {
+        Notification.Builder notificationBuilder = Notification.builder();
+        Map<String, String> data = new HashMap<>(); // android 요청으로 Notification 과 같은 내용 추가
 
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+        // title
+        notificationBuilder.setTitle(title);
+        data.put("title", title);
 
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
+        // body
+        if (StringUtils.hasText(body)) {
+            notificationBuilder.setBody(body);
+            data.put("body", body);
+        }
 
+        return Message.builder()
+                .setToken(target)
+                .setNotification(notificationBuilder.build())
+                .putAllData(data)
+                .build();
     }
 }
