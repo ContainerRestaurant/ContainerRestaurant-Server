@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+/src/**/application-datasource.*
+/src/**/application-oauth2.*
+/src/**/application-aws.*

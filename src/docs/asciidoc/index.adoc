@@ -1,0 +1,413 @@
+= REST API Guide
+용기낸 식당 백엔드 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:operation-curl-request-title: 요청 예시
+:operation-request-fields-title: 요청 필드
+:operation-request-parameters-title: 요청 파라미터
+:operation-http-response-title: 응답 예시
+:operation-response-fields-title: 응답 필드
+:operation-links-title: 응답 링크
+
+[[overview]]
+= 개요
+
+[[overview-http-verbs]]
+== HTTP 동사
+
+본 REST API 에서 사용하는 HTTP 동사(verbs)는 가능한한 표준 HTTP 와 REST 규약을 따릅니다.
+
+|===
+| 동사 | 용례
+
+| `GET`
+| 리소스를 가져올 때 사용
+
+| `POST`
+| 새 리소스를 만들 때 사용
+
+| `PUT`
+| 기존 리소스를 수정할 때 사용
+
+| `PATCH`
+| 기존 리소스의 일부를 수정할 때 사용
+
+| `DELETE`
+| 기존 리소스를 삭제할 떄 사용
+|===
+
+[[overview-http-status-codes]]
+== HTTP 상태 코드
+
+본 REST API 에서 사용하는 HTTP 상태 코드는 가능한한 표준 HTTP 와 REST 규약을 따릅니다.
+
+|===
+| 상태 코드 | 용례
+
+| `200 OK`
+| 요청을 성공적으로 처리함
+
+| `201 Created`
+| 새 리소스를 성공적으로 생성함. 응답의 `Location` 헤더에 해당 리소스의 URI 가 담겨있다.
+
+| `204 No Content`
+| 해당 리소스를 성공적으로 수정함.
+
+| `400 Bad Request`
+| 잘못된 요청을 보낸 경우. 응답 본문에 오류에 대한 정보가 담겨있다.
+
+| `403 Forbidden`
+| 해당 요청에 대한 요청 권한이 없음.
+
+| `404 Not Found`
+| 요청한 리소스가 없음.
+|===
+
+[[overview-errors]]
+== 오류
+
+에러 응답이 발생했을 때 (상태 코드 >= 400), 본문에 해당 문제를 기술한 JSON 객체가 담겨있다. 에러 객체는 다음의 구조를 따른다.
+
+include::{snippets}/error-example/response-fields.adoc[]
+
+예를 들어, 잘못된 요청으로 사용자를 만들려고 했을 때 다음과 같은 `400 Bad Request` 응답을 받는다.
+
+include::{snippets}/error-example/http-response.adoc[]
+
+[[overview-hypermedia]]
+== 하이퍼미디어
+
+본 REST API 는 하이퍼미디어와 사용하며 응답에 담겨있는 리소스는 다른 리소스에 대한 링크를 가지고 있다.
+응답은 http://stateless.co/hal_specification.html[Hypertext Application from resource to resource. Language (HAL)] 형식을 따른다.
+링크는 `_links`라는 키로 제공한다. 본 API 의 사용자(클라이언트)는 URI 를 직접 생성하지 않아야 하며, 리소스에서 제공하는 링크를 사용해야 한다.
+
+[[resources]]
+= 리소스
+
+[[index]]
+== 홈
+
+=== 홈 화면 조회
+
+`GET /api/home`
+
+operation::home[snippets='curl-request,http-response,response-fields,links']
+
+== 배너
+
+=== 배너 조회
+
+`GET /api/banners`
+
+operation::banners[snippets='curl-request,http-response']
+include::{snippets}/banner/response-fields-beneath-_embedded.bannerInfoDtoList.adoc[]
+
+[[user]]
+== 사용자
+
+[[user-new-token]]
+=== 로그인 토큰 생성
+`POST /api/user`
+
+operation::user-new-token[snippets='curl-request,http-response,response-fields']
+
+사용자를 인증하기 위해서는 요청 헤더에 `Authorization` 속성을 `Bearer [생성된_인증_토큰]` 으로 설정해야합니다.
+
+[[user-get]]
+=== 사용자 정보 조회
+`GET /api/user/[유저_ID]`
+
+operation::get-user[snippets='curl-request,http-response,response-fields,links']
+
+[[my-info]]
+=== 내 정보 조회
+`GET /api/user`
+
+operation::my-info[snippets='curl-request,http-response']
+
+내 정보 조회시 응답 형식은 <<user-get>>를 참조합니다.
+
+[[user-update]]
+=== 사용자 정보 변경
+`PATCH /api/user/[유저_ID]`
+
+operation::patch-user[snippets='curl-request,request-fields,http-response']
+
+사용자 정보 변경시 응답 형식은 <<user-get>>를 참조합니다.
+
+[[user-delete]]
+=== 사용자 계정 탈퇴
+`DELETE /api/user/[유저_ID]`
+
+operation::delete-user[snippets='curl-request,http-response']
+
+[[check-nickname]]
+=== 닉네임 중복 확인
+`GET /api/user/nickname/exists?nickname=[확인할_닉네임]`
+
+operation::check-nickname-exists[snippets='curl-request,request-parameters,http-response,response-fields']
+
+[[feed]]
+== 피드
+
+[[feed-create]]
+=== 피드 쓰기
+`POST /api/feed`
+
+operation::feed-create[snippets='curl-request,request-fields,http-response']
+
+[[feed-detail]]
+=== 피드 상세
+`GET /api/feed/[피드_ID]`
+
+단일 피드에 대한 상세 데이터를 조회합니다.
+
+operation::feed-detail[snippets='curl-request,http-response,response-fields,links']
+
+[[feed-list]]
+=== 피드 리스트
+
+조건에 따라 피드 목록을 조회합니다.
+
+==== 일반 피드 목록 (최신순)
+`GET /api/feed`
+
+operation::feed-list[snippets='curl-request,http-response,response-fields,links']
+operation::feed-options[snippets='request-parameters']
+
+카테고리는 <<feed-category>> 참조
+
+[[feed-preview]]
+=== 피드 리스트 리소스
+
+피드 리스트 조회 시 각 피드가 표현되는 형식 입니다.
+
+include::{snippets}/feed-preview/response-fields-beneath-_embedded.feedPreviewDtoList.adoc[]
+
+[[feed-list-advanced]]
+=== 피드 리스트 - 조건부
+
+[[feed-by-user]]
+==== 작성자로 피드 리스트 조회
+`GET /api/feed/user/[사용자_ID]`
+
+include::{snippets}/feed-by-user/curl-request.adoc[]
+
+[[feed-by-restaurant]]
+==== 식당으로 피드 리스트 조회
+`GET /api/feed/restaurant/[식당_ID]`
+
+include::{snippets}/feed-by-restaurant/curl-request.adoc[]
+
+[[feed-by-scrap]]
+==== 특정 사용자가 스크랩한 피드 리스트 조회
+`GET /api/feed/user/[사용자_ID]/scrap`
+
+include::{snippets}/feed-by-scrap/curl-request.adoc[]
+
+[[feed-recommendation]]
+==== 추천 피드 리스트 조회
+
+include::{snippets}/feed-recommendation/curl-request.adoc[]
+
+[[feed-category]]
+=== 피드 카테고리
+`GET /api/feed/category`
+
+operation::feed-category-list[snippets='curl-request,http-response']
+
+[[feed-update]]
+=== 피드 수정
+`PATCH /api/feed/[피드_ID]`
+
+operation::feed-update[snippets='curl-request,request-fields,http-response']
+
+[[feed-delete]]
+=== 피드 삭제
+`DELETE /api/feed/[피드_ID]`
+
+operation::feed-delete[snippets='curl-request,http-response']
+
+[[feed-scrap]]
+=== 피드 스크랩
+`POST /api/scrap/[피드_ID]`
+
+피드를 스크랩합니다. 스크랩하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
+
+operation::feed-scrap[snippets='curl-request,http-response,links']
+
+[[feed-scrap-cancel]]
+=== 피드 스크랩 취소
+`DELETE /api/scrap/[피드_ID]`
+
+피드를 스크랩을 취소합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
+
+operation::feed-scrap-cancel[snippets='curl-request,http-response,links']
+
+[[feed-like]]
+=== 피드 좋아요
+`POST /api/like/feed/[피드_ID]`
+
+피드를 좋아요 합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
+
+operation::feed-like[snippets='curl-request,http-response,links']
+
+[[feed-like-cancel]]
+=== 피드 좋아요 취소
+`DELETE /api/like/feed/[피드_ID]`
+
+피드를 좋아요를 취소합니다. 취소하는 주체는 현재 인증된 사용자가 되며, 인증되지 않은 상태인 경우에는 로그인 페이지로 이동합니다.
+
+operation::feed-like-cancel[snippets='curl-request,http-response,links']
+
+[[comment]]
+== 댓글
+
+[[comment-create]]
+=== 댓글 작성
+`POST /api/comment/feed/[댓글_작성할_피드_ID]`
+
+operation::comment-create[snippets='curl-request,request-fields,http-response']
+
+응답 필드는 <<comment-info>> 참조
+
+[[feed-comments]]
+
+=== 피드의 댓글 조회
+`GET /api/comment/feed/[댓글_조회할_피드_ID]`
+
+operation::feed-comments[snippets='curl-request,http-response,response-fields']
+
+`commentInfoDtoList` 의 상세 필드는 <<comment-info>> 참조
+
+[[comment-update]]
+=== 댓글 수정
+`PATCH /api/comment/[수정할_댓글_ID]`
+
+operation::comment-update[snippets='curl-request,http-response']
+
+응답 필드는 <<comment-info>> 참조
+
+[[comment-delete]]
+=== 댓글 삭제
+`DELETE /api/comment/[삭제할_댓글_ID]`
+
+operation::comment-delete[snippets='curl-request,http-response']
+
+[[comment-info]]
+=== 댓글 정보
+<<comment-create>>, <<feed-comments>>, <<comment-update>> 의 응답 필드에 관한 추가 설명입니다.
+
+include::{snippets}/comment-info/response-fields-beneath-_embedded.commentInfoDtoList.adoc[]
+
+[[comment-like]]
+=== 댓글 좋아요
+
+operation::comment-like[snippets='curl-request,http-response']
+
+[[comment-like-cancel]]
+=== 댓글 좋아요 취소
+
+operation::comment-like-cancel[snippets='curl-request,http-response']
+
+[[restaurant]]
+== 식당
+
+[[restaurant-get]]
+=== 식당 정보
+`GET /api/restaurant/[식당_ID]`
+
+operation::restaurant-get[snippets='curl-request,http-response,response-fields,links']
+
+[[restaurant-register]]
+=== 식당 등록 정보
+
+<<feed-create>>를 하는 경우, 등록할 식당에 대한 정보 필드입니다.
+
+include::{snippets}/restaurant-register/request-fields-beneath-restaurantCreateDto.adoc[]
+
+[[user-restaurant-favorite]]
+=== 즐겨찾기 한 식당 목록
+`GET /api/favorite/restaurant`
+
+현재 로그인한 유저가 즐겨찾기 한 목록을 조회한다.
+
+operation::user-restaurant-favorite[snippets='curl-request,http-response']
+
+응답 리소스에 대한 상세 내용은 <<restaurant-get>> 을 참조한다.
+
+[[restaurant-favorite]]
+=== 식당 즐겨찾기 추가
+`POST /api/favorite/restaurant/[즐겨찾기_할_식당_ID]`
+
+operation::restaurant-favorite[snippets='curl-request,http-response']
+
+[[restaurant-favorite-cancel]]
+=== 식당 즐겨찾기 삭제
+`DELETE /api/favorite/restaurant/[즐겨찾기_할_식당_ID]`
+
+operation::restaurant-favorite-cancel[snippets='curl-request,http-response']
+
+[[restaurant-vanish]]
+=== 식당 없어짐 알림
+`POST /api/restaurant/vanish/[없어진_식당_ID]`
+
+operation::restaurant-vanish[snippets='curl-request,http-response']
+
+[[report]]
+== 신고
+
+[[feed-report]]
+=== 피드 신고
+`POST /api/report/feed/[신고할_피드_ID]`
+
+operation::feed-report[snippets='curl-request,http-response']
+
+[[comment-report]]
+=== 댓글 신고
+`POST /api/report/feed/[신고할_댓글_ID]`
+
+operation::comment-report[snippets='curl-request,http-response']
+
+[[statistics]]
+== 통계
+
+[[statistics-total-container]]
+=== 모두의 용기
+`GET /api/statistics/total-container`
+
+operation::statistics-total-container[snippets='curl-request,http-response,response-fields']
+
+[[push-token]]
+== 푸시 토큰
+
+[[push-token-register]]
+=== 푸시 토큰 등록
+`POST /api/push/[푸시_토큰]`
+
+operation::push-token-register[snippets='curl-request,http-response']
+
+[[push-token-delete]]
+=== 푸시 토큰 삭제
+`DELETE /api/push/[푸시_토큰_ID]`
+
+operation::push-token-delete[snippets='curl-request,http-response']
+
+[[contract]]
+== 이용 약관
+
+=== 이용 약관 리스트
+
+operation::contracts[snippets='curl-request,http-response']
+include::{snippets}/contract/response-fields-beneath-_embedded.contractInfoDtoList.adoc[]
+
+[[image]]
+== 이미지
+
+=== 이미지 업로드
+
+operation::image-upload[snippets='curl-request,http-response,response-fields']
