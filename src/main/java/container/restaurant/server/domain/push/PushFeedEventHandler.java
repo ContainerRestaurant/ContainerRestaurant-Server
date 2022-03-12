@@ -11,8 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @RequiredArgsConstructor
 @Component
 @Log4j2
@@ -25,7 +23,7 @@ public class PushFeedEventHandler {
      * @throws IOException
      */
     @EventListener
-    private void sendFeedLikedEvent(FeedLikedEvent event) throws IOException {
+    public void sendFeedLikedEvent(FeedLikedEvent event) {
         // 피드 작성자가 푸시 대상
         PushToken pushToken = event.getFeed().getOwner().getPushToken();
 
@@ -34,7 +32,7 @@ public class PushFeedEventHandler {
 
         // 좋아요가 눌린 피드의 식당 이름
         String msg = event.getFeed().getRestaurant().getName();
-        fcmUtil.sendMessage(pushToken, title, msg);
+//        fcmUtil.sendMessage(pushToken, title, msg);
     }
 
     /*
@@ -43,28 +41,26 @@ public class PushFeedEventHandler {
      * @throws IOException
      */
     @EventListener
-    private void sendFeedCommentedEvent(FeedCommentedEvent event) throws IOException {
+    public void sendFeedCommentedEvent(FeedCommentedEvent event) {
         // 댓글 or 답글 쓴 사람
-        User from = event.getComment().getOwner();
+        User actor = event.getComment().getOwner();
 
         // 댓글의 경우 피드 사용자가 푸시 대상
-        PushToken pushToken = event.getComment().getFeed().getOwner().getPushToken();
+        User target = event.getComment().getFeed().getOwner();
 
-        // 댓글 내용
-        String msg = event.getComment().getContent();
+        // 댓글인 경우 고정문구
+        String title = "내가 용기낸 피드에 새로운 댓글이 달렸어요";
 
-        // 댓글인 경우 댓글 작성자 닉네임 + 고정문구
-        String title = from.getNickname() + " 님이 댓글을 남겼어요";
+        // 대댓글은 테스트 후 추가
+//        if (event.getComment().getUpperReply() != null) {
+//            // 답글인 경우 UpperReply의 owner 가 푸시 대상이 됨
+//            target = event.getComment().getUpperReply().getOwner();
+//
+//            // 답글일 경우 title 를 변경
+//            title = "내가 남긴 댓글에 "
+//        }
 
-        if (event.getComment().getUpperReply() != null) {
-            // 답글인 경우 UpperReply의 owner 가 푸시 대상이 됨
-            pushToken = event.getComment().getUpperReply().getOwner().getPushToken();
-
-            // 답글일 경우 title 를 변경
-            title = title.replace("댓글", "답글");
-        }
-
-        fcmUtil.sendMessage(pushToken, title, msg);
+        fcmUtil.sendMessage(target.getPushToken(), title);
     }
 
     /*
@@ -73,7 +69,7 @@ public class PushFeedEventHandler {
      * @throws IOException
      */
     @EventListener
-    private void sendCommentLikedEvent(CommentLikedEvent event) throws IOException {
+    public void sendCommentLikedEvent(CommentLikedEvent event) {
         // 좋아요 눌린 댓글의 작성자가 푸시 대상
         PushToken pushToken = event.getComment().getOwner().getPushToken();
 
@@ -88,7 +84,7 @@ public class PushFeedEventHandler {
             // 현재 댓글이 대댓글 일 때 문구 변경
             title = title.replace("댓글", "답글");
         }
-        fcmUtil.sendMessage(pushToken, title, msg);
+//        fcmUtil.sendMessage(pushToken, title, msg);
     }
 
     /*
@@ -97,7 +93,7 @@ public class PushFeedEventHandler {
      * @throws IOException
      */
     @EventListener
-    private void sendFeedHitEvent(FeedHitEvent event) throws IOException {
+    public void sendFeedHitEvent(FeedHitEvent event) {
         // 피드 주인이 푸시 대상
         PushToken pushToken = event.getFeed().getOwner().getPushToken();
 
@@ -107,7 +103,7 @@ public class PushFeedEventHandler {
         // 푸시 개수 + 고정 문구
         String title = hitCount + "명이 내 용기낸 피드를 읽었어요\uD83D\uDC40";
         // 30명, 100명일 경우 이벤트 발송
-        if (hitCount == 30 || hitCount == 100)
-            fcmUtil.sendMessage(pushToken, title, event.getMsg());
+//        if (hitCount == 30 || hitCount == 100)
+//            fcmUtil.sendMessage(pushToken, title, event.getMsg());
     }
 }
