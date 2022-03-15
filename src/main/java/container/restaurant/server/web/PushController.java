@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/push")
 public class PushController {
 
-    final private PushTokenService pushTokenService;
-    final private PushTokenLinker pushTokenLinker;
+    private final PushTokenService pushTokenService;
+    private final PushTokenLinker pushTokenLinker;
 
     /*
      * [ 비로그인 허용 ]
