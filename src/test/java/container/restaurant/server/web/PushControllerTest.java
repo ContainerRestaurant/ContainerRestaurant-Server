@@ -23,7 +23,7 @@ class PushControllerTest extends BaseUserAndFeedControllerTest {
     void registerClientPushToken() throws Exception {
         String testToken = "ASDFDWAQWERASDFZXCV1";
 
-        mvc.perform(post("/api/push/{token}", testToken))
+        mvc.perform(post("/api/push/token/{token}", testToken))
                 .andExpect(status().isOk())
                 .andDo(document("push-token-register"));
     }
@@ -34,7 +34,7 @@ class PushControllerTest extends BaseUserAndFeedControllerTest {
         String testToken = "ASDFDWAQWERASDFZXCV2";
         Long id = pushTokenService.registerPushToken(testToken).getId();
 
-        mvc.perform(delete("/api/push/{tokenId}", id))
+        mvc.perform(delete("/api/push/token/{tokenId}", id))
                 .andExpect(status().isNoContent())
                 .andDo(document("push-token-delete"));
     }
