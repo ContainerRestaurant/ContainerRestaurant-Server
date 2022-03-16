@@ -49,7 +49,7 @@ public class PushTokenService {
             if (owner.getPushToken() != null && owner.getPushToken().getId().equals(tokenId))
                 owner.setPushToken(null);
             else
-                throw new FailedAuthorizationException("다른 사용자의 푸시 토큰을 삭제할 수 없습니다.");
+                throw new FailedAuthorizationException("다른 사용자의 푸시 토큰은 삭제할 수 없습니다.");
         } else {
             // 비로그인의 경우 토큰을 사용하는 사용자가 있는지 확인
             usingPushTokenCheck(tokenId);
@@ -62,7 +62,7 @@ public class PushTokenService {
         User owner = userService.findByPushTokenId(tokenId);
         if (owner != null) {
             // 토큰 아이디로 조회된 사용자가 있으면
-            throw new UsingPushTokenException("사용중인 푸시 토큰으로 삭제가 불가능 합니다.");
+            throw new UsingPushTokenException("사용 중인 푸시 토큰은 삭제할 수 없습니다.");
         }
     }
 
@@ -70,7 +70,7 @@ public class PushTokenService {
     public PushToken findById(Long id) {
         return pushTokenRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "푸시 허용 이력이 존재하지 않습니다..(id:" + id + ")"));
+                        "푸시 토큰을 찾을 수 없습니다.(id:" + id + ")"));
     }
 
 }
