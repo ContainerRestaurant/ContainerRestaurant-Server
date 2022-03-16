@@ -5,6 +5,7 @@ import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.exception.UsingPushTokenException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,12 @@ public class PushTokenService {
 
     @Transactional
     public PushToken registerUserPushToken(Long loginId, String token) {
+        // 저장하려는 토큰이 이미 존재하는 경우 패스
+        Optional<PushToken> savedToken = pushTokenRepository.findByToken(token);
+        if (savedToken.isPresent()) {
+            return savedToken.get();
+        }
+
         // 클라이언트 푸시 토큰은 저장 후
         PushToken pushToken = registerPushToken(token);
 
