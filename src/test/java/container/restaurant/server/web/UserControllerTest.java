@@ -2,7 +2,9 @@ package container.restaurant.server.web;
 
 import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.picture.Image;
+import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.user.OAuth2Registration;
+import container.restaurant.server.domain.user.User;
 import container.restaurant.server.exception.FailedAuthorizationException;
 import container.restaurant.server.exception.ResourceNotFoundException;
 import container.restaurant.server.process.oauth.OAuthAgentService;
@@ -285,6 +287,22 @@ class UserControllerTest extends BaseUserControllerTest {
                                 .value("해당 사용자의 정보를 수정할 수 없습니다.(id:" + other.getId() + ")"));
 
         assertThat(userRepository.existsById(other.getId())).isTrue();
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("푸시 토큰 제거")
+    void testUnregisterPushToken() throws Exception {
+        myself.setPushToken(new PushToken("test token"));
+
+        mvc.perform(
+                delete("/api/user/{id}/push/token", myself.getId())
+                        .session(myselfSession))
+                .andExpect(status().isOk())
+                .andDo(document("unregister-user-push-token"));
+
+        User myselfFromRepository = userRepository.findById(myself.getId()).orElseThrow();
+        assertThat(myselfFromRepository.getPushToken()).isNull();
     }
 
     @Test
