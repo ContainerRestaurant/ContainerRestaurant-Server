@@ -30,12 +30,9 @@ public class PushTokenService {
     public PushToken registerUserPushToken(Long loginId, String token) {
         // 저장하려는 토큰이 이미 존재하는 경우 패스
         Optional<PushToken> savedToken = pushTokenRepository.findByToken(token);
-        if (savedToken.isPresent()) {
-            return savedToken.get();
-        }
 
         // 클라이언트 푸시 토큰은 저장 후
-        PushToken pushToken = registerPushToken(token);
+        PushToken pushToken = savedToken.orElseGet(() -> registerPushToken(token));
 
         if (loginId != null) {
             // 로그인 아이디가 존재할 경우 사용자의 푸시 토큰 업데이트
