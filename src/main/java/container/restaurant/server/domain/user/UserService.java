@@ -3,6 +3,7 @@ package container.restaurant.server.domain.user;
 import container.restaurant.server.config.auth.user.CustomOAuth2User;
 import container.restaurant.server.domain.feed.hit.FeedHitRepository;
 import container.restaurant.server.domain.feed.picture.ImageService;
+import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.restaurant.favorite.RestaurantFavoriteRepository;
 import container.restaurant.server.domain.statistics.StatisticsService;
 import container.restaurant.server.domain.user.level.UserLevelFeedCountRepository;
@@ -111,5 +112,13 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findByPushTokenId(Long pushTokenId) {
         return userRepository.findByPushTokenId(pushTokenId);
+    }
+
+    @Transactional
+    public PushToken unregistPushToken(Long id) {
+        User user = findById(id);
+        PushToken savedPushToken = user.getPushToken();
+        user.setPushToken(null);
+        return savedPushToken;
     }
 }
