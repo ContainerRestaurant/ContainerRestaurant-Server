@@ -103,11 +103,11 @@ public class UserController {
     }
 
     @DeleteMapping("{id}/push/token")
-    public ResponseEntity<PushToken> unregistPushToken(
+    public ResponseEntity<PushToken> unregisterPushToken(
             @PathVariable Long id, @LoginId Long loginId) {
         if (!id.equals(loginId))
             throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
-        return ResponseEntity.ok(userService.unregistPushToken(loginId));
+        return ResponseEntity.ok(userService.unregisterPushToken(loginId));
     }
 
     @GetMapping("nickname/exists")

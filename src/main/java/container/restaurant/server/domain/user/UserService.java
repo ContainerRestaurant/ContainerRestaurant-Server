@@ -115,7 +115,7 @@ public class UserService {
     }
 
     @Transactional
-    public PushToken unregistPushToken(Long id) {
+    public PushToken unregisterPushToken(Long id) {
         User user = findById(id);
         PushToken savedPushToken = user.getPushToken();
         user.setPushToken(null);
