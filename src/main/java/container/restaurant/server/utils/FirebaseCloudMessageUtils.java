@@ -27,6 +27,7 @@ public class FirebaseCloudMessageUtils {
 
     @Value("${firebase.key.path}")
     private String FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
+    private static final String PUSH_TITLE = "용기낸 식당";
 
     private FirebaseMessaging firebaseMessaging;
 
@@ -43,14 +44,13 @@ public class FirebaseCloudMessageUtils {
         this.firebaseMessaging = FirebaseMessaging.getInstance(app);
     }
 
-    public void sendMessage(PushToken target, String title, String body) {
-        // 타겟이 Null 일 때 종료
+    public void sendMessage(PushToken target, String body) {
         if (target == null || !StringUtils.hasText(target.getToken())) {
             log.info("PushToken is null.");
             return;
         }
 
-        Message message = makeMessage(target.getToken(), title, body);
+        Message message = makeMessage(target.getToken(), body);
         try {
             String sendMessageId = firebaseMessaging.send(message);
             log.info("Push success. {}", sendMessageId);
@@ -59,17 +59,13 @@ public class FirebaseCloudMessageUtils {
         }
     }
 
-    public void sendMessage(PushToken target, String title) {
-        this.sendMessage(target, title, null);
-    }
-
-    private Message makeMessage(String target, String title, String body) {
+    private Message makeMessage(String target, String body) {
         Notification.Builder notificationBuilder = Notification.builder();
         Map<String, String> data = new HashMap<>(); // android 요청으로 Notification 과 같은 내용 추가
 
         // title
-        notificationBuilder.setTitle(title);
-        data.put("title", title);
+        notificationBuilder.setTitle(PUSH_TITLE);
+        data.put("title", PUSH_TITLE);
 
         // body
         if (StringUtils.hasText(body)) {
