@@ -45,8 +45,7 @@ public class FirebaseCloudMessageUtils {
     }
 
     public void sendMessage(PushToken target, String body) {
-        if (target == null || !StringUtils.hasText(target.getToken())) {
-            log.info("PushToken is null.");
+        if (!isValidPushInfo(target, body)) {
             return;
         }
 
@@ -59,6 +58,19 @@ public class FirebaseCloudMessageUtils {
         }
     }
 
+    private boolean isValidPushInfo(PushToken target, String body) {
+        if (target == null || !StringUtils.hasText(target.getToken())) {
+            log.warn("PushToken is null.");
+            return false;
+        }
+
+        if (!StringUtils.hasText(body)) {
+            log.warn("Push body is empty.");
+            return false;
+        }
+        return true;
+    }
+
     private Message makeMessage(String target, String body) {
         Notification.Builder notificationBuilder = Notification.builder();
         Map<String, String> data = new HashMap<>(); // android 요청으로 Notification 과 같은 내용 추가
@@ -68,10 +80,8 @@ public class FirebaseCloudMessageUtils {
         data.put("title", PUSH_TITLE);
 
         // body
-        if (StringUtils.hasText(body)) {
-            notificationBuilder.setBody(body);
-            data.put("body", body);
-        }
+        notificationBuilder.setBody(body);
+        data.put("body", body);
 
         return Message.builder()
                 .setToken(target)
