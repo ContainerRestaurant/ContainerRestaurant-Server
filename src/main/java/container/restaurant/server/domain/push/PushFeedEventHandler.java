@@ -48,8 +48,8 @@ public class PushFeedEventHandler {
         // 댓글의 경우 피드 사용자가 푸시 대상
         User target = event.getComment().getFeed().getOwner();
 
-        // 댓글인 경우 고정문구
-        String body = "내가 용기낸 피드에 새로운 댓글이 달렸어요";
+        // 댓글인 경우
+        String title = String.format("내가 용기낸 피드에 %s님이 댓글을 달았어요", actor.getNickname());
 
         // 대댓글은 테스트 후 추가
 //        if (event.getComment().getUpperReply() != null) {
