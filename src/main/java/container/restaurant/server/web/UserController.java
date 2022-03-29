@@ -5,6 +5,7 @@ import container.restaurant.server.domain.comment.CommentService;
 import container.restaurant.server.domain.comment.like.CommentLikeService;
 import container.restaurant.server.domain.feed.FeedService;
 import container.restaurant.server.domain.feed.like.FeedLikeService;
+import container.restaurant.server.domain.push.PushToken;
 import container.restaurant.server.domain.report.ReportService;
 import container.restaurant.server.domain.user.UserService;
 import container.restaurant.server.domain.user.scrap.ScrapFeedService;
@@ -99,6 +100,14 @@ public class UserController {
         userService.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{id}/push/token")
+    public ResponseEntity<PushToken> unregisterPushToken(
+            @PathVariable Long id, @LoginId Long loginId) {
+        if (!id.equals(loginId))
+            throw new FailedAuthorizationException("해당 사용자의 정보를 수정할 수 없습니다.(id:" + id + ")");
+        return ResponseEntity.ok(userService.unregisterPushToken(loginId));
     }
 
     @GetMapping("nickname/exists")

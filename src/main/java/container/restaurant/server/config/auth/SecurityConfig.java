@@ -24,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests(a -> a
                         .antMatchers(GET).permitAll()
                         .antMatchers(POST, "/api/user/login", "/api/user").permitAll()
-                        .antMatchers(POST, "/api/push").permitAll() // 비 로그인 사용자 push token 저장 허용
+                        .antMatchers( "/api/push/token/*").permitAll() // 비 로그인 사용자 push token 저장 허용
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtTokenFilter, OAuth2LoginAuthenticationFilter.class);
     }

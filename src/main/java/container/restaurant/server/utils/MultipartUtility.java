@@ -23,7 +23,6 @@ import static container.restaurant.server.utils.JsonUtils.JsonStringBufferParse;
 @Component
 public class MultipartUtility {
 
-    @Value("${server.image.base.url}")
     private String BASE_URL;
     private final String DEFAULT_PATH = "/api/image/upload";
     private final String UserAgent = "ContainerRestaurant Agent";
