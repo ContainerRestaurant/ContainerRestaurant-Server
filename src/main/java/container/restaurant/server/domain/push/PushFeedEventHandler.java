@@ -56,6 +56,11 @@ public class PushFeedEventHandler {
             target = event.getComment().getUpperReply().getOwner();
             body = String.format("내가 남긴 댓글에 %s님이 답글을 달았어요!", actor.getNickname());
         }
+
+        if (eventByMyself(target, actor)) {
+            return;
+        }
+
         fcmUtil.sendMessage(target.getPushToken(), body);
     }
 
@@ -70,7 +75,15 @@ public class PushFeedEventHandler {
         User actor = event.getFrom();
         boolean hasUpperReply = event.getComment().getUpperReply() != null;
 
+        if (eventByMyself(target, actor)) {
+            return;
+        }
+
         String body = String.format("%s님이 내 %s을 좋아해요 :)", actor.getNickname(), hasUpperReply ? "답글" : "댓글");
         fcmUtil.sendMessage(target.getPushToken(), body);
+    }
+
+    private boolean eventByMyself(User target, User actor) {
+        return target.getId() == actor.getId();
     }
 }
