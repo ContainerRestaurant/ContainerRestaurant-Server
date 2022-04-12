@@ -1,4 +1,4 @@
-package container.restaurant.server.utils;
+package container.restaurant.server.domain.push;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -7,7 +7,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import container.restaurant.server.domain.push.PushToken;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,17 +16,22 @@ import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-@Component
+@Profile("prod")
+@Primary
+@Service
 @Log4j2
 @RequiredArgsConstructor
-public class FirebaseCloudMessageUtils {
+public class FirebasePushService implements PushService {
+
+    private static final String PUSH_TITLE = "용기낸 식당";
 
     @Value("${firebase.key.path}")
     private String FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
-    private static final String PUSH_TITLE = "용기낸 식당";
 
     private FirebaseMessaging firebaseMessaging;
 
