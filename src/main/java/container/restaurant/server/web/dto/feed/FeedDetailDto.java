@@ -1,5 +1,6 @@
 package container.restaurant.server.web.dto.feed;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import container.restaurant.server.domain.feed.Category;
 import container.restaurant.server.domain.feed.Feed;
 import container.restaurant.server.utils.ImageUtils;
@@ -7,9 +8,11 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 
 /**
  * 단일 피드에 대한 상세 정보를 응답하기 위한 DTO
@@ -44,6 +47,11 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
 
     private final Boolean isLike;
     private final Boolean isScraped;
+
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss")
+    private final LocalDateTime createdDate;
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss")
+    private final LocalDateTime modifiedDate;
 
     @Builder
     private FeedDetailDto(Feed feed, Boolean isLike, Boolean isScraped) {
@@ -80,6 +88,9 @@ public class FeedDetailDto extends RepresentationModel<FeedDetailDto> {
 
         this.isLike = isLike;
         this.isScraped = isScraped;
+
+        this.createdDate = feed.getCreatedDate();
+        this.modifiedDate = feed.getModifiedDate();
     }
 
 }
