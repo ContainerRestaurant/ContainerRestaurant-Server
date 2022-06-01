@@ -1,4 +1,4 @@
-name: CI-TEST
+name: CI-DEV
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   cicd:
-    name: CI-TEST
+    name: CI-DEV
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +32,7 @@ jobs:
         run: cp build/libs/*.jar deploy/
 
       - name: Make zip file
-        run: zip -r deploy/container-restaurant.zip deploy/*
+        run: zip -r deploy/container-restaurant-develop.zip deploy/*
 
       # 여기서 부터는 CD 를 위한 AWS 관련 작업
       - name: Configure AWS credentials
@@ -46,5 +46,5 @@ jobs:
         run: >
           aws s3 cp
           --region ap-northeast-2
-          ./deploy/container-restaurant.zip
-          s3://container-restaurant-deploy/container-restaurant.zip
+          ./deploy/container-restaurant-develop.zip
+          s3://container-restaurant-deploy/container-restaurant-develop.zip
