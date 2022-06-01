@@ -1,12 +1,13 @@
-name: CICD
+name: CI-TEST
 
 on:
+  workflow_dispatch:
   push:
     branches: [ develop ]
 
 jobs:
   cicd:
-    name: CICD
+    name: CI-TEST
     runs-on: ubuntu-latest
 
     steps:
