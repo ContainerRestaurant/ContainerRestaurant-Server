@@ -5,7 +5,7 @@ import container.restaurant.server.domain.push.event.CommentLikedEvent;
 import container.restaurant.server.domain.push.event.FeedCommentedEvent;
 import container.restaurant.server.domain.push.event.FeedLikedEvent;
 import container.restaurant.server.domain.user.User;
-import container.restaurant.server.utils.FirebaseCloudMessageUtils;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.event.EventListener;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 public class PushFeedEventHandler {
 
-    private final FirebaseCloudMessageUtils fcmUtil;
+    private final PushService pushService;
 
     /*
      * 피드 좋아요 이벤트 (좋아요가 FEED_LIKE_PUSH_THRESHOLD 의 배수일 때마다 푸시)
@@ -34,7 +34,7 @@ public class PushFeedEventHandler {
         int targetFeedLike = targetFeed.getLikeCount();
         if (targetFeedLike != 0 && targetFeedLike % FEED_LIKE_PUSH_THRESHOLD == 0) {
             String body = String.format("내가 용기낸 %s 피드를 %d명이 좋아해요!", restaurantName, targetFeedLike);
-            fcmUtil.sendMessage(target.getPushToken(), body);
+            pushService.sendMessage(target.getPushToken(), body);
         }
     }
 
@@ -61,7 +61,7 @@ public class PushFeedEventHandler {
             return;
         }
 
-        fcmUtil.sendMessage(target.getPushToken(), body);
+        pushService.sendMessage(target.getPushToken(), body);
     }
 
     /*
@@ -80,10 +80,10 @@ public class PushFeedEventHandler {
         }
 
         String body = String.format("%s님이 내 %s을 좋아해요 :)", actor.getNickname(), hasUpperReply ? "답글" : "댓글");
-        fcmUtil.sendMessage(target.getPushToken(), body);
+        pushService.sendMessage(target.getPushToken(), body);
     }
 
     private boolean eventByMyself(User target, User actor) {
-        return target.getId() == actor.getId();
+        return Objects.equals(target.getId(), actor.getId());
     }
 }
