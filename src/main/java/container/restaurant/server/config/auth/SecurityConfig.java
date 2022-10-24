@@ -1,13 +1,13 @@
 package container.restaurant.server.config.auth;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
-
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -25,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers(GET).permitAll()
                         .antMatchers(POST, "/api/user/login", "/api/user").permitAll()
                         .antMatchers( "/api/push/token/*").permitAll() // 비 로그인 사용자 push token 저장 허용
+                        .antMatchers( "/h2-console/**").permitAll() // local profile 에서 사용하는 h2 console 허용
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtTokenFilter, OAuth2LoginAuthenticationFilter.class);
     }
